@@ -2,7 +2,7 @@
 
 from core.console import log
 from core.cfg_factory import FactoryTable, CfgFactory, Variables, VariableTable
-from core.utils import get_nick, get, SafeTemplateDict
+from core.utils import get_nick, get_global_name, get_class_roles, get, SafeTemplateDict
 from core.client import dc
 
 import bot
@@ -318,7 +318,7 @@ class PickupQueue:
 
 	@property
 	def who(self):
-		return "/".join([f"`{get_nick(m)}`" for m in self.queue])
+		return "/".join([f"`{get_global_name(m)} ({get_nick(m)})`" for m in self.queue])
 
 	@property
 	def length(self):

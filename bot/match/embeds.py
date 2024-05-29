@@ -1,6 +1,7 @@
 from nextcord import Embed, Colour, Streaming
 from core.client import dc
-from core.utils import get_nick, join_and
+from core.utils import get_nick, get_global_name, get_mention, get_div_role, get_class_roles, join_and
+from core import config
 
 
 class Embeds:
@@ -72,7 +73,14 @@ class Embeds:
 		]
 		team_players = [
 			" \u200b ".join([
-				(f"`{self.m.rank_str(p)}" if self.m.ranked else "`") + f"{get_nick(p)}`"
+					" \u200b {mention} (`{name}`) - {div} [{classes}]".format(
+						rank=self.m.rank_str(p) if self.m.ranked else "",
+						name=get_nick(p),
+						mention=get_mention(p),
+						global_name=get_global_name(p),
+						div=get_div_role(p),
+						classes=get_class_roles(p)
+					)
 				for p in t
 			]) if len(t) else self.m.gt("empty")
 			for t in self.m.teams[:2]
@@ -80,15 +88,25 @@ class Embeds:
 		embed.add_field(name=teams_names[0], value=" \u200b ❲ \u200b " + team_players[0] + " \u200b ❳", inline=False)
 		embed.add_field(name=teams_names[1], value=" \u200b ❲ \u200b " + team_players[1] + " \u200b ❳\n\u200b", inline=False)
 
+
+		# self.m.teams[2] = List of Users
+		# get_div_role(User) = String
+		# config.cfg.DIV_ROLES = List of Strings
+		# res = Sorted list of Users
+		# sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x))
 		if len(self.m.teams[2]):
 			embed.add_field(
 				name=self.m.gt("Unpicked:"),
 				value="\n".join((
-					" \u200b `{rank}{name}`".format(
+					" \u200b {mention} (`{name}`) - {div} [{classes}]".format(
 						rank=self.m.rank_str(p) if self.m.ranked else "",
-						name=get_nick(p)
+						name=get_nick(p),
+						mention=get_mention(p),
+						global_name=get_global_name(p),
+						div=get_div_role(p),
+						classes=get_class_roles(p)
 					)
-				) for p in self.m.teams[2]),
+				) for p in sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x)))),
 				inline=False
 			)
 

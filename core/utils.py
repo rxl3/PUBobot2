@@ -5,6 +5,7 @@ from prettytable import PrettyTable, MARKDOWN
 from nextcord import Embed
 from nextcord.utils import get, find, escape_markdown
 from datetime import timedelta
+from core import config
 
 
 class EmojiFormatter(object):
@@ -133,11 +134,32 @@ def escape_cb(string):
 
 def get_nick(user):
 	""" Remove rating tag and text formatting characters """
-	string = user.nick or user.name
+	string = user.name
 	if x := re.match(r"^\[\d+\] (.+)", string):
 		string = x.group(1)
 	return escape_cb(string)
 
+def get_global_name(user):
+	string = user.global_name
+	if x := re.match(r"^\[\d+\] (.+)", string):
+		string = x.group(1)
+	return escape_cb(string)
+
+def get_div_role(user):
+	string = sorted([r.name for r in user.roles if r.name in config.cfg.DIV_ROLES], key=lambda x: config.cfg.DIV_ROLES.index(x))[0]
+	if x := re.match(r"^\[\d+\] (.+)", string):
+		string = x.group(1)
+	return escape_cb(string)
+
+def get_class_roles(user):
+	string = ", ".join(sorted([r.name for r in user.roles if r.name in config.cfg.CLASS_ROLES]))
+	if x := re.match(r"^\[\d+\] (.+)", string):
+		string = x.group(1)
+	return escape_cb(string)
+
+def get_mention(user):
+	string = "<@" + str(user.id) + ">"
+	return string
 
 def discord_table(header, rows):
 	t = PrettyTable()
