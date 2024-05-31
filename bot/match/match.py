@@ -64,15 +64,18 @@ class Match:
 		match = cls(match_id, queue, ctx.qc, players, ratings, **kwargs)
 		# Prepare the Match object
 		match.maps = match.random_maps(match.cfg['maps'], match.cfg['map_count'], queue.last_maps)
+
+		await match.init_immune(match.cfg['captain_immunity_games'])
 		match.init_captains(match.cfg['pick_captains'], match.cfg['captains_role_id'])
 		match.init_teams(match.cfg['pick_teams'])
-		await match.init_immune(match.cfg['captain_immunity_games'])
 
-		p_a, p_b = [], []
-		for p in match.players:
-			(p_a,p_b)[match.immune.count(p.id)==0].append(p)
-		random.shuffle(p_a)
-		match.players = p_a + p_b
+		print("=================================")
+		print([p.name for p in match.players])
+		print("=================================")
+
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+		print([p.name for p in match.teams[2]])
+		print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 		if match.ranked:
 			match.states.append(match.WAITING_REPORT)
@@ -223,7 +226,7 @@ class Match:
 		if pick_teams == "draft":
 			self.teams[0].set(self.captains[:1])
 			self.teams[1].set(self.captains[1:])
-			self.teams[2].set([p for p in self.players if p not in self.captains])
+			self.teams[2] = [p for p in self.players if p not in self.captains]
 		elif pick_teams == "matchmaking":
 			team_len = min(self.cfg['team_size'], int(len(self.players)/2))
 			best_rating = sum(self.ratings.values())/2
@@ -246,6 +249,11 @@ class Match:
 	async def init_immune(self, captain_immunity_games):
 		if captain_immunity_games>0:
 			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players, captain_immunity_games)
+		p_a, p_b = [], []
+		for p in self.players:
+			(p_b,p_a)[self.immune.count(p.id)==0].append(p)
+		random.shuffle(p_a)
+		self.players = p_a + p_b
 
 	async def think(self, frame_time):
 		if self.state == self.INIT:

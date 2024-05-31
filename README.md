@@ -25,16 +25,17 @@ TODO:
 - Possibly improve the map voting system (to be reviewed)
 
 ### Quick channel config
-/channel enable
-/channel set variable: prefix value: /
+`/channel enable`
+`/channel set variable: prefix value: /`
 
 ### Quick queue config
-/queue create_pickup name: test size: 4
-/queue set queue: test variable: pick_teams value: draft
-/queue set queue: test variable: pick_captains value: no captains
-/queue set queue: test variable: pick_order value: ababbababa
-/queue set queue: test variable: team_names value: RED BLU
-/queue set queue: test variable: team_emojis value: :red_circle: :blue_circle:
+`/queue create_pickup name: test size: 4`
+`/queue set queue: test variable: pick_teams value: draft`
+`/queue set queue: test variable: pick_captains value: no captains`
+`/queue set queue: test variable: pick_order value: ababbababa`
+`/queue set queue: test variable: team_names value: RED BLU`
+`/queue set queue: test variable: team_emojis value: :red_circle: :blue_circle:`
+`/queue set queue: test variable: captain_immunity_games value: 2`
 
 ### Using the public bot instance
 If you want to test the bot, feel free to join [**Pubobot2-dev** discord server](https://discord.gg/rjNt9nC).  

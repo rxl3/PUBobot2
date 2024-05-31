@@ -109,6 +109,8 @@ class Embeds:
 			else:
 				unpicked_list=self.m.teams[2]
 
+
+
 			embed.add_field(
 				name=self.m.gt("Unpicked:"),
 				value="\n".join((
