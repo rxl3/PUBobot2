@@ -260,6 +260,12 @@ class PickupQueue:
 				variables=[
 					Variables.StrVar("name", notnull=True)
 				]
+			),
+			Variables.IntVar(
+				"captain_immunity_games", display="Captain Immunity Games", section="General",
+				description="The number of subsequent games for which a player who was Captain is labelled as IMMUNE (set as 0 to disable)",
+				default=2,
+				notnull=True,
 			)
 		]
 	)
@@ -334,7 +340,8 @@ class PickupQueue:
 			maps=[i['name'] for i in self.cfg.maps], vote_maps=self.cfg.vote_maps,
 			map_count=self.cfg.map_count, check_in_timeout=self.cfg.check_in_timeout,
 			check_in_discard=self.cfg.check_in_discard, match_lifetime=self.cfg.match_lifetime,
-			start_msg=self.cfg.start_msg, server=self.cfg.server
+			start_msg=self.cfg.start_msg, server=self.cfg.server,
+			captain_immunity_games=self.cfg.captain_immunity_games
 		)
 
 	async def promote(self, ctx):

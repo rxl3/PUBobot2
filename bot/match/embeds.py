@@ -105,7 +105,7 @@ class Embeds:
 			# Only sort by Division if captains are picked (TODO: Add config option to enable)
 			if (len(self.m.teams[1]) > 0 and len(self.m.teams[1]) > 0):
 				unpicked_list=sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x)))
-				
+
 			else:
 				unpicked_list=self.m.teams[2]
 
@@ -119,7 +119,7 @@ class Embeds:
 						global_name=get_global_name(p),
 						div=get_div_role(p),
 						classes=get_class_roles(p),
-						immune=" - **IMMUNE** " if self.m.immune.count(p.id) else "" + str(p.id) + ""
+						immune=" - **IMMUNE** " if self.m.immune.count(p.id) else ""
 					)
 				) for p in unpicked_list),
 				inline=False
