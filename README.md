@@ -4,6 +4,38 @@
 ### Some screenshots
 ![screenshots](https://cdn.discordapp.com/attachments/824935426228748298/836978698321395712/screenshots.png)
 
+### This is a forked and modified version of Pubotbot2
+This version was designed for Pride Pugs in the TF2 community
+
+It contains some QoL changes that are relevant to TF2 pugging which aim to help smooth the process and minimise the amount of time needed to start a pug
+
+CHANGES:
+- Added lifetime of Check-In to the Check-In stage printout
+- Added Mention, TF2 Division from role, and TF2 Class(es) from roles to the Drafting stage printout
+- Added sorting by TF2 Division to the Unpicked list in the Drafting stage printout
+- Added the Division / Class roles to config.cfg as lists
+- -
+
+TODO:
+- Move Division and Class Role lists from bot config to a user defined list configurable via command
+- Randomly sort the player list in the Drafting stage (before captains are selected) to simulate dice roll for captain position
+- Add database tracking for # of games since player last was a captain
+- Edit player list in the drafting stage (before captains are selected) so that players who have been a captain in the last n games are shunted to the bottom of the list (captain/medic immunity) and tag them as "Immune"
+- Add config options for medic immunity (enable + # of games)
+- Possibly improve the map voting system (to be reviewed)
+
+### Quick channel config
+/channel enable
+/channel set variable: prefix value: /
+
+### Quick queue config
+/queue create_pickup name: test size: 4
+/queue set queue: test variable: pick_teams value: draft
+/queue set queue: test variable: pick_captains value: no captains
+/queue set queue: test variable: pick_order value: ababbababa
+/queue set queue: test variable: team_names value: RED BLU
+/queue set queue: test variable: team_emojis value: :red_circle: :blue_circle:
+
 ### Using the public bot instance
 If you want to test the bot, feel free to join [**Pubobot2-dev** discord server](https://discord.gg/rjNt9nC).  
 All the bot settings can be found and configured on the [Web interface](https://pubobot.leshaka.xyz/).  

@@ -318,7 +318,7 @@ class PickupQueue:
 
 	@property
 	def who(self):
-		return "/".join([f"`{get_global_name(m)} ({get_nick(m)})`" for m in self.queue])
+		return "/".join([f"`{get_nick(m)}`" for m in self.queue])
 
 	@property
 	def length(self):

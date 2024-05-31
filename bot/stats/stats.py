@@ -85,7 +85,8 @@ db.ensure_table(dict(
 		dict(cname="channel_id", ctype=db.types.int),
 		dict(cname="user_id", ctype=db.types.int),
 		dict(cname="nick", ctype=db.types.str),
-		dict(cname="team", ctype=db.types.bool)
+		dict(cname="team", ctype=db.types.bool),
+		dict(cname="captain", ctype=db.types.bool)
 	],
 	primary_keys=["match_id", "user_id"]
 ))
@@ -147,9 +148,11 @@ async def register_match_unranked(ctx, m):
 		else:
 			team = None
 
+		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
+
 		await db.insert(
 			'qc_player_matches',
-			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team)
+			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain)
 		)
 
 
@@ -192,6 +195,7 @@ async def register_match_ranked(ctx, m):
 	for p in m.players:
 		nick = get_nick(p)
 		team = 0 if p in m.teams[0] else 1
+		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
 
 		await db.update(
 			"qc_players",
@@ -209,7 +213,7 @@ async def register_match_ranked(ctx, m):
 
 		await db.insert(
 			'qc_player_matches',
-			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team)
+			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain)
 		)
 		await db.insert('qc_rating_history', dict(
 			channel_id=m.qc.rating.channel_id,
@@ -314,6 +318,20 @@ async def user_stats(channel_id, user_id):
 	stats['queues'] = data
 	return stats
 
+async def get_immune_players(channel_id, players, num):
+	results = [await db.fetchall(
+		"SELECT match_id, user_id, captain FROM `qc_player_matches` " +
+		"WHERE channel_id=%s AND user_id=%s ORDER BY match_id DESC LIMIT 2",
+		(channel_id, str(p.id))
+	) for p in players]
+
+	immune = []
+	for r in results:
+		for d in r:
+			if d['captain']==1:
+				immune.append(d['user_id'])
+				break
+	return immune
 
 async def top(channel_id, time_gap=None):
 	total = await db.fetchone(

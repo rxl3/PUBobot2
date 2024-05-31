@@ -12,7 +12,7 @@ from core.client import dc
 from .check_in import CheckIn
 from .draft import Draft
 from .embeds import Embeds
-
+import random
 
 class Match:
 
@@ -29,7 +29,7 @@ class Match:
 	default_cfg = dict(
 		teams=None, team_names=['Alpha', 'Beta'], team_emojis=None, ranked=False,
 		team_size=1, pick_captains="no captains", captains_role_id=None, pick_teams="draft",
-		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
+		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0, immune=[],
 		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True
 	)
 
@@ -65,6 +65,10 @@ class Match:
 		match.maps = match.random_maps(match.cfg['maps'], match.cfg['map_count'], queue.last_maps)
 		match.init_captains(match.cfg['pick_captains'], match.cfg['captains_role_id'])
 		match.init_teams(match.cfg['pick_teams'])
+		await match.init_immune(enable_captain_immunity=1, captain_immune_games=2)
+		non_immune = [p for p in match.players if match.immune.count(p.id)==0]
+		random.shuffle(non_immune)
+		match.players = non_immune + [p for p in match.players if match.immune.count(p.id)>0]
 		if match.ranked:
 			match.states.append(match.WAITING_REPORT)
 		bot.active_matches.append(match)
@@ -93,6 +97,7 @@ class Match:
 			channel_id=self.queue.qc.id,
 			cfg=self.cfg,
 			players=[p.id for p in self.players if p],
+			immune=self.immune,
 			teams=[[p.id for p in team if p] for team in self.teams],
 			maps=self.maps,
 			state=self.state,
@@ -130,6 +135,7 @@ class Match:
 		match.maps = data['maps']
 		match.state = data['state']
 		match.states = data['states']
+		match.immune = data['immune']
 		if match.state == match.CHECK_IN:
 			ctx = bot.SystemContext(qc)
 			await match.check_in.start(ctx)  # Spawn a new check_in message
@@ -167,6 +173,7 @@ class Match:
 		self.captains = []
 		self.states = []
 		self.maps = []
+		self.immune = []
 		self.lifetime = self.cfg['match_lifetime']
 		self.start_time = int(time())
 		self.state = self.INIT
@@ -230,6 +237,19 @@ class Match:
 			self.teams[0].set(random.sample(self.players, min(len(self.players)//2, self.cfg['team_size'])))
 			self.teams[1].set([p for p in self.players if p not in self.teams[0]][:self.cfg['team_size']])
 			self.teams[2].set([p for p in self.players if p not in [*self.teams[0], *self.teams[1]]])
+
+	# async def get_captain_immune():
+	# 	fake_config = {"enable_captain_immunity": 1, "captain_immune_games": 2}
+	# 	if fake_config.enable_captain_immunity==1:
+	# 		num = fake_config.captain_immune_games
+	# 		player_ids = ", ".join([p.id for p in m.teams[2]])
+	# 		immune_players = await db.select(
+	# 			('user_id'), 'qc_player_matches', where=dict(channel_id=m.qc.id, captain="1 AND user_id IN ({player_ids})"), limit=num
+	# 		)
+	
+	async def init_immune(self, enable_captain_immunity=1, captain_immune_games=2):
+		if enable_captain_immunity==1:
+			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players, captain_immune_games)
 
 	async def think(self, frame_time):
 		if self.state == self.INIT:

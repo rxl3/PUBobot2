@@ -3,7 +3,6 @@ from core.client import dc
 from core.utils import get_nick, get_global_name, get_mention, get_div_role, get_class_roles, join_and
 from core import config
 
-
 class Embeds:
 	""" This class generates discord embeds for various match states """
 
@@ -19,9 +18,16 @@ class Embeds:
 	def check_in(self, not_ready):
 		embed = Embed(
 			colour=Colour(0xf5d858),
-			title=self.m.gt("__**{queue}** is now on the check-in stage!__").format(
+			title=self.m.gt("__**{queue}** is now on the check-in stage! __").format(
 				queue=self.m.queue.name[0].upper()+self.m.queue.name[1:]
 			)
+		)
+		embed.add_field(
+			name="",
+			value=self.m.gt("Expires in {:0.0f}m if players do not ready up").format(
+				self.m.lifetime/60/60
+			),
+			inline=False
 		)
 		embed.add_field(
 			name=self.m.gt("Waiting on:"),
@@ -95,20 +101,30 @@ class Embeds:
 		# res = Sorted list of Users
 		# sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x))
 		if len(self.m.teams[2]):
+
+			# Only sort by Division if captains are picked (TODO: Add config option to enable)
+			if (len(self.m.teams[1]) > 0 and len(self.m.teams[1]) > 0):
+				unpicked_list=sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x)))
+				
+			else:
+				unpicked_list=self.m.teams[2]
+
 			embed.add_field(
 				name=self.m.gt("Unpicked:"),
 				value="\n".join((
-					" \u200b {mention} (`{name}`) - {div} [{classes}]".format(
+					" \u200b {mention} - {div} [{classes}]{immune}".format(
 						rank=self.m.rank_str(p) if self.m.ranked else "",
 						name=get_nick(p),
 						mention=get_mention(p),
 						global_name=get_global_name(p),
 						div=get_div_role(p),
-						classes=get_class_roles(p)
+						classes=get_class_roles(p),
+						immune=" - **IMMUNE** " if self.m.immune.count(p.id) else "" + str(p.id) + ""
 					)
-				) for p in sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x)))),
+				) for p in unpicked_list),
 				inline=False
 			)
+
 
 			if len(self.m.teams[0]) and len(self.m.teams[1]):
 				msg = self.m.gt("Pick players with `/pick @player` command.")
@@ -168,6 +184,8 @@ class Embeds:
 					value=" \u200b " + join_and([self.m.teams[0][0].mention, self.m.teams[1][0].mention]),
 					inline=False
 				)
+			
+			# Update Medic Immunity here?
 
 		else:  # just players list
 			embed.add_field(
