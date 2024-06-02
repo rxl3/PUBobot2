@@ -1,1 +1,1 @@
-{"queues": [{"queue_type": "PickupQueue", "queue_id": 18, "channel_id": 1225335263849353226, "players": [126627312509648897, 94354443180457984, 303349023476023296]}], "matches": [], "allow_offline": [], "expire": []}
+{"queues": [{"queue_type": "PickupQueue", "queue_id": 18, "channel_id": 1225335263849353226, "players": [303349023476023296, 126627312509648897, 94354443180457984]}], "matches": [], "allow_offline": [], "expire": []}

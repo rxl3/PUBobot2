@@ -2,6 +2,7 @@ from nextcord import Embed, Colour, Streaming
 from core.client import dc
 from core.utils import get_nick, get_global_name, get_mention, get_div_role, get_class_roles, join_and
 from core import config
+import random
 
 class Embeds:
 	""" This class generates discord embeds for various match states """
@@ -22,13 +23,15 @@ class Embeds:
 				queue=self.m.queue.name[0].upper()+self.m.queue.name[1:]
 			)
 		)
-		embed.add_field(
-			name="",
-			value=self.m.gt("Expires in {:0.0f}m if players do not ready up").format(
-				self.m.lifetime/60/60
-			),
-			inline=False
-		)
+		if self.m.check_in.timeout != 0:
+			embed.add_field(
+				name="",
+				value=self.m.gt("Expires in {:0.0f}m if players do not ready up").format(
+					self.m.check_in.timeout/60/60
+				),
+				inline=False
+			)
+		random.shuffle(not_ready)
 		embed.add_field(
 			name=self.m.gt("Waiting on:"),
 			value="\n".join((f" \u200b <@{p.id}>" for p in not_ready)),
@@ -109,8 +112,6 @@ class Embeds:
 			else:
 				unpicked_list=self.m.teams[2]
 
-
-
 			embed.add_field(
 				name=self.m.gt("Unpicked:"),
 				value="\n".join((
@@ -126,7 +127,6 @@ class Embeds:
 				) for p in unpicked_list),
 				inline=False
 			)
-
 
 			if len(self.m.teams[0]) and len(self.m.teams[1]):
 				msg = self.m.gt("Pick players with `/pick @player` command.")

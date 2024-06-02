@@ -1,0 +1,12 @@
+ISSUES / TODO
+
+
+- Check-in stage list seems to be sorted (shuffled, IMMUNE at the bottom). This might lead to people baiting if they see they're going to be medic.
+  - Possibly fixed by shuffling the not_ready list in embeds at check-in
+
+- Additionally, if the bot is shuffling only at the match creation stage then there may be an issue where if someone leaves at checkin and someone 
+  - I think it might be okay, a new match seems to be created each time?
+
+- Lifetime expire timer seems to grab default value (3m) not the configured server value
+  - Possibly fixed by using check_in.timer
+- 

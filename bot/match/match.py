@@ -69,14 +69,6 @@ class Match:
 		match.init_captains(match.cfg['pick_captains'], match.cfg['captains_role_id'])
 		match.init_teams(match.cfg['pick_teams'])
 
-		print("=================================")
-		print([p.name for p in match.players])
-		print("=================================")
-
-		print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-		print([p.name for p in match.teams[2]])
-		print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
-
 		if match.ranked:
 			match.states.append(match.WAITING_REPORT)
 		bot.active_matches.append(match)
