@@ -68,6 +68,20 @@ async def _create_pickup(
 	)
 ): await run_slash(bot.commands.create_pickup, interaction=interaction, name=name, size=size)
 
+# testing -> ...
+
+@groups.admin_testing.subcommand(name='add_multiple', description='For bot testing.')
+async def _add_multiple(
+	interaction: Interaction,
+	player_names_string: str = SlashOption(name="player_names_string", description="Member to add to the queue", required=False),
+	queue: str = SlashOption(name="queue", description="Queue to add to.", required=False)
+): await run_slash(bot.commands.add_multiple, interaction=interaction, player_names_string=player_names_string, queue=queue)
+_add_multiple.on_autocomplete("queue")(autocomplete.queues)
+
+@groups.admin_testing.subcommand(name='set_ready_all', description='For bot testing.')
+async def _set_ready_all(
+	interaction: Interaction
+): await run_slash(bot.commands.set_ready_all, interaction=interaction)
 
 # queue -> ...
 

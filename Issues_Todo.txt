@@ -1,12 +1,12 @@
 ISSUES / TODO
 
 
-- Check-in stage list seems to be sorted (shuffled, IMMUNE at the bottom). This might lead to people baiting if they see they're going to be medic.
-  - Possibly fixed by shuffling the not_ready list in embeds at check-in
+- Teams list to put players on new line, as the extra info in the printout is distracting OR remove all the Classes/Divs once a player is on a team
 
-- Additionally, if the bot is shuffling only at the match creation stage then there may be an issue where if someone leaves at checkin and someone 
-  - I think it might be okay, a new match seems to be created each time?
+- Unpicked list sorted itself after only 1 captain had joined? (seems fine, further testing required)
 
-- Lifetime expire timer seems to grab default value (3m) not the configured server value
-  - Possibly fixed by using check_in.timer
-- 
+- Add IMMUNE count (eg IMMUNE x2 if they are immune for next 2 games)
+
+- Edit draft printout to make it more obvious that the top 2 players in list need to captain (when bot is 100% tested we can auto select captains)
+
+- Player list probably doesn't need the Mention + nickname + Class list. Just the Mention + Div is likely enough, if the other info is needed then you can just click the Mention

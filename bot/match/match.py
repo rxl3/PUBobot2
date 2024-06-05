@@ -65,7 +65,7 @@ class Match:
 		# Prepare the Match object
 		match.maps = match.random_maps(match.cfg['maps'], match.cfg['map_count'], queue.last_maps)
 
-		await match.init_immune(match.cfg['captain_immunity_games'])
+		
 		match.init_captains(match.cfg['pick_captains'], match.cfg['captains_role_id'])
 		match.init_teams(match.cfg['pick_teams'])
 
@@ -218,7 +218,7 @@ class Match:
 		if pick_teams == "draft":
 			self.teams[0].set(self.captains[:1])
 			self.teams[1].set(self.captains[1:])
-			self.teams[2] = [p for p in self.players if p not in self.captains]
+			self.teams[2].set([p for p in self.players if p not in self.captains])
 		elif pick_teams == "matchmaking":
 			team_len = min(self.cfg['team_size'], int(len(self.players)/2))
 			best_rating = sum(self.ratings.values())/2
@@ -239,6 +239,7 @@ class Match:
 			self.teams[2].set([p for p in self.players if p not in [*self.teams[0], *self.teams[1]]])
 
 	async def init_immune(self, captain_immunity_games):
+		print("Sorting players by immunity")
 		if captain_immunity_games>0:
 			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players, captain_immunity_games)
 		p_a, p_b = [], []
@@ -271,6 +272,7 @@ class Match:
 			if self.state == self.CHECK_IN:
 				await self.check_in.start(ctx)
 			elif self.state == self.DRAFT:
+				await self.init_immune(self.cfg['captain_immunity_games'])
 				await self.draft.start(ctx)
 			elif self.state == self.WAITING_REPORT:
 				await self.start_waiting_report(ctx)

@@ -31,7 +31,6 @@ class Embeds:
 				),
 				inline=False
 			)
-		random.shuffle(not_ready)
 		embed.add_field(
 			name=self.m.gt("Waiting on:"),
 			value="\n".join((f" \u200b <@{p.id}>" for p in not_ready)),
@@ -110,7 +109,7 @@ class Embeds:
 				unpicked_list=sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x)))
 
 			else:
-				unpicked_list=self.m.teams[2]
+				unpicked_list=[p for p in self.m.players if p in self.m.teams[2]]
 
 			embed.add_field(
 				name=self.m.gt("Unpicked:"),
@@ -186,8 +185,6 @@ class Embeds:
 					value=" \u200b " + join_and([self.m.teams[0][0].mention, self.m.teams[1][0].mention]),
 					inline=False
 				)
-			
-			# Update Medic Immunity here?
 
 		else:  # just players list
 			embed.add_field(

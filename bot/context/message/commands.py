@@ -111,6 +111,9 @@ async def _teams(ctx: MessageContext, args: str = None):
 async def _ready(ctx: MessageContext, args: str = None):
 	await bot.commands.set_ready(ctx, is_ready=True)
 
+@message_command('ready_all')
+async def _ready_all(ctx: MessageContext, args: str = None):
+	await bot.commands.set_ready_all(ctx)
 
 @message_command('notready', 'nr')
 async def _not_ready(ctx: MessageContext, args: str = None):

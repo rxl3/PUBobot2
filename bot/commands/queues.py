@@ -1,5 +1,5 @@
 __all__ = [
-	'add', 'remove', 'who', 'add_player', 'remove_player', 'promote', 'start', 'split',
+	'add_multiple', 'add', 'remove', 'who', 'add_player', 'remove_player', 'promote', 'start', 'split',
 	'reset', 'subscribe', 'server', 'maps'
 ]
 
@@ -9,6 +9,22 @@ from nextcord import Member
 from core.utils import error_embed, join_and, find, seconds_to_str
 import bot
 
+async def add_multiple(ctx, player_names_string: str = None, queue: str = 'test'):
+	# Get queued players + remaining queue space
+	pq = next((x for x in ctx.qc.queues if x.name==queue), False)
+	n = pq.cfg.size - pq.length if pq else 1
+	queued_players = pq.queue if pq else []
+
+	# Retrieve the players from the given string, or grab the first n non-queued players
+	if player_names_string == None:
+		players = [m for m in ctx.channel.guild.members if not m.bot and m not in queued_players]
+	else:
+		players = [m for m in ctx.channel.guild.members if str(m.name) in player_names_string.split(',') and m not in queued_players][:n]
+	
+	# Add the players to the queue
+	for p in players:
+		ctx.author = p
+		await add(ctx, queue)
 
 async def add(ctx, queues: str = None):
 	""" add author to channel queues """
