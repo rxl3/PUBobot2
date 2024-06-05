@@ -75,13 +75,23 @@ async def _add_multiple(
 	interaction: Interaction,
 	player_names_string: str = SlashOption(name="player_names_string", description="Member to add to the queue", required=False),
 	queue: str = SlashOption(name="queue", description="Queue to add to.", required=False)
-): await run_slash(bot.commands.add_multiple, interaction=interaction, player_names_string=player_names_string, queue=queue)
+): 	
+	if not interaction.user.guild_permissions.administrator:
+		return await interaction.response.send_message(
+			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
+		)
+	await run_slash(bot.commands.add_multiple, interaction=interaction, player_names_string=player_names_string, queue=queue)
 _add_multiple.on_autocomplete("queue")(autocomplete.queues)
 
 @groups.admin_testing.subcommand(name='set_ready_all', description='For bot testing.')
 async def _set_ready_all(
 	interaction: Interaction
-): await run_slash(bot.commands.set_ready_all, interaction=interaction)
+): 
+	if not interaction.user.guild_permissions.administrator:
+		return await interaction.response.send_message(
+			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
+		)
+	await run_slash(bot.commands.set_ready_all, interaction=interaction)
 
 # queue -> ...
 
