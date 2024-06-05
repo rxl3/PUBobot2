@@ -318,18 +318,35 @@ async def user_stats(channel_id, user_id):
 	stats['queues'] = data
 	return stats
 
-async def get_immune_players(channel_id, players, num):
-	results = [await db.fetchall(
+# For each Player we run a fetchall which returns a list of tuples
+# results = [
+# 	[
+#		(match_id, user_id, captain),
+#		(match_id, user_id, captain)
+# 	],
+# 	[
+#		(match_id, user_id, captain),
+#		(match_id, user_id, captain)
+# 	],
+# 	[
+#		(match_id, user_id, captain),
+#		(match_id, user_id, captain)
+# 	],
+# }
+
+
+async def get_immune_players(channel_id, players, num: int):
+	player_matches = [await db.fetchall(
 		"SELECT match_id, user_id, captain FROM `qc_player_matches` " +
-		"WHERE channel_id=%s AND user_id=%s ORDER BY match_id DESC LIMIT 2",
-		(channel_id, str(p.id))
+		"WHERE channel_id=%s AND user_id=%s ORDER BY match_id DESC LIMIT %s",
+		(channel_id, str(p.id), num)
 	) for p in players]
 
-	immune = []
-	for r in results:
-		for d in r:
-			if d['captain']==1:
-				immune.append(d['user_id'])
+	immune = {}
+	for players in player_matches:
+		for index, match in enumerate(players):
+			if match['captain']==1:
+				immune[match['user_id']] = num - index
 				break
 	return immune
 

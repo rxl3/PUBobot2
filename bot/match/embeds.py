@@ -81,7 +81,7 @@ class Embeds:
 		]
 		team_players = [
 			" \u200b ".join([
-					" \u200b {mention} (`{name}`) - {div} [{classes}]".format(
+					" \u200b {mention}".format(
 						rank=self.m.rank_str(p) if self.m.ranked else "",
 						name=get_nick(p),
 						mention=get_mention(p),
@@ -121,7 +121,7 @@ class Embeds:
 						global_name=get_global_name(p),
 						div=get_div_role(p),
 						classes=get_class_roles(p),
-						immune=" - **IMMUNE** " if self.m.immune.count(p.id) else ""
+						immune=f" - **IMMUNE: x{self.m.immune[int(p.id)]}**" if p.id in self.m.immune else ""
 					)
 				) for p in unpicked_list),
 				inline=False

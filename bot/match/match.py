@@ -3,6 +3,7 @@ from time import time
 from itertools import combinations
 import random
 from nextcord import DiscordException
+import json
 
 import bot
 from core.utils import find, get, iter_to_dict, join_and, get_nick
@@ -29,7 +30,7 @@ class Match:
 	default_cfg = dict(
 		teams=None, team_names=['Alpha', 'Beta'], team_emojis=None, ranked=False,
 		team_size=1, pick_captains="no captains", captains_role_id=None, pick_teams="draft",
-		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0, immune=[],
+		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
 		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True,
 		captain_immunity_games=2
 	)
@@ -135,7 +136,7 @@ class Match:
 		match.maps = data['maps']
 		match.state = data['state']
 		match.states = data['states']
-		match.immune = data['immune']
+		match.immune = {int(x):data['immune'][x] for x in data['immune']}
 		if match.state == match.CHECK_IN:
 			ctx = bot.SystemContext(qc)
 			await match.check_in.start(ctx)  # Spawn a new check_in message
@@ -239,14 +240,13 @@ class Match:
 			self.teams[2].set([p for p in self.players if p not in [*self.teams[0], *self.teams[1]]])
 
 	async def init_immune(self, captain_immunity_games):
-		print("Sorting players by immunity")
 		if captain_immunity_games>0:
 			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players, captain_immunity_games)
-		p_a, p_b = [], []
-		for p in self.players:
-			(p_b,p_a)[self.immune.count(p.id)==0].append(p)
-		random.shuffle(p_a)
-		self.players = p_a + p_b
+			p_a, p_b = [], []
+			for p in self.players:
+				(p_a,p_b)[p.id in self.immune].append(p)
+			random.shuffle(p_a)
+			self.players = p_a + p_b
 
 	async def think(self, frame_time):
 		if self.state == self.INIT:
