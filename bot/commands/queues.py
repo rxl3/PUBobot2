@@ -11,7 +11,7 @@ import bot
 
 async def add_multiple(ctx, player_names_string: str = None, queue: str = 'test'):
 	# Get queued players + remaining queue space
-	pq = next((x for x in ctx.qc.queues if x.name==queue), False)
+	pq = {obj.name: obj for obj in ctx.qc.queues}.get(queue, (ctx.qc.queues or [None])[0])
 	n = pq.cfg.size - pq.length if pq else 1
 	queued_players = pq.queue if pq else []
 
@@ -24,7 +24,7 @@ async def add_multiple(ctx, player_names_string: str = None, queue: str = 'test'
 	# Add the players to the queue
 	for p in players:
 		ctx.author = p
-		await add(ctx, queue)
+		await add(ctx, queue) # will respond "Action had no effect" if queue == None
 
 async def add(ctx, queues: str = None):
 	""" add author to channel queues """

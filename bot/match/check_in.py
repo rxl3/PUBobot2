@@ -42,7 +42,6 @@ class CheckIn:
 				await self.finish(ctx)
 
 	async def start(self, ctx):
-		print([p.name for p in self.m.teams[2]])
 		text = f"!spawn message {self.m.id}"
 		self.message = await ctx.channel.send(text)
 
