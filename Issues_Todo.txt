@@ -5,8 +5,13 @@ ISSUES / TODO
 
 - Unpicked list sorted itself after only 1 captain had joined? (seems fine, further testing required)
 
-- Add IMMUNE count (eg IMMUNE x2 if they are immune for next 2 games)
+
 
 - Edit draft printout to make it more obvious that the top 2 players in list need to captain (when bot is 100% tested we can auto select captains)
 
+
+
+DONE
+
 - Player list probably doesn't need the Mention + nickname + Class list. Just the Mention + Div is likely enough, if the other info is needed then you can just click the Mention
+- Add IMMUNE count (eg IMMUNE x2 if they are immune for next 2 games)

@@ -1,1 +1,1 @@
-{"queues": [], "matches": [], "allow_offline": [], "expire": []}
+{"queues": [{"queue_type": "PickupQueue", "queue_id": 17, "channel_id": 1161197767826354296, "players": [303349023476023296]}], "matches": [], "allow_offline": [], "expire": []}

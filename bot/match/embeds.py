@@ -24,10 +24,11 @@ class Embeds:
 			)
 		)
 		if self.m.check_in.timeout != 0:
+			
 			embed.add_field(
 				name="",
-				value=self.m.gt("Expires in {:0.0f}m if players do not ready up").format(
-					self.m.check_in.timeout/60/60
+				value=self.m.gt("Expires in <{t}s if players do not ready up").format(
+					t=int(self.m.check_in.time_to_timeout)
 				),
 				inline=False
 			)
@@ -96,25 +97,49 @@ class Embeds:
 		embed.add_field(name=teams_names[0], value=" \u200b ❲ \u200b " + team_players[0] + " \u200b ❳", inline=False)
 		embed.add_field(name=teams_names[1], value=" \u200b ❲ \u200b " + team_players[1] + " \u200b ❳\n\u200b", inline=False)
 
-
-		# self.m.teams[2] = List of Users
-		# get_div_role(User) = String
-		# config.cfg.DIV_ROLES = List of Strings
-		# res = Sorted list of Users
-		# sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x))
+		# If players are still waiting to be picked
 		if len(self.m.teams[2]):
 
-			# Only sort by Division if captains are picked (TODO: Add config option to enable)
-			if (len(self.m.teams[1]) > 0 and len(self.m.teams[1]) > 0):
+			# If teams have captains
+			if len(self.m.teams[0]) and len(self.m.teams[1]):
+				# Sort the unpicked players by Division Role (descending)
 				unpicked_list=sorted(self.m.teams[2], key=lambda x: config.cfg.DIV_ROLES.index(get_div_role(x)))
 
+				# Post-msg 
+				msg = self.m.gt("Pick players with `/pick @player` command.")
+				pick_step = len(self.m.teams[0]) + len(self.m.teams[1]) - 2
+				picker_team = self.m.teams[self.m.draft.pick_order[pick_step]] if pick_step < len(self.m.draft.pick_order)-1 else None
+				if picker_team:
+					msg += "\n" + self.m.gt("{member}'s turn to pick!").format(member=f"<@{picker_team[0].id}>")
+
 			else:
+				# Keep the pre-sorting that we did to the Match.players variable (if any)
 				unpicked_list=[p for p in self.m.players if p in self.m.teams[2]]
 
+				# Post-msg
+				msg = self.m.gt("Type {cmd} to become a captain and start picking teams.").format(
+					cmd=f"`{self.m.qc.cfg.prefix}capfor {'/'.join((team.name.lower() for team in self.m.teams[:2]))}`"
+				)
+
+				# Temporary captains (if they exist)
+				if len(self.m.temporary_captains) == 2:
+					temporary_captains_list = [p for p in unpicked_list if p.id in self.m.temporary_captains]
+					plural_msg = " have been rolled as captains" if len(temporary_captains_list) > 1 else " has been rolled as captain"
+					embed.add_field(
+						name=self.m.gt(""),
+						value=" and ".join((
+							"{mention}".format(
+								mention=get_mention(p)
+							)
+						) for p in temporary_captains_list) + plural_msg + "\n",
+						inline=False
+					)
+
+			# Unpicked Players msg
 			embed.add_field(
 				name=self.m.gt("Unpicked:"),
 				value="\n".join((
-					" \u200b {mention} - {div} [{classes}]{immune}".format(
+					" \u200b {mention} - {div} {immune}".format(
 						rank=self.m.rank_str(p) if self.m.ranked else "",
 						name=get_nick(p),
 						mention=get_mention(p),
@@ -127,17 +152,7 @@ class Embeds:
 				inline=False
 			)
 
-			if len(self.m.teams[0]) and len(self.m.teams[1]):
-				msg = self.m.gt("Pick players with `/pick @player` command.")
-				pick_step = len(self.m.teams[0]) + len(self.m.teams[1]) - 2
-				picker_team = self.m.teams[self.m.draft.pick_order[pick_step]] if pick_step < len(self.m.draft.pick_order)-1 else None
-				if picker_team:
-					msg += "\n" + self.m.gt("{member}'s turn to pick!").format(member=f"<@{picker_team[0].id}>")
-			else:
-				msg = self.m.gt("Type {cmd} to become a captain and start picking teams.").format(
-					cmd=f"`{self.m.qc.cfg.prefix}capfor {'/'.join((team.name.lower() for team in self.m.teams[:2]))}`"
-				)
-
+			# Create the post-msg
 			embed.add_field(name="—", value=msg + "\n\u200b", inline=False)
 
 		embed.set_footer(**self.footer)

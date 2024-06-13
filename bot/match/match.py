@@ -99,6 +99,7 @@ class Match:
 			cfg=self.cfg,
 			players=[p.id for p in self.players if p],
 			immune=self.immune,
+			temporary_captains=self.temporary_captains,
 			teams=[[p.id for p in team if p] for team in self.teams],
 			maps=self.maps,
 			state=self.state,
@@ -137,6 +138,7 @@ class Match:
 		match.state = data['state']
 		match.states = data['states']
 		match.immune = {int(x):data['immune'][x] for x in data['immune']}
+		match.temporary_captains = data['temporary_captains']
 		if match.state == match.CHECK_IN:
 			ctx = bot.SystemContext(qc)
 			await match.check_in.start(ctx)  # Spawn a new check_in message
@@ -175,6 +177,7 @@ class Match:
 		self.states = []
 		self.maps = []
 		self.immune = []
+		self.temporary_captains = []
 		self.lifetime = self.cfg['match_lifetime']
 		self.start_time = int(time())
 		self.state = self.INIT
@@ -239,7 +242,7 @@ class Match:
 			self.teams[1].set([p for p in self.players if p not in self.teams[0]][:self.cfg['team_size']])
 			self.teams[2].set([p for p in self.players if p not in [*self.teams[0], *self.teams[1]]])
 
-	async def init_immune(self, captain_immunity_games):
+	async def init_immune(self, captain_immunity_games, pick_captains):
 		if captain_immunity_games>0:
 			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players, captain_immunity_games)
 			p_a, p_b = [], []
@@ -247,6 +250,10 @@ class Match:
 				(p_a,p_b)[p.id in self.immune].append(p)
 			random.shuffle(p_a)
 			self.players = p_a + p_b
+
+			# If captain_immunity_games is set and we have no automatic method of selecting captains: Assign temporary captains for the draft list
+			if (pick_captains == "no captains"):
+				self.temporary_captains = [p.id for p in self.players[:2]]
 
 	async def think(self, frame_time):
 		if self.state == self.INIT:
@@ -272,7 +279,7 @@ class Match:
 			if self.state == self.CHECK_IN:
 				await self.check_in.start(ctx)
 			elif self.state == self.DRAFT:
-				await self.init_immune(self.cfg['captain_immunity_games'])
+				await self.init_immune(self.cfg['captain_immunity_games'], self.cfg['pick_captains'])
 				await self.draft.start(ctx)
 			elif self.state == self.WAITING_REPORT:
 				await self.start_waiting_report(ctx)
