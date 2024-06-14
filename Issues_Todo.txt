@@ -1,17 +1,78 @@
-ISSUES / TODO
+**********************************
+*********     Goals     **********
+**********************************
+
+1) Add new features that are useful for TF2 Pride Pugs (Done)
+2) To fully implement my new features in a way that does not impact the existing PugBot (ie: Via configurable variables)
+3) To replace the config.cfg reading system with a .env environment variable system to make web hosting easier
 
 
-- Teams list to put players on new line, as the extra info in the printout is distracting OR remove all the Classes/Divs once a player is on a team
+**********************************
+******     New Features     ******
+**********************************
 
-- Unpicked list sorted itself after only 1 captain had joined? (seems fine, further testing required)
+1) Automatic captain/medic dice roll
+- Message informs players that they have been rolled as captain
+- Roll is simulated by shuffling the player list (captains at the top)
+- Captains still join manually (to cater for possible Medic volunteers)
+
+2) Automatic captain/medic immunity tracking
+- Players receive IMMUNE after captaining a game
+- IMMUNE players are shuffled to the bottom of the captain roll
+- Tracks the number of games of immunity remaining
+
+3) Picking support for captains
+- Clickable player names to easily view more info about a player
+- Players' OzFort Divisions listed next to their name
+- After captains are selected the list will sort by TF2 Division (Prem -> Open)
+
+4) Misc
+- Check-in expiry timer is no longer hidden
 
 
+**********************************
+*********      TODO     **********
+**********************************
 
-- Edit draft printout to make it more obvious that the top 2 players in list need to captain (when bot is 100% tested we can auto select captains)
+1) Migrate new features to variable options
+- New "Pick Captains" options that allow for random (forced) and random (manual)
+- The following new vars
+
+    captain_immunity_games
+    (int) Number of games a player has IMMUNE for after being captain. Feature is disabled if 0. 
+        If > 0 and pick_captains="No Captains" then we randomise the Unpicked Player list with IMMUNE players at the bottom (simulates roll)
+        If > 0 and pick_captains="Random" then we randomise the Unpicked Player list with IMMUNE players at the bottom AND force the top 2 players to Captain (simulates roll)
+        If > 0 and pick_captains is none of the above, then idk?
+    default=0
+
+    division_roles
+    (list of strings) The case-sensitive Role names for player Division, where higher division is at the start of the list. Used in player_list_format as {division}
+    default=[]
+
+    class_roles
+    (list of strings) The case-sensitive, comma-separated Role names for player Classes. Used in player_list_format as {class}
+    default=[]
+
+    show_check_in_timer
+    (boolean) If enabled the Check-In stage will show the remaining time until expiry in seconds (defined by check_in_timeout?)
+    default=False
+
+    player_list_format
+    (string) Defines how players' names appear in the Drafting stage as a string with vars in {braces}. Allowed vars: {name},{rank},{division},{class},{mention},{global_name},{immune}
+    default={name}
+    example: 
+        "{mention} - {div} [{classes}] - **{immune}**"
+        "@Chungus McBungus - Main [Scout, Demo] - IMMUNE: x2"     Where IMMUNE: x2 is bolded
+
+    randomise_checkin_list
+    (boolean) If True then the Not Ready list at the Check-In stage will be randomised (useful if we are shuffling for IMMUNE before check-in)
+    default=False
 
 
+2) Migrate config.cfg stuff to .env
+- Add the following to files that need config variables
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
 
-DONE
-
-- Player list probably doesn't need the Mention + nickname + Class list. Just the Mention + Div is likely enough, if the other info is needed then you can just click the Mention
-- Add IMMUNE count (eg IMMUNE x2 if they are immune for next 2 games)
+- Requires replacing all instances of config.cfg.VARIABLE_NAME with os.getenv("VARIABLE_NAME")
