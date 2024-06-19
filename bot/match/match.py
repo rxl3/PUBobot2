@@ -14,8 +14,6 @@ from .check_in import CheckIn
 from .draft import Draft
 from .embeds import Embeds
 import random
-import os
-from dotenv import load_dotenv
 
 class Match:
 
@@ -30,11 +28,11 @@ class Match:
 	]
 
 	default_cfg = dict(
-		teams=None, team_names=['Alpha', 'Beta'], team_emojis=None, ranked=False,
+		teams=None, team_names=['Alpha', 'Beta'], team_emojis=":red_circle: :blue_circle:", ranked=False,
 		team_size=1, pick_captains="no captains", captains_role_id=None, pick_teams="draft",
 		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
 		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True,
-		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="\{name\}"
+		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="{{name}}"
 	)
 
 	class Team(list):

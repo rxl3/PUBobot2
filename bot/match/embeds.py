@@ -101,9 +101,12 @@ class Embeds:
 
 			# If teams have captains
 			if len(self.m.teams[0]) and len(self.m.teams[1]):
-				# Sort the unpicked players by Division Role (descending)
-				unpicked_list=sorted(self.m.teams[2], key=lambda x: self.m.cfg['divison_roles'].index(get_div_role(x,self.m.cfg['divison_roles'])))
-
+				if len(self.m.cfg['divison_roles']):
+					# Sort the unpicked players by Division Role (descending)
+					unpicked_list=sorted(self.m.teams[2], key=lambda x: self.m.cfg['divison_roles'].index(get_div_role(x,self.m.cfg['divison_roles'])))
+				else:
+					unpicked_list = self.m.teams[2]
+				
 				# Post-msg 
 				msg = self.m.gt("Pick players with `/pick @player` command.")
 				pick_step = len(self.m.teams[0]) + len(self.m.teams[1]) - 2

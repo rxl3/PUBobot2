@@ -266,6 +266,30 @@ class PickupQueue:
 				description="The number of subsequent games for which a player who was Captain is labelled as IMMUNE (set as 0 to disable)",
 				default=2,
 				notnull=True,
+			),
+			Variables.VariableTable(
+				"division_roles", display="Division Roles List", section="General",
+				description="List of Roles for player Divisions",
+				default=[],
+				notnull=True,
+			),
+			Variables.VariableTable(
+				"class_roles", display="Class Roles List", section="General",
+				description="List of Roles for player Classes",
+				default=[],
+				notnull=True,
+			),
+			Variables.BoolVar(
+				"show_checkin_timer", display="Show Check-in Expiry Timer", section="General",
+				description="Display the number of seconds remaining until Check-In expires (if all players are not ready)",
+				default=False,
+				notnull=True,
+			),
+			Variables.TextVar(
+				"player_list_format", display="Player name list format (for drafting stage)", section="General",
+				description="The format to use when printing the Player Names in Drafting Stage",
+				default="\{name\}",
+				notnull=True,
 			)
 		]
 	)

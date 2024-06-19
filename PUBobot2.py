@@ -8,8 +8,6 @@ import traceback
 import queue
 from asyncio import sleep as asleep
 from asyncio import iscoroutine
-import os
-from dotenv import load_dotenv
 
 # Load bot core
 from core import config, console, database, locales, cfg_factory
@@ -19,7 +17,6 @@ from core.client import dc
 import bot
 
 # Load web server
-print(config.cfg.WS_ENABLE)
 if config.cfg.WS_ENABLE:
 	from webui import webserver
 else:
