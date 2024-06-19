@@ -59,6 +59,7 @@ class Adapter:
 				charset='utf8mb4',
 				autocommit=True,
 				cursorclass=aiomysql.cursors.DictCursor)
+			print(createpool)
 			print("--2--")
 			self.pool = self.loop.run_until_complete(createpool)
 			print("--3--")

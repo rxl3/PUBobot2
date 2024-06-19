@@ -77,7 +77,10 @@ class Log:
 def user_input():
 	readline.parse_and_bind("tab: complete")
 	while 1:
-		input_cmd = input('>')
+		try:
+			input_cmd = input('>')
+		except EOFError:
+			return
 		user_input_queue.put(input_cmd)
 
 
