@@ -42,15 +42,10 @@ class Adapter:
 				self.dbHost, self.dbPort = self.dbHost.split(':')
 			else:
 				self.dbPort = '3306'
-			print(self.dbUser)
-			print(self.dbPassword)
-			print(self.dbHost)
-			print(self.dbPort)
 		except Exception:
 			raise(ValueError('Bad database address string: ' + self.dbAddress))
 
 		try:
-			print("--1--")
 			createpool = aiomysql.create_pool(
 				host=self.dbHost,
 				user=self.dbUser,
@@ -59,13 +54,9 @@ class Adapter:
 				charset='utf8mb4',
 				autocommit=True,
 				cursorclass=aiomysql.cursors.DictCursor)
-			print(createpool)
-			print("--2--")
 			self.pool = self.loop.run_until_complete(createpool)
-			print("--3--")
 
 		except mysqlErr.Error as e:
-			print(e)
 			self.wrap_exc(e)
 
 	async def execute(self, *args):

@@ -249,24 +249,9 @@ class Match:
 			for p in self.players:
 				(p_a,p_b)[p.id in self.immune].append(p)
 
-			print("~~~~~~~~~~p_a before shuffle~~~~~~~~~")
-			[print(i) for i in p_a]
-			print("~~~~~~~~~~~~p_b before shuffle~~~~~~~~~")
-			[print(i) for i in p_b]
-			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 			random.shuffle(p_a)
 			random.shuffle(p_b)
 			self.players = p_a + p_b
-
-			print("~~~~~~~~~~~p_a after shuffle~~~~~~~~~~")
-			[print(i) for i in p_a]
-			print("~~~~~~~~~~~~p_b after shuffle~~~~~~~~~")
-			[print(i) for i in p_b]
-			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-
-			print("~~~~~~~~~~~~~self.players~~~~~~~~~~~~~")
-			[print(i) for i in self.players]
-			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 			# If captain_immunity_games is set and we have no automatic method of selecting captains: Assign temporary captains for the draft list
 			if (pick_captains == "no captains"):
