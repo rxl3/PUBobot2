@@ -19,5 +19,4 @@ six==1.16.0
 trueskill==0.4.5
 typing_extensions==4.12.0
 wcwidth==0.2.13
-webui==0.1.7
 yarl==1.9.4
