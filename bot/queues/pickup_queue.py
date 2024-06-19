@@ -288,7 +288,7 @@ class PickupQueue:
 			Variables.TextVar(
 				"player_list_format", display="Player name list format (for drafting stage)", section="General",
 				description="The format to use when printing the Player Names in Drafting Stage",
-				default="\{name\}",
+				default="{{name}}",
 				notnull=True,
 			)
 		]
