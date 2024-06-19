@@ -59,4 +59,4 @@ with open('.version', 'r') as f:
 	__version__ = f.read()
 
 # test
-print(f"[ENV TEST] {cfg.DB_URI}\n")
+print(f"[ENV TEST] {cfg.DB_URI}")
