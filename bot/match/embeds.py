@@ -23,7 +23,7 @@ class Embeds:
 				queue=self.m.queue.name[0].upper()+self.m.queue.name[1:]
 			)
 		)
-		if self.m.show_checkin_timer and self.m.check_in.timeout != 0:
+		if self.m.cfg['show_checkin_timer'] and self.m.check_in.timeout != 0:
 			embed.add_field(
 				name="",
 				value=self.m.gt("Expires in <{t}s if players do not ready up").format(
@@ -82,12 +82,7 @@ class Embeds:
 		team_players = [
 			" \u200b ".join([
 					" \u200b {mention}".format(
-						rank=self.m.rank_str(p) if self.m.ranked else "",
-						name=get_nick(p),
 						mention=get_mention(p),
-						global_name=get_global_name(p),
-						div=get_div_role(p),
-						classes=get_class_roles(p)
 					)
 				for p in t
 			]) if len(t) else self.m.gt("empty")
@@ -101,9 +96,9 @@ class Embeds:
 
 			# If teams have captains
 			if len(self.m.teams[0]) and len(self.m.teams[1]):
-				if len(self.m.cfg['divison_roles']):
+				if len(self.m.cfg['division_roles']):
 					# Sort the unpicked players by Division Role (descending)
-					unpicked_list=sorted(self.m.teams[2], key=lambda x: self.m.cfg['divison_roles'].index(get_div_role(x,self.m.cfg['divison_roles'])))
+					unpicked_list=sorted(self.m.teams[2], key=lambda x: self.m.cfg['division_roles'].index(get_div_role(x,self.m.cfg['division_roles'])))
 				else:
 					unpicked_list = self.m.teams[2]
 				
@@ -141,12 +136,12 @@ class Embeds:
 			embed.add_field(
 				name=self.m.gt("Unpicked:"),
 				value="\n".join((
-					(" \u200b " + self.m.cfg['player_list_format']).format(
+					(f" \u200b " + self.m.cfg['player_list_format']).format(
 						rank=self.m.rank_str(p) if self.m.ranked else "",
 						name=get_nick(p),
 						mention=get_mention(p),
 						global_name=get_global_name(p),
-						div=get_div_role(p, self.m.cfg['divison_roles']),
+						div=get_div_role(p, self.m.cfg['division_roles']),
 						classes=get_class_roles(p, self.m.cfg['class_roles']),
 						immune=f" - **IMMUNE: x{self.m.immune[int(p.id)]}**" if p.id in self.m.immune else ""
 					)

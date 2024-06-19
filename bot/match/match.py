@@ -32,7 +32,7 @@ class Match:
 		team_size=1, pick_captains="no captains", captains_role_id=None, pick_teams="draft",
 		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
 		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True,
-		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="{{name}}"
+		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="{name}"
 	)
 
 	class Team(list):
@@ -248,8 +248,25 @@ class Match:
 			p_a, p_b = [], []
 			for p in self.players:
 				(p_a,p_b)[p.id in self.immune].append(p)
+
+			print("~~~~~~~~~~p_a before shuffle~~~~~~~~~")
+			[print(i) for i in p_a]
+			print("~~~~~~~~~~~~p_b before shuffle~~~~~~~~~")
+			[print(i) for i in p_b]
+			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 			random.shuffle(p_a)
+			random.shuffle(p_b)
 			self.players = p_a + p_b
+
+			print("~~~~~~~~~~~p_a after shuffle~~~~~~~~~~")
+			[print(i) for i in p_a]
+			print("~~~~~~~~~~~~p_b after shuffle~~~~~~~~~")
+			[print(i) for i in p_b]
+			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+			print("~~~~~~~~~~~~~self.players~~~~~~~~~~~~~")
+			[print(i) for i in self.players]
+			print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 			# If captain_immunity_games is set and we have no automatic method of selecting captains: Assign temporary captains for the draft list
 			if (pick_captains == "no captains"):

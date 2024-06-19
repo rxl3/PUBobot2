@@ -267,13 +267,13 @@ class PickupQueue:
 				default=2,
 				notnull=True,
 			),
-			Variables.VariableTable(
+			Variables.StrVar(
 				"division_roles", display="Division Roles List", section="General",
 				description="List of Roles for player Divisions",
 				default=[],
 				notnull=True,
 			),
-			Variables.VariableTable(
+			Variables.StrVar(
 				"class_roles", display="Class Roles List", section="General",
 				description="List of Roles for player Classes",
 				default=[],
@@ -288,7 +288,7 @@ class PickupQueue:
 			Variables.TextVar(
 				"player_list_format", display="Player name list format (for drafting stage)", section="General",
 				description="The format to use when printing the Player Names in Drafting Stage",
-				default="{{name}}",
+				default="{name}",
 				notnull=True,
 			)
 		]
@@ -365,7 +365,10 @@ class PickupQueue:
 			map_count=self.cfg.map_count, check_in_timeout=self.cfg.check_in_timeout,
 			check_in_discard=self.cfg.check_in_discard, match_lifetime=self.cfg.match_lifetime,
 			start_msg=self.cfg.start_msg, server=self.cfg.server,
-			captain_immunity_games=self.cfg.captain_immunity_games
+			captain_immunity_games=self.cfg.captain_immunity_games,
+			division_roles=self.cfg.division_roles.split(",") if self.cfg.division_roles else None,
+			class_roles=self.cfg.class_roles.split(",") if self.cfg.class_roles else None,
+			show_checkin_timer=self.cfg.show_checkin_timer, player_list_format=self.cfg.player_list_format
 		)
 
 	async def promote(self, ctx):

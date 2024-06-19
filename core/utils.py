@@ -146,12 +146,16 @@ def get_global_name(user):
 	return escape_cb(string)
 
 def get_div_role(user, division_roles):
+	if len(division_roles) == 0:
+		return
 	string = sorted([r.name for r in user.roles if r.name in division_roles], key=lambda x: division_roles.index(x))[0]
 	if x := re.match(r"^\[\d+\] (.+)", string):
 		string = x.group(1)
 	return escape_cb(string)
 
 def get_class_roles(user, class_roles):
+	if len(class_roles) == 0:
+		return
 	string = ", ".join(sorted([r.name for r in user.roles if r.name in class_roles]))
 	if x := re.match(r"^\[\d+\] (.+)", string):
 		string = x.group(1)

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from importlib.machinery import SourceFileLoader
 import os
-from os.path import join, dirname
 from dotenv import load_dotenv
-from types import ModuleType
 
 # http://byatool.com/uncategorized/simple-property-merge-for-python-objects/
 def mergeObjectProperties(objectToMergeFrom, objectToMergeTo):
@@ -40,39 +38,22 @@ class EnvCfg(object):
 		setattr(self, k, v)
 
 # Try load variables from config file, else .env file
-print("\n[CONFIGS]Attempting to load config from config.cfg...")
+print("\n[CONFIGS] Attempting to load config from config.cfg...")
 try:
 	cfg = SourceFileLoader('cfg', 'config2.cfg').load_module()
 except Exception as e:
-	print("[CONFIGS]Failed to load config.cfg! Trying .env instead...")
+	print("[CONFIGS] Failed to load config.cfg! Trying .env instead...")
 	try:
 		load_dotenv()
 		env = os.environ
 		cfg = EnvCfg(env)
 	except Exception as e2:
-		print("[CONFIGS]Failed to load config.cfg and .env file! Throwing Exception and quitting...")
+		print("[CONFIGS] Failed to load config.cfg and .env file! Throwing Exception and quitting...")
 		raise e2
-	print("[CONFIGS]Successfully loaded config from .env file!\n")
+	print("[CONFIGS] Successfully loaded config from .env file!\n")
 else:
-	print("[CONFIGS]Successfully loaded config from config.cfg file!\n")
+	print("[CONFIGS] Successfully loaded config from config.cfg file!\n")
 
 # set Version
 with open('.version', 'r') as f:
 	__version__ = f.read()
-
-# testing
-sfl = SourceFileLoader("peeee", "test.test")
-mergeObjectProperties(sfl, cfg)
-
-cfg2 = SourceFileLoader('cfg', 'config.cfg').load_module()
-
-cfg3 = SourceFileLoader("peeee", "test.test")
-
-for k in dir(cfg2):
-	try:
-		print(f"{getattr(cfg,k)==getattr(cfg2,k)}-----cfg.{k}:{getattr(cfg,k)}-----cfg2.{k}:{getattr(cfg2,k)}-----")
-	except:
-		print(f"cfg does not have '{k}")
-
-print(f"\n\n~~~~~{dir(cfg)}~~~~~\n\n")
-print(f"\n\n~~~~~{dir(sfl)}~~~~~\n\n")
