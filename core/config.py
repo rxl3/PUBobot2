@@ -38,7 +38,7 @@ class EnvCfg(object):
 		setattr(self, k, v)
 
 # Try load variables from config file, else .env file
-print("\n[CONFIGS] Attempting to load config from config.cfg...")
+print("[CONFIGS] Attempting to load config from config.cfg...")
 try:
 	cfg = SourceFileLoader('cfg', 'config2.cfg').load_module()
 except Exception as e:
@@ -50,9 +50,9 @@ except Exception as e:
 	except Exception as e2:
 		print("[CONFIGS] Failed to load config.cfg and .env file! Throwing Exception and quitting...")
 		raise e2
-	print("[CONFIGS] Successfully loaded config from .env file!\n")
+	print("[CONFIGS] Successfully loaded config from .env file!")
 else:
-	print("[CONFIGS] Successfully loaded config from config.cfg file!\n")
+	print("[CONFIGS] Successfully loaded config from config.cfg file!")
 
 # set Version
 with open('.version', 'r') as f:
