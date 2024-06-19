@@ -3,6 +3,20 @@ from importlib.machinery import SourceFileLoader
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
+from types import ModuleType
+
+# http://byatool.com/uncategorized/simple-property-merge-for-python-objects/
+def mergeObjectProperties(objectToMergeFrom, objectToMergeTo):
+    """
+    Used to copy properties from one object to another if there isn't a naming conflict;
+    """
+    for property in objectToMergeFrom.__dict__:
+        #Check to make sure it can't be called... ie a method.
+        #Also make sure the objectobjectToMergeTo doesn't have a property of the same name.
+        if not callable(objectToMergeFrom.__dict__[property]) and not hasattr(objectToMergeTo, property):
+            setattr(objectToMergeTo, property, getattr(objectToMergeFrom, property))
+
+    return objectToMergeTo
 
 # Custom object to hold environment variables (So we don't have to change all the cfg.VAR_NAME to cfg['VAR_NAME'}])
 class EnvCfg(object):
@@ -13,7 +27,11 @@ class EnvCfg(object):
 
 	# Custom function to set the values from .env (which are always string) to list / boolean as needed
 	def envSetAttr(self, k: str, v: str):
-		if v.startswith("[") and v.endswith("]"):
+		if v.isnumeric():
+			v = int(v)
+		elif v == "[]":
+			v = []
+		elif v.startswith("[") and v.endswith("]"):
 			v = v.strip('[]').split(',')
 		elif v in ["True", "true", "TRUE"]:
 			v = True
@@ -41,3 +59,20 @@ else:
 # set Version
 with open('.version', 'r') as f:
 	__version__ = f.read()
+
+# testing
+sfl = SourceFileLoader("peeee", "test.test")
+mergeObjectProperties(sfl, cfg)
+
+cfg2 = SourceFileLoader('cfg', 'config.cfg').load_module()
+
+cfg3 = SourceFileLoader("peeee", "test.test")
+
+for k in dir(cfg2):
+	try:
+		print(f"{getattr(cfg,k)==getattr(cfg2,k)}-----cfg.{k}:{getattr(cfg,k)}-----cfg2.{k}:{getattr(cfg2,k)}-----")
+	except:
+		print(f"cfg does not have '{k}")
+
+print(f"\n\n~~~~~{dir(cfg)}~~~~~\n\n")
+print(f"\n\n~~~~~{dir(sfl)}~~~~~\n\n")
