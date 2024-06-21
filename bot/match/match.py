@@ -273,7 +273,7 @@ class Match:
 				))
 			except DiscordException:
 				pass
-			await self.report_win(ctx, 'RED', True)
+			await self.report_win(ctx, self.teams[1].name, True)
 
 	async def next_state(self, ctx):
 		if len(self.states):
