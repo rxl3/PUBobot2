@@ -273,7 +273,7 @@ class Match:
 				))
 			except DiscordException:
 				pass
-			await self.cancel(ctx)
+			await self.report_win(ctx, 'RED', True)
 
 	async def next_state(self, ctx):
 		if len(self.states):
