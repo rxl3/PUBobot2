@@ -134,7 +134,8 @@ def escape_cb(string):
 
 def get_nick(user):
 	""" Remove rating tag and text formatting characters """
-	if string := user.name is None:
+	string = user.name
+	if string is None:
 		print(f"==============================\nNAME IS NONETYPE FOR USER\n==============================")
 		return "no_name"
 	if x := re.match(r"^\[\d+\] (.+)", string):
@@ -144,7 +145,8 @@ def get_nick(user):
 def get_global_name(user):
 	if user is None:
 		return "INVALID USER"
-	if string := user.global_name is None:
+	string = user.global_name
+	if string is None:
 		print(f"==============================\nGLOBAL_NAME IS NONETYPE FOR USER: {get_nick(user)} : {user.id}\n==============================")
 		return get_nick(user)
 	if x := re.match(r"^\[\d+\] (.+)", string):
@@ -156,7 +158,8 @@ def get_div_role(user, division_roles):
 		return "INVALID USER"
 	if len(division_roles) == 0:
 		return ""
-	if string := sorted([r.name for r in user.roles if r.name in division_roles], key=lambda x: division_roles.index(x))[0] is None:
+	string = string = sorted([r.name for r in user.roles if r.name in division_roles], key=lambda x: division_roles.index(x))[0]
+	if string is None:
 		print(f"==============================\nERROR GETTING DIVISION ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
 		return ""
 	if x := re.match(r"^\[\d+\] (.+)", string):
@@ -168,7 +171,8 @@ def get_class_roles(user, class_roles):
 		return "INVALID USER"
 	if len(class_roles) == 0:
 		return ""
-	if string := ", ".join(sorted([r.name for r in user.roles if r.name in class_roles])) is None:
+	string = ", ".join(sorted([r.name for r in user.roles if r.name in class_roles]))
+	if string is None:
 		print(f"==============================\nERROR GETTING CLASS ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
 		return ""
 	if x := re.match(r"^\[\d+\] (.+)", string):
@@ -189,7 +193,6 @@ def get_user_id(user):
 	if user.id is None:
 		return "NO USER ID"
 	return user.id
-
 
 def discord_table(header, rows):
 	t = PrettyTable()
