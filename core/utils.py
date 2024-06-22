@@ -134,36 +134,62 @@ def escape_cb(string):
 
 def get_nick(user):
 	""" Remove rating tag and text formatting characters """
-	string = user.name
+	if string := user.name is None:
+		print(f"==============================\nNAME IS NONETYPE FOR USER\n==============================")
+		return "no_name"
 	if x := re.match(r"^\[\d+\] (.+)", string):
 		string = x.group(1)
 	return escape_cb(string)
 
 def get_global_name(user):
-	string = user.global_name
+	if user is None:
+		return "INVALID USER"
+	if string := user.global_name is None:
+		print(f"==============================\nGLOBAL_NAME IS NONETYPE FOR USER: {get_nick(user)} : {user.id}\n==============================")
+		return get_nick(user)
 	if x := re.match(r"^\[\d+\] (.+)", string):
 		string = x.group(1)
 	return escape_cb(string)
 
 def get_div_role(user, division_roles):
+	if user is None:
+		return "INVALID USER"
 	if len(division_roles) == 0:
-		return
-	string = sorted([r.name for r in user.roles if r.name in division_roles], key=lambda x: division_roles.index(x))[0]
+		return ""
+	if string := sorted([r.name for r in user.roles if r.name in division_roles], key=lambda x: division_roles.index(x))[0] is None:
+		print(f"==============================\nERROR GETTING DIVISION ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
+		return ""
 	if x := re.match(r"^\[\d+\] (.+)", string):
 		string = x.group(1)
 	return escape_cb(string)
 
 def get_class_roles(user, class_roles):
+	if user is None:
+		return "INVALID USER"
 	if len(class_roles) == 0:
-		return
-	string = ", ".join(sorted([r.name for r in user.roles if r.name in class_roles]))
+		return ""
+	if string := ", ".join(sorted([r.name for r in user.roles if r.name in class_roles])) is None:
+		print(f"==============================\nERROR GETTING CLASS ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
+		return ""
 	if x := re.match(r"^\[\d+\] (.+)", string):
 		string = x.group(1)
 	return escape_cb(string)
 
 def get_mention(user):
-	string = "<@" + str(user.id) + ">"
-	return string
+	if user is None:
+		return "INVALID USER"
+	if user.id is None:
+		print(f"==============================\nID IS NONETYPE FOR USER: {get_nick(user)}\n==============================")
+		return "no_ID"
+	return "<@" + str(user.id) + ">"
+
+def get_user_id(user):
+	if user is None:
+		return "INVALID USER"
+	if user.id is None:
+		return "NO USER ID"
+	return user.id
+
 
 def discord_table(header, rows):
 	t = PrettyTable()
