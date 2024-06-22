@@ -273,9 +273,8 @@ class Match:
 				))
 			except DiscordException:
 				pass
-			if self.state != self.WAITING_REPORT:
-				self.state = self.WAITING_REPORT
-			await self.report_win(ctx, self.teams[1].name, True)
+			if self.state == self.WAITING_REPORT:
+				await self.report_win(ctx, self.teams[1].name, True)
 
 	async def next_state(self, ctx):
 		if len(self.states):
