@@ -267,14 +267,14 @@ class Match:
 		elif frame_time > self.lifetime + self.start_time:
 			ctx = bot.SystemContext(self.qc)
 			try:
+				if self.state == self.WAITING_REPORT:
+					await self.report_win(ctx, self.teams[1].name, True)
 				await ctx.error(self.gt("Match {queue} ({id}) has timed out.").format(
 					queue=self.queue.name,
 					id=self.id
 				))
 			except DiscordException:
 				pass
-			if self.state == self.WAITING_REPORT:
-				await self.report_win(ctx, self.teams[1].name, True)
 
 	async def next_state(self, ctx):
 		if len(self.states):
