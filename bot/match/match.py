@@ -268,6 +268,7 @@ class Match:
 			ctx = bot.SystemContext(self.qc)
 			try:
 				if self.state == self.WAITING_REPORT:
+					print(f"===============\n{self.teams[1].name}: {','.join([p.name for p in self.teams[1]])}\n==================")
 					await self.report_win(ctx, self.teams[1].name, True)
 				await ctx.error(self.gt("Match {queue} ({id}) has timed out.").format(
 					queue=self.queue.name,
