@@ -176,6 +176,7 @@ async def register_match_ranked(ctx, m):
 	]]
 
 	if m.winner is None:  # draw
+		print(f"=============\nResults[0][0]: {results[0][0]}, Results[0][1]{results[0][1]}\n=============")
 		after = m.qc.rating.rate(winners=results[0][0], losers=results[0][1], draw=True)
 		results.append(after)
 	else:  # process actual scores
