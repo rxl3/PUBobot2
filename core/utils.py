@@ -158,7 +158,13 @@ def get_div_role(user, division_roles):
 		return "INVALID USER"
 	if len(division_roles) == 0:
 		return ""
-	string = string = sorted([r.name for r in user.roles if r.name in division_roles], key=lambda x: division_roles.index(x))[0]
+	roles = [r.name for r in user.roles if r.name in division_roles]
+	if len(roles) == 0:
+		return ""
+	string = sorted(roles, key=lambda x: division_roles.index(x))
+	if len(string) == 0:
+		return ""
+	string = string[0]
 	if string is None:
 		print(f"==============================\nERROR GETTING DIVISION ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
 		return ""
