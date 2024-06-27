@@ -134,71 +134,101 @@ def escape_cb(string):
 
 def get_nick(user):
 	""" Remove rating tag and text formatting characters """
-	string = user.name
-	if string is None:
-		print(f"==============================\nNAME IS NONETYPE FOR USER\n==============================")
-		return "no_name"
-	if x := re.match(r"^\[\d+\] (.+)", string):
-		string = x.group(1)
-	return escape_cb(string)
+	try:
+		string = user.name
+		if string is None:
+			print(f"==============================\nNAME IS NONETYPE FOR USER\n==============================")
+			return "no_name"
+		if x := re.match(r"^\[\d+\] (.+)", string):
+			string = x.group(1)
+		return escape_cb(string)
+	except Exception as err:
+		print("SOMETHING FAILED")
+		print(err)
+		return ""
 
 def get_global_name(user):
-	if user is None:
-		return "INVALID USER"
-	string = user.global_name
-	if string is None:
-		print(f"==============================\nGLOBAL_NAME IS NONETYPE FOR USER: {get_nick(user)} : {user.id}\n==============================")
-		return get_nick(user)
-	if x := re.match(r"^\[\d+\] (.+)", string):
-		string = x.group(1)
-	return escape_cb(string)
+	try:
+		if user is None:
+			return "INVALID USER"
+		string = user.global_name
+		if string is None:
+			print(f"==============================\nGLOBAL_NAME IS NONETYPE FOR USER: {get_nick(user)} : {user.id}\n==============================")
+			return get_nick(user)
+		if x := re.match(r"^\[\d+\] (.+)", string):
+			string = x.group(1)
+		return escape_cb(string)
+	except Exception as err:
+		print("SOMETHING FAILED")
+		print(err)
+		return ""
 
 def get_div_role(user, division_roles):
-	if user is None:
-		return "INVALID USER"
-	if len(division_roles) == 0:
+	try:
+		if user is None:
+			return "INVALID USER"
+		if len(division_roles) == 0:
+			return ""
+		roles = [r.name for r in user.roles if r.name in division_roles]
+		if len(roles) == 0:
+			return ""
+		string = sorted(roles, key=lambda x: division_roles.index(x))
+		if len(string) == 0:
+			return ""
+		string = string[0]
+		if string is None:
+			print(f"==============================\nERROR GETTING DIVISION ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
+			return ""
+		if x := re.match(r"^\[\d+\] (.+)", string):
+			string = x.group(1)
+		return escape_cb(string)
+	except Exception as err:
+		print("SOMETHING FAILED")
+		print(err)
 		return ""
-	roles = [r.name for r in user.roles if r.name in division_roles]
-	if len(roles) == 0:
-		return ""
-	string = sorted(roles, key=lambda x: division_roles.index(x))
-	if len(string) == 0:
-		return ""
-	string = string[0]
-	if string is None:
-		print(f"==============================\nERROR GETTING DIVISION ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
-		return ""
-	if x := re.match(r"^\[\d+\] (.+)", string):
-		string = x.group(1)
-	return escape_cb(string)
 
 def get_class_roles(user, class_roles):
-	if user is None:
-		return "INVALID USER"
-	if len(class_roles) == 0:
+	try:
+		if user is None:
+			return "INVALID USER"
+		if len(class_roles) == 0:
+			return ""
+		string = ", ".join(sorted([r.name for r in user.roles if r.name in class_roles]))
+		if string is None:
+			print(f"==============================\nERROR GETTING CLASS ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
+			return ""
+		if x := re.match(r"^\[\d+\] (.+)", string):
+			string = x.group(1)
+		return escape_cb(string)
+	except Exception as err:
+		print("SOMETHING FAILED")
+		print(err)
 		return ""
-	string = ", ".join(sorted([r.name for r in user.roles if r.name in class_roles]))
-	if string is None:
-		print(f"==============================\nERROR GETTING CLASS ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
-		return ""
-	if x := re.match(r"^\[\d+\] (.+)", string):
-		string = x.group(1)
-	return escape_cb(string)
 
 def get_mention(user):
-	if user is None:
-		return "INVALID USER"
-	if user.id is None:
-		print(f"==============================\nID IS NONETYPE FOR USER: {get_nick(user)}\n==============================")
-		return "no_ID"
-	return "<@" + str(user.id) + ">"
+	try:
+		if user is None:
+			return "INVALID USER"
+		if user.id is None:
+			print(f"==============================\nID IS NONETYPE FOR USER: {get_nick(user)}\n==============================")
+			return "no_ID"
+		return "<@" + str(user.id) + ">"
+	except Exception as err:
+		print("SOMETHING FAILED")
+		print(err)
+		return ""
 
 def get_user_id(user):
-	if user is None:
-		return "INVALID USER"
-	if user.id is None:
-		return "NO USER ID"
-	return user.id
+	try:
+		if user is None:
+			return "INVALID USER"
+		if user.id is None:
+			return "NO USER ID"
+		return user.id
+	except Exception as err:
+		print("SOMETHING FAILED")
+		print(err)
+		return ""
 
 def discord_table(header, rows):
 	t = PrettyTable()
