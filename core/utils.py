@@ -133,58 +133,33 @@ def escape_cb(string):
 
 
 def get_nick(user):
-	""" Remove rating tag and text formatting characters """
 	try:
 		string = user.name
-		if string is None:
-			print(f"==============================\nNAME IS NONETYPE FOR USER\n==============================")
-			return "no_name"
 		if x := re.match(r"^\[\d+\] (.+)", string):
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
-		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
-		print(err)
-		return ""
-
-def get_global_name(user):
-	try:
-		if user is None:
-			return "INVALID USER"
-		string = user.global_name
-		if string is None:
-			print(f"==============================\nGLOBAL_NAME IS NONETYPE FOR USER: {get_nick(user)} : {user.id}\n==============================")
-			return get_nick(user)
-		if x := re.match(r"^\[\d+\] (.+)", string):
-			string = x.group(1)
-		return escape_cb(string)
-	except Exception as err:
-		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
-		print(err)
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
 
 def get_div_role(user, division_roles):
 	try:
-		if user is None:
-			return "INVALID USER"
-		if len(division_roles) == 0:
+		if user is None or len(division_roles) == 0:
+			print("INVALID USER")
 			return ""
 		roles = [r.name for r in user.roles if r.name in division_roles]
 		if len(roles) == 0:
+			print("USER HAS NO ROLES THAT ARE IN DIVISION_ROLES")
 			return ""
 		string = sorted(roles, key=lambda x: division_roles.index(x))
-		if len(string) == 0:
+		if len(string) == 0 or string[0] is None:
+			print("USER DIV ROLES LIST IS EMPTY AFTER SORTING")
 			return ""
-		string = string[0]
-		if string is None:
-			print(f"==============================\nERROR GETTING DIVISION ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
-			return ""
-		if x := re.match(r"^\[\d+\] (.+)", string):
+		if x := re.match(r"^\[\d+\] (.+)", string[0]):
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
-		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
-		print(err)
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
 
 def get_class_roles(user, class_roles):
@@ -201,8 +176,7 @@ def get_class_roles(user, class_roles):
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
-		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
-		print(err)
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
 
 def get_mention(user):

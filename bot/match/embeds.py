@@ -1,6 +1,6 @@
 from nextcord import Embed, Colour, Streaming
 from core.client import dc
-from core.utils import get_nick, get_global_name, get_mention, get_div_role, get_class_roles, join_and
+from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and
 from core import config
 import random
 
@@ -94,11 +94,19 @@ class Embeds:
 		# If players are still waiting to be picked
 		if len(self.m.teams[2]):
 
+			# Easier to use
+			divs = self.m.cfg['division_roles']
+
 			# If teams have captains
 			if len(self.m.teams[0]) and len(self.m.teams[1]):
-				if len(self.m.cfg['division_roles']):
+				if len(divs):
 					# Sort the unpicked players by Division Role (descending)
-					unpicked_list=sorted(self.m.teams[2], key=lambda x: self.m.cfg['division_roles'].index(get_div_role(x,self.m.cfg['division_roles'])))
+					unpicked_list=sorted(
+						self.m.teams[2], 
+						key=lambda u: divs.index(
+							d:=get_div_role(u,divs) if d in divs else divs[0]
+						)
+					)
 				else:
 					unpicked_list = self.m.teams[2]
 				
@@ -140,7 +148,6 @@ class Embeds:
 						rank=self.m.rank_str(p) if self.m.ranked else "",
 						name=get_nick(p),
 						mention=get_mention(p),
-						global_name=get_global_name(p),
 						div=get_div_role(p, self.m.cfg['division_roles']),
 						classes=get_class_roles(p, self.m.cfg['class_roles']),
 						immune=f" - **IMMUNE: x{self.m.immune[int(p.id)]}**" if p.id in self.m.immune else ""

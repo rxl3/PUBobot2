@@ -274,6 +274,7 @@ class Match:
 					queue=self.queue.name,
 					id=self.id
 				))
+				await self.finish_match(ctx) # just incase?
 			except DiscordException:
 				pass
 
