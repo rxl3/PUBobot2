@@ -143,7 +143,7 @@ def get_nick(user):
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
-		print("SOMETHING FAILED")
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
 		print(err)
 		return ""
 
@@ -159,7 +159,7 @@ def get_global_name(user):
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
-		print("SOMETHING FAILED")
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
 		print(err)
 		return ""
 
@@ -183,7 +183,7 @@ def get_div_role(user, division_roles):
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
-		print("SOMETHING FAILED")
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
 		print(err)
 		return ""
 
@@ -201,7 +201,7 @@ def get_class_roles(user, class_roles):
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
-		print("SOMETHING FAILED")
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
 		print(err)
 		return ""
 
@@ -214,7 +214,7 @@ def get_mention(user):
 			return "no_ID"
 		return "<@" + str(user.id) + ">"
 	except Exception as err:
-		print("SOMETHING FAILED")
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
 		print(err)
 		return ""
 
@@ -226,7 +226,7 @@ def get_user_id(user):
 			return "NO USER ID"
 		return user.id
 	except Exception as err:
-		print("SOMETHING FAILED")
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
 		print(err)
 		return ""
 
