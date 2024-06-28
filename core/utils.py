@@ -150,17 +150,17 @@ def get_div_role(user, division_roles):
 		roles = [r.name for r in user.roles if r.name in division_roles]
 		if len(roles) == 0:
 			print("USER HAS NO ROLES THAT ARE IN DIVISION_ROLES")
-			return ""
+			return division_roles[0]
 		string = sorted(roles, key=lambda x: division_roles.index(x))
 		if len(string) == 0 or string[0] is None:
 			print("USER DIV ROLES LIST IS EMPTY AFTER SORTING")
-			return ""
+			return division_roles[0]
 		if x := re.match(r"^\[\d+\] (.+)", string[0]):
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
 		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
-		return ""
+		return division_roles[0]
 
 def get_class_roles(user, class_roles):
 	try:

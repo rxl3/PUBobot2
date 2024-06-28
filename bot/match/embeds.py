@@ -103,9 +103,7 @@ class Embeds:
 					# Sort the unpicked players by Division Role (descending)
 					unpicked_list=sorted(
 						self.m.teams[2], 
-						key=lambda u: divs.index(
-							get_div_role(u,divs) if get_div_role(u,divs) != "" and get_div_role(u,divs) in divs else divs[0]
-						)
+						key=lambda u: divs.index(get_div_role(u,divs))
 					)
 				else:
 					unpicked_list = self.m.teams[2]
