@@ -135,74 +135,42 @@ def escape_cb(string):
 def get_nick(user):
 	try:
 		string = user.name
-		if x := re.match(r"^\[\d+\] (.+)", string):
+		if x := re.match(r"^\[\d+\] (.+)", string): # Strip numeric prefix from user name
 			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
 		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
+
 
 def get_div_role(user, division_roles):
 	try:
-		if user is None or len(division_roles) == 0:
-			print("INVALID USER")
-			return ""
-		roles = [r.name for r in user.roles if r.name in division_roles]
-		if len(roles) == 0:
-			print("USER HAS NO ROLES THAT ARE IN DIVISION_ROLES")
-			return division_roles[0]
-		string = sorted(roles, key=lambda x: division_roles.index(x))
-		if len(string) == 0 or string[0] is None:
-			print("USER DIV ROLES LIST IS EMPTY AFTER SORTING")
-			return division_roles[0]
-		if x := re.match(r"^\[\d+\] (.+)", string[0]):
-			string = x.group(1)
-		return escape_cb(string)
+		roles = sorted(
+			[r.name for r in user.roles if r.name in division_roles],  # User Roles that are in division_roles - Will be List or empty string
+			key=lambda x: division_roles.index(x) # Sort by division_roles order - Can assume index(x) exists or it wouldn't be in the List
+		) 
+		return escape_cb(roles[0]) # Remove invalid chars - Throws IndexError exception if User has no Roles in division_roles
 	except Exception as err:
 		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
-		return division_roles[0]
+		return division_roles[0] # Just use the first division role if we hit an error
+
 
 def get_class_roles(user, class_roles):
 	try:
-		if user is None:
-			return "INVALID USER"
-		if len(class_roles) == 0:
-			return ""
 		string = ", ".join(sorted([r.name for r in user.roles if r.name in class_roles]))
-		if string is None:
-			print(f"==============================\nERROR GETTING CLASS ROLES FOR USER: {get_nick(user)} : {user.id}\n==============================")
-			return ""
-		if x := re.match(r"^\[\d+\] (.+)", string):
-			string = x.group(1)
 		return escape_cb(string)
 	except Exception as err:
 		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
 
+
 def get_mention(user):
 	try:
-		if user is None:
-			return "INVALID USER"
-		if user.id is None:
-			print(f"==============================\nID IS NONETYPE FOR USER: {get_nick(user)}\n==============================")
-			return "no_ID"
-		return "<@" + str(user.id) + ">"
+		return "<@" + str(user.id) + ">" # User must have an id, right?
 	except Exception as err:
-		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
-		print(err)
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
 
-def get_user_id(user):
-	try:
-		if user is None:
-			return "INVALID USER"
-		if user.id is None:
-			return "NO USER ID"
-		return user.id
-	except Exception as err:
-		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}")
-		print(err)
-		return ""
 
 def discord_table(header, rows):
 	t = PrettyTable()
