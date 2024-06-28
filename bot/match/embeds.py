@@ -106,7 +106,7 @@ class Embeds:
 						key=lambda u: (
 							d:=get_div_role(u,divs),
 							divs.index(
-								get_div_role(u,divs) if d != "" and d in divs else divs[0]
+								d if d != "" and d in divs else divs[0]
 							)
 						)
 					)
