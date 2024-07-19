@@ -36,6 +36,10 @@ class SlashContext(Context):
 		if not self.interaction.response.is_done():
 			await self.interaction.response.send_message(*args, **kwargs, ephemeral=True)
 
+	async def ephemeral(self, *args, **kwargs):
+		if not self.interaction.response.is_done():
+			await self.interaction.response.send_message(*args, **kwargs, ephemeral=True)
+
 	async def error(self, *args, **kwargs):
 		if not self.interaction.response.is_done():
 			await self.interaction.response.send_message(embed=error_embed(*args, **kwargs), ephemeral=True)
