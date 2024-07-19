@@ -4,6 +4,7 @@ __all__ = [
 ]
 
 import time
+from datetime import timedelta
 from random import choice
 from nextcord import Member
 from core.utils import error_embed, join_and, find, seconds_to_str
@@ -63,6 +64,8 @@ async def add(ctx, queues: str = None):
 		await ctx.qc.update_expire(ctx.author)
 		if phrase:
 			await ctx.reply(phrase)
+		if q.cfg.auto_ready_on_add:
+			await bot.commands.auto_ready(ctx, duration=timedelta(q.cfg.auto_ready_on_add))
 		await ctx.notice(ctx.qc.topic)
 	else:  # have to give some response for slash commands
 		await ctx.ignore(content=ctx.qc.topic, embed=error_embed(ctx.qc.gt("Action had no effect."), title=None))

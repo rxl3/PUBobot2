@@ -14,19 +14,28 @@ MAX_EXPIRE_TIME = timedelta(hours=12)
 
 
 async def auto_ready(ctx, duration: timedelta = None):
-	if not duration:
-		duration = timedelta(seconds=min([60*5, ctx.qc.cfg.max_auto_ready]))
 
+	# Turn off auto_ready only if they explicitly set auto_ready to "off"
+	if duration == "off":
+		if ctx.author.id in bot.auto_ready.keys():
+			bot.auto_ready.pop(ctx.author.id)
+			await ctx.success(ctx.qc.gt("Your automatic ready confirmation is now turned off."))
+			return
+		else:
+			await ctx.reply(ctx.qc.gt("Your automatic ready confirmation is not currently on"))
+			return
+
+	# If no duration given, default to the maximum allowed time
+	if not duration:
+		duration = timedelta(seconds=ctx.qc.cfg.max_auto_ready)
+
+	# If time is too high, raise error
 	if duration.total_seconds() > ctx.qc.cfg.max_auto_ready:
 		raise ctx.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {duration}.").format(
 			duration=seconds_to_str(ctx.qc.cfg.max_auto_ready)
 		))
 
-	if ctx.author.id in bot.auto_ready.keys():
-		bot.auto_ready.pop(ctx.author.id)
-		await ctx.success(ctx.qc.gt("Your automatic ready confirmation is now turned off."))
-		return
-
+	# Else, set the auto ready expire time (overwriting if already exists)
 	bot.auto_ready[ctx.author.id] = int(time()) + duration.total_seconds()
 	await ctx.success(
 		ctx.qc.gt("During next {duration} your match participation will be confirmed automatically.").format(
