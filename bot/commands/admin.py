@@ -1,7 +1,7 @@
 __all__ = [
 	'noadds', 'noadd', 'forgive', 'rating_seed', 'rating_penality', 'rating_hide',
 	'rating_reset', 'rating_snap', 'stats_reset', 'stats_reset_player', 'stats_replace_player',
-	'phrases_add', 'phrases_clear', 'undo_match', 'save_bot_state'
+	'phrases_add', 'phrases_clear', 'undo_match'
 ]
 
 from time import time
