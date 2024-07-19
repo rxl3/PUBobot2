@@ -70,8 +70,6 @@ class Match:
 		match.init_captains(match.cfg['pick_captains'], match.cfg['captains_role_id'])
 		match.init_teams(match.cfg['pick_teams'])
 
-		match.match_start_time = int(time())
-
 		if match.ranked:
 			match.states.append(match.WAITING_REPORT)
 		bot.active_matches.append(match)
@@ -294,6 +292,9 @@ class Match:
 		return self.queue.qc.rating_rank(self.ratings[member.id])['rank']
 
 	async def start_waiting_report(self, ctx):
+		# Set match start time
+		self.match_start_time = int(time())
+
 		# remove never picked players from the match
 		if len(self.teams[2]):
 			for p in self.teams[2]:
