@@ -76,9 +76,9 @@ class Context:
 		""" Send message in chat without replying if possible """
 		pass
 
-	async def ephemeral(self, content: str = None, embed: Embed = None):
-		""" Reply ephemerally """
-		pass
+	# async def ephemeral(self, content: str = None, embed: Embed = None):
+	# 	""" Reply ephemerally """
+	# 	pass
 
 	async def ignore(self, content: str = None, embed: Embed = None):
 		""" Send reply only if it's required to reply by the context class """
@@ -124,8 +124,8 @@ class SystemContext(Context):
 	async def reply_dm(self, content: str = None, embed: Embed = None):
 		await self.messagable.send(content=content, embed=embed)
 	
-	async def ephemeral(self, content: str = None, embed: Embed = None):
-		await self.messagable.send(content=content, embed=embed, ephemeral=True)
+	# async def ephemeral(self, content: str = None, embed: Embed = None):
+	# 	await self.messagable.send(content=content, embed=embed, ephemeral=True)
 
 	async def error(self, *args, **kwargs):
 		await self.messagable.send(embed=error_embed(*args, **kwargs))
