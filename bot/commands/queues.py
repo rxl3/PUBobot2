@@ -65,7 +65,7 @@ async def add(ctx, queues: str = None):
 		if phrase:
 			await ctx.reply(phrase)
 		if q.cfg.auto_ready_on_add:
-			await bot.commands.auto_ready(ctx, duration=timedelta(q.cfg.auto_ready_on_add))
+			await bot.commands.auto_ready(ctx, duration=timedelta(seconds=q.cfg.auto_ready_on_add))
 		await ctx.notice(ctx.qc.topic)
 	else:  # have to give some response for slash commands
 		await ctx.ignore(content=ctx.qc.topic, embed=error_embed(ctx.qc.gt("Action had no effect."), title=None))
