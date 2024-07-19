@@ -37,7 +37,7 @@ async def auto_ready(ctx, duration: timedelta = None):
 
 	# Else, set the auto ready expire time (overwriting if already exists)
 	bot.auto_ready[ctx.author.id] = int(time()) + duration.total_seconds()
-	await ctx.success(
+	await ctx.ignore(
 		ctx.qc.gt("During next {duration} your match participation will be confirmed automatically.").format(
 			duration=duration.__str__()
 		)
