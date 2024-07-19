@@ -1,41 +1,50 @@
-# PUBobot2
+# PUBobot2 (Pride Pugs modifications by Chungus McBungus)
 **PUBobot2** is a Discord bot for pickup games organisation. PUBobot2 have a remarkable list of features such as rating matches, rank roles, drafts, map votepolls and more!
 
-### Some screenshots
-![screenshots](https://cdn.discordapp.com/attachments/824935426228748298/836978698321395712/screenshots.png)
+## This is a forked version with modifications - Designed for the Pride Pugs TF2 Community
+This version contains QoL modifications specifically aimed at improving the overall experience in TF2 pugging (See the Context section below)
 
-### This is a forked and modified version of Pubotbot2
-This version was designed for Pride Pugs in the TF2 community
+I eventually hope to have these changes implemented in a way that is convenient, fully configurable, and does not interfere with the existing flow of PUBobot2 so that the fork can be merged in to the original bot as useful optional features
 
-It contains some QoL changes that are relevant to TF2 pugging which aim to help smooth the process and minimise the amount of time needed to start a pug
+__**Changes:**__
+- Database can now track when a player is a "Captain" in their match
+- Players can be given **Immunity** for x number of games after playing Captain
+- Drafting Stage:
+  - (If either team does not yet have a Captain) Player list can now be randomised while also filtering **Immune** players to the bottom of the list
+  - (When both teams have a Captain) Player list can now be re-ordered based on Division Roles to aid team selection
+  - Player name format can be configured to any string, with variables for Division and Class Roles, Mention, Nickname, Immunity, etc
+- Check-In Lifetime can now be made visible (Time remaining until check-in is discarded)
+- Configurable variables for the above features
+- Games which have ended automatically due to time-out report a "Draw" instead of giving an Error message (Necessary for the game to be logged to DB for Immunity tracking)
+- ENV variables can now come from a .env file OR the config.cfg file (This is necessary for most web hosting services, unless you want your private discord Tokens on github)
 
-CHANGES:
-- Added lifetime of Check-In to the Check-In stage printout
-- Added Mention, TF2 Division from role, and TF2 Class(es) from roles to the Drafting stage printout
-- Added sorting by TF2 Division to the Unpicked list in the Drafting stage printout
-- Added the Division / Class roles to config.cfg as lists
-- -
+__**Context:**__
+The TF2 community was previously using PUBobot in the following way:
+1) All 12 players add and ready up, we enter the Draft stage
+2) We use Dyno bot's /roll command to determine which players will be forced to play Medic (Get 5 random numbers ranging from 1-12)
+   - If the first die rolls "5" and you are the 5th player in the list, then you are the Medic (and Captain)
+   - After someone plays Medic in a pug, they are Immune from playing Medic for 2 games
+3) If either of the rolled players had played Medic in the last 2 games, they will type "Immune" and post a link to a match log as evidence
+4) We then move down the dice roll list to see who will be captain...
+5) Once captains are finally decided, they take turns picking players for their teams
+6) If a newer player (or someone who doesn't know the other players very well) is captain then they will need to ask others to help them pick the best players
 
-TODO:
-- Move Division and Class Role lists from bot config to a user defined list configurable via command
-- Randomly sort the player list in the Drafting stage (before captains are selected) to simulate dice roll for captain position
-- Add database tracking for # of games since player last was a captain
-- Edit player list in the drafting stage (before captains are selected) so that players who have been a captain in the last n games are shunted to the bottom of the list (captain/medic immunity) and tag them as "Immune"
-- Add config options for medic immunity (enable + # of games)
-- Possibly improve the map voting system (to be reviewed)
+As you can see this can be a hassle for 3 main reasons:
+- Manual dice roll (and non-unique results, ie your 5 12-sided dice rolls might return "5 12 5 5 12")
+- A lot of back-and-forth when players claim to be Immune: Players have to dig up their match logs, Mods have to confirm that the player is not lying, Players who were further down the dice roll list sometimes go AFK because they think they aren't captain, etc
+- It can be very difficult to pick a balanced team unless you know everyone on the server (and sometimes people who offer to "help" you pick can be trolls)
 
-### Quick channel config
-`/channel enable`
-`/channel set variable: prefix value: /`
-
-### Quick queue config
-`/queue create_pickup name: test size: 4`
-`/queue set queue: test variable: pick_teams value: draft`
-`/queue set queue: test variable: pick_captains value: no captains`
-`/queue set queue: test variable: pick_order value: ababbababa`
-`/queue set queue: test variable: team_names value: RED BLU`
-`/queue set queue: test variable: team_emojis value: :red_circle: :blue_circle:`
-`/queue set queue: test variable: captain_immunity_games value: 2`
+__**TODO List:**__
+- Auto-ready players for x minutes after adding
+- Auto-ready when already auto-readied should update instead of disable the current auto-ready (maybe we can disable it explicitly with /auto_ready off)
+- Auto-ready default to minutes if nothing specified (eg: `!ar 15` should do the same as `!ar 15m`)
+- Change the useless error message if someone does `!ar 20m` when `15m` is the max
+- Times added to the Match Results print-out: Time taken to pick teams, Time taken to play game
+- Option to save games to the database even when they are unranked (current workaround is to use flat ranking system gaining 0.1 per win)
+- Map voting AFTER teams have readied up
+- Configurable variables for all of the above (to toggle on/off)
+- 
+# Original PUBobot2 Readme content:
 
 ### Using the public bot instance
 If you want to test the bot, feel free to join [**Pubobot2-dev** discord server](https://discord.gg/rjNt9nC).  
