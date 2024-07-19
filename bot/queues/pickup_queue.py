@@ -297,7 +297,7 @@ class PickupQueue:
 				section="General",
 				description="Set the duration to automatically auto_ready a user when they add up",
 				default=None,
-				verify=lambda d: 0 < d < 86401,
+				verify=lambda d: 0 < d < 901,
 				verify_message="Auto ready on add value must be 15 mins or less"
 			)
 		]
