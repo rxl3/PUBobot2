@@ -89,7 +89,7 @@ def parse_duration(string):
 	if string == 'inf':
 		return 0
 
-	if string.lower() == 'off':
+	if string == 'off':
 		return string
 
 	if re.match(r"^\d\d:\d\d:\d\d$", string):

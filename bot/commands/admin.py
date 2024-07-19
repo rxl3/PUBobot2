@@ -1,7 +1,7 @@
 __all__ = [
 	'noadds', 'noadd', 'forgive', 'rating_seed', 'rating_penality', 'rating_hide',
 	'rating_reset', 'rating_snap', 'stats_reset', 'stats_reset_player', 'stats_replace_player',
-	'phrases_add', 'phrases_clear', 'undo_match'
+	'phrases_add', 'phrases_clear', 'undo_match', 'save_bot_state'
 ]
 
 from time import time
@@ -143,3 +143,5 @@ async def undo_match(ctx, match_id: int):
 		await ctx.success(ctx.qc.gt("Done."))
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Could not find match with specified id."))
+
+async def save_bot_state(ctx):
