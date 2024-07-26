@@ -30,7 +30,8 @@ db.ensure_table(dict(
 		dict(cname="wins", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="losses", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="draws", ctype=db.types.int, notnull=True, default=0),
-		dict(cname="streak", ctype=db.types.int, notnull=True, default=0)
+		dict(cname="streak", ctype=db.types.int, notnull=True, default=0),
+		dict(cname="auto_ready_on_add", ctype=db.types.int, notnull=True, default=120)
 	],
 	primary_keys=["user_id", "channel_id"]
 ))

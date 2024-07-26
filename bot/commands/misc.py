@@ -1,4 +1,4 @@
-__all__ = ['auto_ready', 'expire', 'default_expire', 'allow_offline', 'switch_dms', 'cointoss', 'show_help', 'set_nick']
+__all__ = ['auto_ready', 'auto_ready_on_add', 'expire', 'default_expire', 'allow_offline', 'switch_dms', 'cointoss', 'show_help', 'set_nick']
 
 from time import time
 from datetime import timedelta
@@ -14,7 +14,6 @@ MAX_EXPIRE_TIME = timedelta(hours=12)
 
 
 async def auto_ready(ctx, duration: timedelta = None):
-
 	# Turn off auto_ready only if they explicitly set auto_ready to "off"
 	if duration == "off":
 		if ctx.author.id in bot.auto_ready.keys():
@@ -43,6 +42,32 @@ async def auto_ready(ctx, duration: timedelta = None):
 		)
 	)
 
+
+async def auto_ready_on_add(ctx, duration: timedelta = None):
+	# If no duration given, default to the maximum allowed time
+	if not duration:
+		duration = timedelta(seconds=ctx.qc.cfg.max_auto_ready)
+
+	# If time is too high, raise error
+	if duration.total_seconds() > ctx.qc.cfg.max_auto_ready:
+		raise ctx.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {duration}.").format(
+			duration=seconds_to_str(ctx.qc.cfg.max_auto_ready)
+		))
+
+	# Turn off auto_ready_on_add
+	if duration == "off" or duration == 0:
+		await db.update('qc_players', {'auto_ready_on_add': 0}, keys={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})
+		await ctx.success(ctx.qc.gt("You will no longer receive auto-ready when adding to queues in this channel"))
+		return
+
+	# Else, set auto_ready_on_add for user in this channel
+	await db.update('qc_players', {'auto_ready_on_add': duration.total_seconds()}, keys={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})
+	await ctx.success(
+		ctx.qc.gt("You will now receive {duration} auto-ready when adding to queues in this channel.").format(
+			duration=duration.__str__()
+		)
+	)
+	
 
 async def expire(ctx, duration: timedelta = None):
 	if not duration:

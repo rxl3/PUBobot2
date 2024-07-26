@@ -202,6 +202,17 @@ async def _auto_ready(ctx: MessageContext, args: str = None):
 	await bot.commands.auto_ready(ctx, duration=duration)
 
 
+@message_command('auto_ready_on_add')
+async def _auto_ready_on_add(ctx: MessageContext, args: str = None):
+	duration = None
+	if args:
+		try:
+			duration = parse_duration(args)
+		except ValueError:
+			raise bot.Exc.SyntaxError(ctx.qc.gt("Invalid duration format. Syntax: 3h2m1s or 03:02:01."))
+	await bot.commands.auto_ready_on_add(ctx, duration=duration)
+
+
 @message_command('rank')
 async def _rank(ctx: MessageContext, args: str = None):
 	if not args:
