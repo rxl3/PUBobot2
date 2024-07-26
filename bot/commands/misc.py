@@ -4,7 +4,7 @@ from time import time
 from datetime import timedelta
 from random import randint
 
-from core.utils import seconds_to_str, find
+from core.utils import seconds_to_str, find, get_nick
 from core.database import db
 from core.config import cfg
 
@@ -67,13 +67,19 @@ async def auto_ready_on_add(ctx, duration: timedelta = None):
 			duration=seconds_to_str(ctx.qc.cfg.max_auto_ready)
 		))
 
-	# Else, set auto_ready_on_add for user in this channel
-	await db.update('qc_players', {'auto_ready_on_add': duration.total_seconds()}, keys={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})
+	# Else, set auto_ready_on_add for user in this channel (creating the user entry if none exists)
+	update_user = await db.update('qc_players', {'auto_ready_on_add': duration.total_seconds()}, keys={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})
+	if update_user is None:
+		insert_user = await db.insert('qc_players', {'channel_id': ctx.channel.id, 'user_id': ctx.author.id, 'nick': get_nick(ctx.author), 'auto_ready_on_add': duration.total_seconds()})
 	await ctx.success(
 		ctx.qc.gt("You will now receive {duration} auto-ready when adding to queues in this channel.").format(
 			duration=duration.__str__()
 		)
 	)
+
+
+async def add_qc_player_if_not_exists(ctx):
+	return
 	
 
 async def expire(ctx, duration: timedelta = None):
