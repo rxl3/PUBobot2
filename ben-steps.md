@@ -55,7 +55,7 @@ I also needed to do the following:
 
 ### Quick channel config
 `/channel enable`
-`/channel set variable: prefix value: /`
+`/channel set variable: prefix value: !`
 
 ### Quick queue config
 `/queue create_pickup name: test size: 4`

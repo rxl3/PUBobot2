@@ -291,15 +291,6 @@ class PickupQueue:
 				default="{name}",
 				notnull=True,
 			),
-			Variables.DurationVar(
-				"auto_ready_on_add",
-				display="Auto ready on add",
-				section="General",
-				description="Set the duration to automatically auto_ready a user when they add up",
-				default=None,
-				verify=lambda d: 0 < d < 901,
-				verify_message="Auto ready on add value must be 15 mins or less"
-			)
 		]
 	)
 
@@ -378,7 +369,6 @@ class PickupQueue:
 			division_roles=self.cfg.division_roles.split(",") if self.cfg.division_roles else None,
 			class_roles=self.cfg.class_roles.split(",") if self.cfg.class_roles else None,
 			show_checkin_timer=self.cfg.show_checkin_timer, player_list_format=self.cfg.player_list_format,
-			auto_ready_on_add=self.cfg.auto_ready_on_add
 		)
 
 	async def promote(self, ctx):

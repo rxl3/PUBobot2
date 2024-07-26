@@ -13,7 +13,7 @@ import bot
 MAX_EXPIRE_TIME = timedelta(hours=12)
 
 
-async def auto_ready(ctx, duration: timedelta = None):
+async def auto_ready(ctx, duration: timedelta = None, overwrite = True):
 	# Turn off auto_ready only if they explicitly set auto_ready to "off"
 	if duration == "off":
 		if ctx.author.id in bot.auto_ready.keys():
@@ -30,12 +30,19 @@ async def auto_ready(ctx, duration: timedelta = None):
 
 	# If time is too high, raise error
 	if duration.total_seconds() > ctx.qc.cfg.max_auto_ready:
-		raise ctx.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {duration}.").format(
+		raise bot.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {duration}.").format(
 			duration=seconds_to_str(ctx.qc.cfg.max_auto_ready)
 		))
 
-	# Else, set the auto ready expire time (overwriting if already exists)
-	bot.auto_ready[ctx.author.id] = int(time()) + duration.total_seconds()
+	# Calculate the new auto_ready end time
+	new_time = int(time()) + duration.total_seconds()
+
+	# If overwrite is false, and we already have an auto_ready which expires later than the new one - cancel the command
+	if (overwrite==False) and (ctx.author.id in bot.auto_ready.keys()) and (bot.auto_ready[ctx.author.id] > new_time):
+		return
+	
+	# Update the auto_ready time
+	bot.auto_ready[ctx.author.id] = new_time
 	await ctx.success(
 		ctx.qc.gt("During next {duration} your match participation will be confirmed automatically.").format(
 			duration=duration.__str__()
@@ -48,17 +55,17 @@ async def auto_ready_on_add(ctx, duration: timedelta = None):
 	if not duration:
 		duration = timedelta(seconds=ctx.qc.cfg.max_auto_ready)
 
-	# If time is too high, raise error
-	if duration.total_seconds() > ctx.qc.cfg.max_auto_ready:
-		raise ctx.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {duration}.").format(
-			duration=seconds_to_str(ctx.qc.cfg.max_auto_ready)
-		))
-
 	# Turn off auto_ready_on_add
-	if duration == "off" or duration == 0:
+	if duration == "off":
 		await db.update('qc_players', {'auto_ready_on_add': 0}, keys={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})
 		await ctx.success(ctx.qc.gt("You will no longer receive auto-ready when adding to queues in this channel"))
 		return
+
+	# If time is too high, raise error
+	if duration.total_seconds() > ctx.qc.cfg.max_auto_ready:
+		raise bot.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {duration}.").format(
+			duration=seconds_to_str(ctx.qc.cfg.max_auto_ready)
+		))
 
 	# Else, set auto_ready_on_add for user in this channel
 	await db.update('qc_players', {'auto_ready_on_add': duration.total_seconds()}, keys={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})

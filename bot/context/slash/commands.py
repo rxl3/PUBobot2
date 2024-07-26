@@ -620,6 +620,19 @@ async def _auto_ready(
 	await run_slash(_run, interaction=interaction, _duration=duration)
 
 
+@dc.slash_command(name='auto_ready_on_add', description='Apply auto-ready when you add to a queue.', **guild_kwargs)
+async def _auto_ready_on_add(
+		interaction: Interaction,
+		duration: str = SlashOption(required=False),
+):
+	async def _run(ctx, *args, _duration=None, **kwargs):
+		if _duration:
+			_duration = _parse_duration(ctx, _duration)
+		await bot.commands.auto_ready_on_add(ctx, *args, duration=_duration, **kwargs)
+
+	await run_slash(_run, interaction=interaction, _duration=duration)
+
+
 @dc.slash_command(name='expire', description='Set or show your current expire timer.', **guild_kwargs)
 async def _expire(
 		interaction: Interaction,

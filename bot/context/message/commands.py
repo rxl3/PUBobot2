@@ -202,7 +202,7 @@ async def _auto_ready(ctx: MessageContext, args: str = None):
 	await bot.commands.auto_ready(ctx, duration=duration)
 
 
-@message_command('auto_ready_on_add')
+@message_command('auto_ready_on_add', 'aar')
 async def _auto_ready_on_add(ctx: MessageContext, args: str = None):
 	duration = None
 	if args:

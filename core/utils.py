@@ -89,12 +89,15 @@ def parse_duration(string):
 	if string == 'inf':
 		return 0
 
-	if string == 'off':
-		return string
+	if string == 'off' or string == '0':
+		return 'off'
 
 	if re.match(r"^\d\d:\d\d:\d\d$", string):
 		x = sum(x * int(t) for x, t in zip([3600, 60, 1], string.split(":")))
 		return timedelta(seconds=x)
+	
+	elif re.match(r"^\d+(\.\d+)?$", string):
+		return timedelta(minutes=float(string))
 
 	elif re.match(r"^(\d+\w ?)+$", string):
 		duration = 0
@@ -117,10 +120,7 @@ def parse_duration(string):
 			else:
 				raise ValueError()
 		return timedelta(seconds=int(duration))
-	
-	elif re.match(r"^\d+(\.\d+)?$", string):
-		return timedelta(minutes=float(string))
-	
+
 	else:
 		raise ValueError()
 
