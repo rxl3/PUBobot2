@@ -55,27 +55,31 @@ async def auto_ready_on_add(ctx, duration: timedelta = None):
 	if not duration:
 		duration = timedelta(seconds=ctx.qc.cfg.max_auto_ready)
 
-	# Turn off auto_ready_on_add
 	if duration == "off":
-		await db.update('qc_players', {'auto_ready_on_add': 0}, keys={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})
-		await ctx.success(ctx.qc.gt("You will no longer receive auto-ready when adding to queues in this channel"))
-		return
-
-	# If time is too high, raise error
-	if duration.total_seconds() > ctx.qc.cfg.max_auto_ready:
-		raise bot.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {duration}.").format(
-			duration=seconds_to_str(ctx.qc.cfg.max_auto_ready)
-		))
-
-	# Else, set auto_ready_on_add for user in this channel (creating the user entry if none exists)
-	update_user = await db.update('qc_players', {'auto_ready_on_add': duration.total_seconds()}, keys={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})
-	if update_user is None:
-		insert_user = await db.insert('qc_players', {'channel_id': ctx.channel.id, 'user_id': ctx.author.id, 'nick': get_nick(ctx.author), 'auto_ready_on_add': duration.total_seconds()})
-	await ctx.success(
-		ctx.qc.gt("You will now receive {duration} auto-ready when adding to queues in this channel.").format(
-			duration=duration.__str__()
+		d=0
+		msg=ctx.qc.gt("You will no longer receive auto-ready when adding to queues in this channel")
+	else:
+		d=duration.total_seconds()
+		# If time is too high, raise error
+		if d > ctx.qc.cfg.max_auto_ready:
+			raise bot.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {d}.").format(
+				d=seconds_to_str(ctx.qc.cfg.max_auto_ready)
+			))
+		msg=ctx.qc.gt("You will now receive {d} auto-ready when adding to queues in this channel.").format(
+			d=d.__str__()
 		)
-	)
+
+	# Update (or insert into if no entry exists for this user) the qc_players table to set the new auto_ready_on_add_value
+	exists = await db.select_one(['channel_id'], 'qc_players', where={'channel_id': ctx.channel.id, 'user_id': ctx.author.id})
+	print(exists)
+	if exists:
+		await db.update('qc_players', {'auto_ready_on_add': d}, keys={'channel_id': ctx.channel.id, 'user_id': ctx.author.id})
+		
+	else:
+		await db.insert('qc_players', {'channel_id': ctx.channel.id, 'user_id': ctx.author.id, 'nick': get_nick(ctx.author), 'auto_ready_on_add': d})
+
+	# Message
+	await ctx.success(msg)
 
 
 async def add_qc_player_if_not_exists(ctx):
