@@ -82,10 +82,6 @@ async def auto_ready_on_add(ctx, duration: timedelta = None):
 	await ctx.success(msg)
 
 
-async def add_qc_player_if_not_exists(ctx):
-	return
-	
-
 async def expire(ctx, duration: timedelta = None):
 	if not duration:
 		if task := bot.expire.get(ctx.qc, ctx.author):
