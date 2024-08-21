@@ -65,8 +65,8 @@ async def auto_ready_on_add(ctx, duration: timedelta = None):
 			raise bot.Exc.ValueError(ctx.qc.gt("Maximum auto_ready duration is {d}.").format(
 				d=seconds_to_str(ctx.qc.cfg.max_auto_ready)
 			))
-		msg=ctx.qc.gt("You will now receive {d} auto-ready when adding to queues in this channel.").format(
-			d=d.__str__()
+		msg=ctx.qc.gt("You will now receive {duration} auto-ready when adding to queues in this channel.").format(
+			duration=duration.__str__()
 		)
 
 	# Update (or insert into if no entry exists for this user) the qc_players table to set the new auto_ready_on_add_value
