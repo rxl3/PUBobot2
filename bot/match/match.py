@@ -245,10 +245,10 @@ class Match:
 
 	async def init_immune(self, captain_immunity_games, pick_captains):
 		if captain_immunity_games>0:
-			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players, captain_immunity_games)
+			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players)
 			p_a, p_b = [], []
 			for p in self.players:
-				(p_a,p_b)[p.id in self.immune].append(p)
+				(p_a,p_b)[p.id in self.immune.keys()].append(p)
 
 			random.shuffle(p_a)
 			random.shuffle(p_b)

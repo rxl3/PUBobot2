@@ -370,7 +370,7 @@ async def user_stats(channel_id, user_id):
 # }
 
 
-async def get_immune_players(channel_id, players, num: int):
+async def get_immune_players_old(channel_id, players, num: int):
 	player_matches = [await db.fetchall(
 		"SELECT match_id, user_id, captain FROM `qc_player_matches` " +
 		"WHERE channel_id=%s AND user_id=%s ORDER BY match_id DESC LIMIT %s",
@@ -383,6 +383,15 @@ async def get_immune_players(channel_id, players, num: int):
 			if match['captain']==1:
 				immune[match['user_id']] = num - index
 				break
+	return immune
+
+async def get_immune_players(channel_id, players):
+	player_str = ', '.join(["'"+str(p.id)+"'" for p in players])
+	data = await db.fetchall("\n".join((
+			"SELECT user_id, immunity FROM `qc_players`",
+			"WHERE channel_id = '{}' AND user_id IN ({}) AND immunity > 0".format(channel_id, player_str)
+	)))
+	immune = {i['user_id']: i['immunity'] for i in data}
 	return immune
 
 async def top(channel_id, time_gap=None):
