@@ -31,7 +31,8 @@ db.ensure_table(dict(
 		dict(cname="losses", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="draws", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="streak", ctype=db.types.int, notnull=True, default=0),
-		dict(cname="auto_ready_on_add", ctype=db.types.int, notnull=True, default=120)
+		dict(cname="auto_ready_on_add", ctype=db.types.int, notnull=True, default=120),
+		dict(cname="immunity", ctype=db.types.int, default=0)
 	],
 	primary_keys=["user_id", "channel_id"]
 ))
@@ -134,6 +135,12 @@ async def register_match_unranked(ctx, m):
 		for p in m.players
 	), on_dublicate="ignore")
 
+	results = [[
+		await m.qc.rating.get_players((p.id for p in m.teams[0])),
+		await m.qc.rating.get_players((p.id for p in m.teams[1])),
+	]]
+	before = iter_to_dict((*results[0][0], *results[0][1]), key='user_id')
+
 	for p in m.players:
 		nick = get_nick(p)
 		await db.update(
@@ -154,6 +161,23 @@ async def register_match_unranked(ctx, m):
 		await db.insert(
 			'qc_player_matches',
 			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain)
+		)
+
+		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
+		new_immunity = before[p.id]['immunity']
+		if captain==1:
+			if new_immunity < m.cfg['captain_immunity_games']:
+				new_immunity = m.cfg['captain_immunity_games']
+		# If not captain reduce immunity by 1 (to a minimum of zero)
+		elif new_immunity > 0:
+			new_immunity -= 1
+
+		await db.update(
+			"qc_players",
+			dict(
+				immunity=new_immunity,
+			),
+			keys=dict(channel_id=m.qc.rating.channel_id, user_id=p.id)
 		)
 
 
@@ -177,7 +201,6 @@ async def register_match_ranked(ctx, m):
 	]]
 
 	if m.winner is None:  # draw
-		print(f"=============\nResults[0][0]: {results[0][0]}, Results[0][1]{results[0][1]}\n=============")
 		after = m.qc.rating.rate(winners=results[0][0], losers=results[0][1], draw=True)
 		results.append(after)
 	else:  # process actual scores
@@ -199,6 +222,15 @@ async def register_match_ranked(ctx, m):
 		team = 0 if p in m.teams[0] else 1
 		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
 
+		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
+		new_immunity = before[p.id]['immunity']
+		if captain==1:
+			if new_immunity < m.cfg['captain_immunity_games']:
+				new_immunity = m.cfg['captain_immunity_games']
+		# If not captain reduce immunity by 1 (to a minimum of zero)
+		elif new_immunity > 0:
+			new_immunity -= 1
+
 		await db.update(
 			"qc_players",
 			dict(
@@ -208,7 +240,8 @@ async def register_match_ranked(ctx, m):
 				wins=after[p.id]['wins'],
 				losses=after[p.id]['losses'],
 				draws=after[p.id]['draws'],
-				streak=after[p.id]['streak']
+				streak=after[p.id]['streak'],
+				immunity=new_immunity,
 			),
 			keys=dict(channel_id=m.qc.rating.channel_id, user_id=p.id)
 		)

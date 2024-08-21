@@ -117,7 +117,7 @@ async def rank(ctx, player: Member = None):
 		place = data.index(p) + 1
 	else:
 		data = await db.select(
-			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'is_hidden', 'streak'],
+			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'is_hidden', 'streak', 'immunity'],
 			"qc_players",
 			where={'channel_id': ctx.qc.rating.channel_id}
 		)
@@ -144,6 +144,12 @@ async def rank(ctx, player: Member = None):
 		), inline=True)
 		if target.display_avatar:
 			embed.set_thumbnail(url=target.display_avatar.url)
+
+		games_as_captain = await db.select(['COUNT(*) as count'], "qc_player_matches",
+			where=dict(channel_id=ctx.qc.rating.channel_id, user_id=target.id, captain=1))
+		embed.add_field(name="Games as Captain", value=f"**{games_as_captain[0]['count']}**", inline=True)
+
+		embed.add_field(name="Immunity", value=f"**{p['immunity']}**", inline=True)
 
 		changes = await db.select(
 			('at', 'rating_change', 'match_id', 'reason'),

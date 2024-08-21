@@ -489,6 +489,7 @@ class PickupQueue:
 		await bot.Match.fake_ranked_match(
 			ctx, self, self.qc, winners, losers, draw=draw,
 			team_names=self.cfg.team_names.split(" ") if self.cfg.team_names else None,
+			captain_immunity_games=self.cfg.captain_immunity_games
 		)
 
 	async def revert(self, ctx, not_ready, ready):

@@ -74,13 +74,14 @@ class Match:
 		bot.active_matches.append(match)
 
 	@classmethod
-	async def fake_ranked_match(cls, ctx, queue, qc, winners, losers, draw=False, **kwargs):
+	async def fake_ranked_match(cls, ctx, queue, qc, winners, losers, draw=False, captain_immunity_games=0, **kwargs):
 		players = winners + losers
 		if len(set(players)) != len(players):
 			raise bot.Exc.ValueError("Players list can not contains duplicates.")
 		ratings = {p['user_id']: p['rating'] for p in await qc.rating.get_players((p.id for p in players))}
 		match_id = await bot.stats.next_match()
 		match = cls(match_id, queue, qc, players, ratings, pick_teams="premade", **kwargs)
+		match.cfg['captain_immunity_games'] = captain_immunity_games
 		match.teams[0].set(winners)
 		match.teams[1].set(losers)
 		if draw:
