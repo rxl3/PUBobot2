@@ -36,6 +36,12 @@ class Embeds:
 			value="\n".join((f" \u200b <@{p.id}>" for p in not_ready)),
 			inline=False
 		)
+		embed.add_field(
+			name=self.m.gt("Ready to play:"),
+			value="\n".join((f" \u200b `{get_nick(p)}`" for p in self.m.check_in.ready_players)),
+			inline=False
+		)
+
 		if not len(self.m.check_in.maps):
 			embed.add_field(
 				name="—",
