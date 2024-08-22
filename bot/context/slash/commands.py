@@ -619,6 +619,14 @@ async def _luck(
 ): await run_slash(bot.commands.luck, interaction=interaction, rows=rows, min_games=min_games)
 
 
+@dc.slash_command(name='set_immunity', description="Set a player's immunity value", **guild_kwargs)
+async def _set_immunity(
+		interaction: Interaction,
+		player: Member = SlashOption(required=False, verify=False),
+		immunity: int = 0
+): await run_slash(bot.commands.set_immunity, interaction=interaction, player=player, immunity=immunity)
+
+
 @dc.slash_command(name='leaderboard', description='Show rating leaderboard.', **guild_kwargs)
 async def _leaderboard(
 		interaction: Interaction,

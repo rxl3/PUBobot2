@@ -1,4 +1,4 @@
-__all__ = ['last_game', 'stats', 'top', 'luck', 'rank', 'leaderboard']
+__all__ = ['last_game', 'stats', 'top', 'luck', 'rank', 'leaderboard', 'set_immunity']
 
 from time import time
 from nextcord import Member, Embed, Colour
@@ -152,6 +152,31 @@ async def luck(ctx, rows=10, min_games=10):
 	# Send Messages
 	await ctx.reply(embed=unlucky)
 	await ctx.reply(embed=lucky)
+
+
+async def set_immunity(ctx, player: Member = None, immunity=0):
+	ctx.check_perms(ctx.Perms.MODERATOR)
+
+	target = ctx.author if not player else await ctx.get_member(player)
+	if not target:
+		raise bot.Exc.SyntaxError(ctx.qc.gt("Specified user not found."))
+
+	await db.update(
+		"qc_players",
+		dict(immunity=immunity),
+		keys=dict(channel_id=ctx.qc.id, user_id=target.id, nick=get_nick(target))
+	)
+
+	await ctx.reply(embed=
+		Embed(
+			title=ctx.qc.gt("Immunity Updated!"),
+			colour=Colour(0x00ff00),
+			description=ctx.qc.gt("Set {target}'s immunity to {immunity}").format(
+				target=f"{get_nick(target)}",
+				immunity=immunity
+			),
+		)
+	)
 
 
 async def rank(ctx, player: Member = None):
