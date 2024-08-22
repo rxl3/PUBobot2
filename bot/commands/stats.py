@@ -107,8 +107,8 @@ async def top(ctx, period=None):
 
 
 async def luck(ctx, rows=10, min_games=10):
-	# Absolute Maximum of 20
-	rows = 20 if rows > 20 else rows
+	# Absolute Maximum of 10
+	rows = 10 if rows > 10 else rows
 
 	# Get data
 	data = await bot.stats.luck(ctx,min_games,rows)
