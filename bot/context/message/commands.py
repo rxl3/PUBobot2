@@ -222,6 +222,11 @@ async def _rank(ctx: MessageContext, args: str = None):
 	await bot.commands.rank(ctx, player=member)
 
 
+@message_command('luck')
+async def _luck(ctx: MessageContext, args: int = 10):
+	await bot.commands.luck(ctx, rows=args)
+
+
 @message_command('leaderboard', 'lb')
 async def _leaderboard(ctx: MessageContext, args: str = None):
 	page = int(args) if args else None
@@ -246,6 +251,16 @@ async def _cancel_match(ctx: MessageContext, args: str = None):
 	if not args or not args.isdigit():
 		raise bot.Exc.SyntaxError(f"Usage: {ctx.qc.cfg.prefix}cancel_match __match_id__")
 	await bot.commands.report_admin(ctx, match_id=int(args), abort=True)
+
+
+@message_command('get_all_immunity')
+async def _get_all_immunity(ctx: MessageContext, args: str = None):
+	await bot.commands.get_all_immunity(ctx, channel_id=ctx.qc.id, num=2)
+
+
+@message_command('seed_immunity')
+async def _seed_immunity(ctx: MessageContext, args: str = None):
+	await bot.commands.seed_immunity(ctx, channel_id=ctx.qc.id, num=2)
 
 
 @message_command('promote')

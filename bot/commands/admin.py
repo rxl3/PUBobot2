@@ -1,7 +1,7 @@
 __all__ = [
 	'noadds', 'noadd', 'forgive', 'rating_seed', 'rating_penality', 'rating_hide',
 	'rating_reset', 'rating_snap', 'stats_reset', 'stats_reset_player', 'stats_replace_player',
-	'phrases_add', 'phrases_clear', 'undo_match'
+	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity'
 ]
 
 from time import time
@@ -144,4 +144,21 @@ async def undo_match(ctx, match_id: int):
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Could not find match with specified id."))
 
+async def get_all_immunity(ctx, channel_id, num):
+	ctx.check_perms(ctx.Perms.ADMIN)
+
+	result = await bot.stats.get_all_immunity(ctx, channel_id, num)
+	if result:
+		await ctx.success(ctx.qc.gt("Done."))
+	else:
+		raise bot.Exc.NotFoundError(ctx.qc.gt("Failed"))
+
+async def seed_immunity(ctx, channel_id, num):
+	ctx.check_perms(ctx.Perms.ADMIN)
+
+	result = await bot.stats.seed_immunity(ctx, channel_id, num)
+	if result:
+		await ctx.success(ctx.qc.gt("Done."))
+	else:
+		raise bot.Exc.NotFoundError(ctx.qc.gt("Failed"))
 # async def save_bot_state(ctx):

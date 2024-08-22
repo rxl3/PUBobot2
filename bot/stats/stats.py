@@ -6,6 +6,7 @@ import bot
 from core.console import log
 from core.database import db
 from core.utils import iter_to_dict, find, get_nick
+from core.client import dc
 
 db.ensure_table(dict(
 	tname="players",
@@ -393,6 +394,80 @@ async def get_immune_players(channel_id, players):
 	)))
 	immune = {i['user_id']: i['immunity'] for i in data}
 	return immune
+
+async def get_all_immunity(ctx, channel_id, num):
+
+	# Get all Members in guild (as list of Members --> [Member1, Member2, Member3, ...])
+	members = dc.get_guild(ctx.qc.guild_id).members
+
+	# SELECT last {num} matches for each Member 
+	player_matches = [i for i in [await db.fetchall(
+		"SELECT match_id, user_id, nick, captain FROM `qc_player_matches` " +
+		"WHERE channel_id=%s AND user_id=%s ORDER BY match_id DESC LIMIT %s",
+		(channel_id, str(m.id), num)
+	) for m in members] if i]
+
+	# Calculate Immunity (as dict of user_id->immune {123: 2, 124: 0, 125: 1})
+	immunity = {}
+	for player in player_matches:
+		immune = 0
+		for index, match in enumerate(player):
+			if match['captain']==1:
+				immune = num - index
+				break
+		immunity[player[0]['user_id']] = immune
+
+	print(immunity)
+	return immunity
+
+
+# When we convert from the old immunity method (looking at captain col in user's last n games) to the new method we must ensure players do not lose their current immunity
+async def seed_immunity(ctx, channel_id, num):
+
+	# Get all Members in guild (as list of Members --> [Member1, Member2, Member3, ...])
+	members = dc.get_guild(ctx.qc.guild_id).members
+	
+	# Insert Members into qc_players if they're not there
+	await db.insert_many('qc_players', (
+		dict(channel_id=channel_id, user_id=m.id, nick=get_nick(m))
+			for m in members
+		), on_dublicate="ignore")
+
+	# Get Immunities
+	immunity = await get_all_immunity(ctx, channel_id, num)
+	
+	# set initial immunity for everyone
+	for i in immunity:
+		await db.update("qc_players", dict(immunity=immunity[i]), keys=dict(channel_id=channel_id, user_id=i))
+
+	return True
+
+async def luck(ctx, min_games=10, rows=10):
+	unlucky = await db.fetchall(
+		"\n".join((
+			"SELECT nick,",
+			"SUM(CASE WHEN captain = 1 THEN 1 ELSE 0 END) AS captain_games,",
+			"SUM(CASE WHEN captain = 0 THEN 1 ELSE 0 END) AS non_captain_games,",
+			"SUM(CASE WHEN captain = 1 THEN 1 ELSE 0 END) / COUNT(*) AS ratio,",
+			"COUNT(*) AS total_games",
+			"FROM qc_player_matches WHERE channel_id=%s",
+			"GROUP BY nick HAVING COUNT(*) >= %s ORDER BY ratio DESC LIMIT %s;"
+		)), (ctx.qc.id, min_games, rows)
+	)
+
+	lucky =  await db.fetchall(
+		"\n".join((
+			"SELECT nick,",
+			"SUM(CASE WHEN captain = 1 THEN 1 ELSE 0 END) AS captain_games,",
+			"SUM(CASE WHEN captain = 0 THEN 1 ELSE 0 END) AS non_captain_games,",
+			"SUM(CASE WHEN captain = 1 THEN 1 ELSE 0 END) / COUNT(*) AS ratio,",
+			"COUNT(*) AS total_games",
+			"FROM qc_player_matches WHERE channel_id=%s",
+			"GROUP BY nick HAVING COUNT(*) >= %s ORDER BY ratio ASC LIMIT %s;"
+		)), (ctx.qc.id, min_games, rows)
+	)
+
+	return dict(unlucky=unlucky, lucky=lucky)
 
 async def top(channel_id, time_gap=None):
 	total = await db.fetchone(

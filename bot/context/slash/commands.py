@@ -611,6 +611,14 @@ async def _rank(
 ): await run_slash(bot.commands.rank, interaction=interaction, player=player)
 
 
+@dc.slash_command(name='luck', description='Show luckiest players', **guild_kwargs)
+async def _luck(
+		interaction: Interaction,
+		rows: int = 10,
+		min_games: int = 10
+): await run_slash(bot.commands.luck, interaction=interaction, rows=rows, min_games=min_games)
+
+
 @dc.slash_command(name='leaderboard', description='Show rating leaderboard.', **guild_kwargs)
 async def _leaderboard(
 		interaction: Interaction,

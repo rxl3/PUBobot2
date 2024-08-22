@@ -1,4 +1,4 @@
-__all__ = ['last_game', 'stats', 'top', 'rank', 'leaderboard']
+__all__ = ['last_game', 'stats', 'top', 'luck', 'rank', 'leaderboard']
 
 from time import time
 from nextcord import Member, Embed, Colour
@@ -104,6 +104,50 @@ async def top(ctx, period=None):
 	for p in data['players']:
 		embed.add_field(name=p['nick'], value=str(p['count']), inline=True)
 	await ctx.reply(embed=embed)
+
+
+async def luck(ctx, rows=10, min_games=10):
+	data = await bot.stats.luck(ctx,min_games,rows)
+
+	# UNLUCKY
+	unlucky = Embed(
+		title=ctx.qc.gt("Unluckiest {rows} players for __{target}__").format(
+			target=f"#{ctx.channel.name}",
+			min_games=min_games,
+			rows=rows
+		),
+		colour=Colour(0xff0000),
+		description=ctx.qc.gt("Highest percentage of Captain to Non-Captain games for players who have played at least {min_games} games").format(min_games=min_games)
+	)
+	for index,p in enumerate(data['unlucky']):
+		percent = '{0:.2f}'.format(p['ratio']*100)
+		unlucky.add_field(
+			name=f"**#{index+1}. {p['nick']}**", 
+			value=f"Captained {p['captain_games']} out of {p['total_games']} games played (**{percent}%**)",
+			inline=False
+		)
+
+	# LUCKY
+	lucky = Embed(
+		title=ctx.qc.gt("Luckiest {rows} players for __{target}__").format(
+			target=f"#{ctx.channel.name}",
+			min_games=min_games,
+			rows=rows
+		),
+		colour=Colour(0x00ff00),
+		description=ctx.qc.gt("Lowest percentage of Captain to Non-Captain games for players who have played at least {min_games} games").format(min_games=min_games)
+	)
+	for index,p in enumerate(data['lucky']):
+		percent = '{0:.2f}'.format(p['ratio']*100)
+		lucky.add_field(
+			name=f"**#{index+1}. {p['nick']}**", 
+			value=f"Captained {p['captain_games']} out of {p['total_games']} games played (**{percent}%**)",
+			inline=False
+		)
+
+	# Send Messages
+	await ctx.reply(embed=unlucky)
+	await ctx.reply(embed=lucky)
 
 
 async def rank(ctx, player: Member = None):
