@@ -440,7 +440,7 @@ async def seed_immunity(ctx, channel_id, num):
 	for i in immunity:
 		await db.update("qc_players", dict(immunity=immunity[i]), keys=dict(channel_id=channel_id, user_id=i))
 
-	return True
+	return immunity
 
 async def luck(ctx, min_games=10, rows=10):
 	unlucky = await db.fetchall(

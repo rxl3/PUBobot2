@@ -145,11 +145,11 @@ async def undo_match(ctx, match_id: int):
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Could not find match with specified id."))
 
 async def get_all_immunity(ctx, channel_id, num):
-	ctx.check_perms(ctx.Perms.ADMIN)
+	ctx.check_perms(ctx.Perms.MODERATOR)
 
 	result = await bot.stats.get_all_immunity(ctx, channel_id, num)
 	if result:
-		await ctx.success(ctx.qc.gt("Done."))
+		await ctx.success(ctx.qc.gt("\n".join([f"<@{i}> IMMUNITY: x{result[i]}" for i in result])))
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Failed"))
 
@@ -158,7 +158,7 @@ async def seed_immunity(ctx, channel_id, num):
 
 	result = await bot.stats.seed_immunity(ctx, channel_id, num)
 	if result:
-		await ctx.success(ctx.qc.gt("Done."))
+		await ctx.success(ctx.qc.gt("\n".join([f"<@{i}> IMMUNITY: x{result[i]}" for i in result])))
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Failed"))
 # async def save_bot_state(ctx):
