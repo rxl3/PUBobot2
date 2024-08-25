@@ -107,6 +107,9 @@ async def top(ctx, period=None):
 
 
 async def luck(ctx, rows=10, min_games=10):
+	# Mods only (too spammy)
+	ctx.check_perms(ctx.Perms.MODERATOR)
+	
 	# Absolute Maximum of 10
 	rows = 10 if int(rows) > 10 else rows
 
