@@ -1,15 +1,15 @@
-# PUBobot2 (Pride Pugs fork)
+# 🏳️‍🌈 PUBobot2 (Pride Pugs fork)
 
 [**PUBobot2**](https://github.com/Leshaka/PUBobot2) is a Discord bot for pickup games organisation originally made by [Leshaka](https://github.com/Leshaka/PUBobot2)
 
 This is a forked version of the existing bot with some QoL modifications aimed at improving the TF2 Pugging experience - Designed for the Pride Pugs TF2 Community by [Chungus McBungus](https://github.com/chungusmcbungus)
 
-This version of the bot is currently **PRIVATELY HOSTED** due to the costs associated with hosting a public discord bot, but the code is publicly available if you wish to self host (see Self-Hosting Guide)
+This version of the bot is currently **PRIVATELY HOSTED** due to the costs associated with hosting a public discord bot, but the code is publicly available if you wish to self host (see [Self-Hosting Guide](SELF-HOSTING-GUIDE.md))
 
 I eventually hope to have these changes implemented in a way that is convenient, fully configurable, and does not interfere with the existing flow of PUBobot2 so that the fork can be merged in to the original bot as useful optional features (and so I don't need to pay for hosting)
 
 **<u>Table of Contents</u>**
-- [PUBobot2 (Pride Pugs fork)](#pubobot2-pride-pugs-fork)
+- [🏳️‍🌈 PUBobot2 (Pride Pugs fork)](#️-pubobot2-pride-pugs-fork)
 - [🏳️‍🌈 New Features](#️-new-features)
   - [🆕 Front-Facing Features](#-front-facing-features)
   - [🆕 Back-End Features](#-back-end-features)
@@ -17,7 +17,7 @@ I eventually hope to have these changes implemented in a way that is convenient,
   - [🆕 New Commands](#-new-commands)
 - [🏳️‍🌈 Context](#️-context)
 - [🏳️‍🌈 TODO](#️-todo)
-- [More Documentation](#more-documentation)
+- [🏳️‍🌈 More Documentation](#️-more-documentation)
 
 ---
 # 🏳️‍🌈 New Features
@@ -99,7 +99,7 @@ As you can see this can be a hassle for 3 main reasons:
 - Configurable variables for all of the above (to toggle on/off)
 
 ---
-# More Documentation
+# 🏳️‍🌈 More Documentation
 
 - [Original README (Leshaka)](ORIGINAL-README.md)
 - [Self-Hosting Guide (Chungus McBungus)](SELF-HOSTING-GUIDE.md) - The extra steps I had to do to get it running locally + host it online
