@@ -1,24 +1,77 @@
-# PUBobot2 (Pride Pugs modifications by Chungus McBungus)
-**PUBobot2** is a Discord bot for pickup games organisation. PUBobot2 have a remarkable list of features such as rating matches, rank roles, drafts, map votepolls and more!
+# PUBobot2 (Pride Pugs fork)
 
-## This is a forked version with modifications - Designed for the Pride Pugs TF2 Community
-This version contains QoL modifications specifically aimed at improving the overall experience in TF2 pugging (See the Context section below)
+[**PUBobot2**](https://github.com/Leshaka/PUBobot2) is a Discord bot for pickup games organisation originally made by [Leshaka](https://github.com/Leshaka/PUBobot2)
 
-I eventually hope to have these changes implemented in a way that is convenient, fully configurable, and does not interfere with the existing flow of PUBobot2 so that the fork can be merged in to the original bot as useful optional features
+This is a forked version of the existing bot with some QoL modifications aimed at improving the TF2 Pugging experience - Designed for the Pride Pugs TF2 Community by [Chungus McBungus](https://github.com/chungusmcbungus)
 
-__**Changes:**__
-- Database can now track when a player is a "Captain" in their match
-- Players can be given **Immunity** for x number of games after playing Captain
-- Drafting Stage:
-  - (If either team does not yet have a Captain) Player list can now be randomised while also filtering **Immune** players to the bottom of the list
-  - (When both teams have a Captain) Player list can now be re-ordered based on Division Roles to aid team selection
-  - Player name format can be configured to any string, with variables for Division and Class Roles, Mention, Nickname, Immunity, etc
-- Check-In Lifetime can now be made visible (Time remaining until check-in is discarded)
-- Configurable variables for the above features
-- Games which have ended automatically due to time-out report a "Draw" instead of giving an Error message (Necessary for the game to be logged to DB for Immunity tracking)
-- ENV variables can now come from a .env file OR the config.cfg file (This is necessary for most web hosting services, unless you want your private discord Tokens on github)
+This version of the bot is currently **PRIVATELY HOSTED** due to the costs associated with hosting a public discord bot, but the code is publicly available if you wish to self host (see Self-Hosting Guide)
 
-__**Context:**__
+I eventually hope to have these changes implemented in a way that is convenient, fully configurable, and does not interfere with the existing flow of PUBobot2 so that the fork can be merged in to the original bot as useful optional features (and so I don't need to pay for hosting)
+
+**<u>Table of Contents</u>**
+- [PUBobot2 (Pride Pugs fork)](#pubobot2-pride-pugs-fork)
+- [🏳️‍🌈 New Features](#️-new-features)
+  - [🆕 Front-Facing Features](#-front-facing-features)
+  - [🆕 Back-End Features](#-back-end-features)
+  - [🆕 New Queue Variables](#-new-queue-variables)
+  - [🆕 New Commands](#-new-commands)
+- [🏳️‍🌈 Context](#️-context)
+- [🏳️‍🌈 TODO](#️-todo)
+- [More Documentation](#more-documentation)
+
+---
+# 🏳️‍🌈 New Features
+## 🆕 Front-Facing Features
+- Captains can be given Captain **Immunity** for `n` games after Captaining
+- Can define a list of Player **Division** and **Class** Roles per Queue
+- Player Sorting (Drafting Stage)
+  - Initially randomised but with **Immune** Players at the bottom of the list so they do not get rolled Captain
+  - After Captains are chosen, Players will then be sorted by **Division** (descending) to aid in the picking process
+- Games that end automatically due to `match_lifetime` running out are reported as Draw so they can be tracked in the system
+- QoL tweaks
+  - Durations (ie:  `!ar` , `!aar`)
+    - Assumes minutes if no unit specified (eg: `!ar 10 === !ar 10m`)
+    - Assumes max value if no duration specified (eg: `!aar === !aar 15m`)
+    - Is now toggled off by specifying "off" (eg: `!ar off` to turn off Auto-Ready)
+  - Additions to Printouts
+    - Check-In:
+      - Time until check-in expires
+      - List of Players who have readied up
+    - Drafting:
+      - [Customisable format for Player list with variables](###🆕-New-Configurable-variables-for-Queue)
+    - Results (after Match `/report`):
+        1. Time taken to pick teams (Start of Drafting -> End of Drafting)
+        2. Time taken to play match (End of Drafting -> Match result is Reported)
+    - Rank (via the `/rank` command):
+      - Now shows number of Captained games and current **Immunity**
+## 🆕 Back-End Features
+- Bot will now attempt to load from `.env` if no `config.cfg` is found
+  - Allows the bot to use System Variables defined on your hosting service (don't put private bot tokens on public github repos)
+- DB Table `qc_player_matches` now tracks which Player was `Captain` 
+- DB Table `qc_players` now tracks Player `auto_ready_on_add` and `immunity`
+## 🆕 New Queue Variables
+  - `captain_immunity_games` - Automatically set a Captain's **Immunity** to this after the game
+  - `division_roles` - Comma separated list of Division Role names in descending order (eg: `"Prem,High,Inter,Main,Open"`)
+  - `class_roles` - Comma separated list of Class Role names (eg: `"Scout,Soldier,Demo,Medic"`)
+  - `show_checkin_timer` - Display the time remaining until Check-in expires
+  - `player_list_format` - Text format to be used in the Player list at the Drafting stage (eg: `"{mention} {div} [{classes}] {immune}"`) ![Image displaying an example of a formatted Player list](readme-image-1.png)
+  - `auto_ready_on_add` - The default setting of `!aar` to give to all Players (they can adjust it themselves)
+## 🆕 New Commands
+- `/auto_ready_on_add` (aka Auto-Auto-Ready `!aar`)
+  - When a Player uses `/add` they will instantly also receive `/auto_ready` - Customisable per Player!
+- `/luck <rows:10> <min_games:10>` (**Moderator Only**)
+  - Prints a list of the Players with the highest and lowest ratio of Captain to Non-Captain games
+- `/set_immunity <player:self> <num:0>` (**Moderator Only**)
+  - Manually set the immunity value for a Player
+- `/testing add_multiple <player_namews_string:all> <queue:default>` (**Admin Only**)
+  - FOR TESTING PURPOSES
+  - Forcibly add Players to the queue
+- `/testing set_ready_all` (**Admin Only**)
+  - FOR TESTING PURPOSES
+  - Forcibly ready-up all Players in queue
+
+---
+# 🏳️‍🌈 Context
 The TF2 community was previously using PUBobot in the following way:
 1) All 12 players add and ready up, we enter the Draft stage
 2) We use Dyno bot's /roll command to determine which players will be forced to play Medic (Get 5 random numbers ranging from 1-12)
@@ -34,7 +87,8 @@ As you can see this can be a hassle for 3 main reasons:
 - A lot of back-and-forth when players claim to be Immune: Players have to dig up their match logs, Mods have to confirm that the player is not lying, Players who were further down the dice roll list sometimes go AFK because they think they aren't captain, etc
 - It can be very difficult to pick a balanced team unless you know everyone on the server (and sometimes people who offer to "help" you pick can be trolls)
 
-__**TODO List:**__
+---
+# 🏳️‍🌈 TODO
 - Auto-ready players for x minutes after adding
 - Auto-ready when already auto-readied should update instead of disable the current auto-ready (maybe we can disable it explicitly with /auto_ready off)
 - Auto-ready default to minutes if nothing specified (eg: `!ar 15` should do the same as `!ar 15m`)
@@ -43,49 +97,9 @@ __**TODO List:**__
 - Option to save games to the database even when they are unranked (current workaround is to use flat ranking system gaining 0.1 per win)
 - Map voting AFTER teams have readied up
 - Configurable variables for all of the above (to toggle on/off)
-- 
-# Original PUBobot2 Readme content:
 
-### Using the public bot instance
-If you want to test the bot, feel free to join [**Pubobot2-dev** discord server](https://discord.gg/rjNt9nC).  
-All the bot settings can be found and configured on the [Web interface](https://pubobot.leshaka.xyz/).  
-For the complete list of commands see [COMMANDS.md](https://github.com/Leshaka/PUBobot2/blob/main/COMMANDS.md).  
-You can invite the bot to your discord server from the [web interface](https://pubobot.leshaka.xyz/) or use the direct [invite link](https://discord.com/oauth2/authorize?client_id=177021948935667713&scope=bot).
+---
+# More Documentation
 
-### Support (Original Developer
-Hosting the service for everyone is not free, not mentioning the actual time and effort to develop the project. If you enjoy the bot please subscribe on [Boosty](https://boosty.to/leshaka).
-
-## Hosting the bot yourself
-
-### Requirements
-* **Python 3.9+** 
-* **MySQL**.
-* **gettext** for multilanguage support.
-
-### Installing
-* Create mysql user and database for PUBobot2:
-* * `sudo mysql`
-* * `CREATE USER 'pubobot'@'localhost' IDENTIFIED BY 'your-password';`
-* * `CREATE DATABASE pubodb CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;`
-* * `GRANT ALL PRIVILEGES ON pubodb.* TO 'pubobot'@'localhost';`
-* Install required modules and configure PUBobot2:
-* * `git clone https://github.com/Leshaka/PUBobot2`
-* * `cd PUBobot2`
-* * `pip3 install -r requirements.txt`
-* * `cp config.example.cfg config.cfg`
-* * `nano config.cfg` - Fill config file with your discord bot instance credentials and mysql settings and save.
-* * Optionally, if you want to use other languages, run script to compile translations: `./compile_locales.sh`.
-* * `python3 PUBobot2.py` - If everything is installed correctly the bot should launch without any errors and give you CLI.
-
-## Credits
-Developer: **Leshaka**. Contact: leshkajm@ya.ru.  
-Used libraries: [discord.py](https://github.com/Rapptz/discord.py), [aiomysql](https://github.com/aio-libs/aiomysql), [emoji](https://github.com/carpedm20/emoji/), [glicko2](https://github.com/deepy/glicko2), [TrueSkill](https://trueskill.org/), [prettytable](https://github.com/jazzband/prettytable).
-
-## License
-Copyright (C) 2020 **Leshaka**.
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3 as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-See 'GNU GPLv3.txt' for GNU General Public License.
+- [Original README (Leshaka)](ORIGINAL-README.md)
+- [Self-Hosting Guide (Chungus McBungus)](SELF-HOSTING-GUIDE.md) - The extra steps I had to do to get it running locally + host it online
