@@ -63,7 +63,9 @@ I eventually hope to have these changes implemented in a way that is convenient,
   - `division_roles` - Comma separated list of Division Role names in descending order (eg: `"Prem,High,Inter,Main,Open"`)
   - `class_roles` - Comma separated list of Class Role names (eg: `"Scout,Soldier,Demo,Medic"`)
   - `show_checkin_timer` - Display the time remaining until Check-in expires
-  - `player_list_format` - Text format to be used in the Player list at the Drafting stage (eg: `"{mention} {div} [{classes}] {immune}"`) ![Image displaying an example of a formatted Player list](readme-image-1.png)
+  - `player_list_format` - Text format to be used in the Player list at the Drafting stage (eg: `"{mention} {div} [{classes}] {immune}"`) 
+
+    ![Image displaying an example of a formatted Player list](readme-image-1.png)
   - `auto_ready_on_add` - The default setting of `!aar` to give to all Players (they can adjust it themselves)
 
 ## 🆕 New Commands

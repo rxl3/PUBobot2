@@ -40,7 +40,7 @@ class EnvCfg(object):
 # Try load variables from config file, else .env file
 print("[CONFIGS] Attempting to load config from config.cfg...")
 try:
-	cfg = SourceFileLoader('cfg', 'config2.cfg').load_module()
+	cfg = SourceFileLoader('cfg', 'config.cfg').load_module()
 except Exception as e:
 	print("[CONFIGS] Failed to load config.cfg! Trying .env instead...")
 	try:
