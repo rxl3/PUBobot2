@@ -1,7 +1,8 @@
 from nextcord import Embed, Colour, Streaming
 from core.client import dc
-from core.utils import get_nick, join_and
-
+from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and
+from core import config
+import random
 
 class Embeds:
 	""" This class generates discord embeds for various match states """
@@ -18,15 +19,29 @@ class Embeds:
 	def check_in(self, not_ready):
 		embed = Embed(
 			colour=Colour(0xf5d858),
-			title=self.m.gt("__**{queue}** is now on the check-in stage!__").format(
+			title=self.m.gt("__**{queue}** is now on the check-in stage! __").format(
 				queue=self.m.queue.name[0].upper()+self.m.queue.name[1:]
 			)
 		)
+		if self.m.cfg['show_checkin_timer'] and self.m.check_in.timeout != 0:
+			embed.add_field(
+				name="",
+				value=self.m.gt("Expires in <{t}s if players do not ready up").format(
+					t=int(self.m.check_in.time_to_timeout)
+				),
+				inline=False
+			)
 		embed.add_field(
 			name=self.m.gt("Waiting on:"),
 			value="\n".join((f" \u200b <@{p.id}>" for p in not_ready)),
 			inline=False
 		)
+		embed.add_field(
+			name=self.m.gt("Ready to play:"),
+			value="\n".join((f" \u200b `{get_nick(p)}`" for p in self.m.check_in.ready_players)),
+			inline=False
+		)
+
 		if not len(self.m.check_in.maps):
 			embed.add_field(
 				name="—",
@@ -72,7 +87,9 @@ class Embeds:
 		]
 		team_players = [
 			" \u200b ".join([
-				(f"`{self.m.rank_str(p)}" if self.m.ranked else "`") + f"{get_nick(p)}`"
+					" \u200b {mention}".format(
+						mention=get_mention(p),
+					)
 				for p in t
 			]) if len(t) else self.m.gt("empty")
 			for t in self.m.teams[:2]
@@ -80,29 +97,70 @@ class Embeds:
 		embed.add_field(name=teams_names[0], value=" \u200b ❲ \u200b " + team_players[0] + " \u200b ❳", inline=False)
 		embed.add_field(name=teams_names[1], value=" \u200b ❲ \u200b " + team_players[1] + " \u200b ❳\n\u200b", inline=False)
 
+		# If players are still waiting to be picked
 		if len(self.m.teams[2]):
-			embed.add_field(
-				name=self.m.gt("Unpicked:"),
-				value="\n".join((
-					" \u200b `{rank}{name}`".format(
-						rank=self.m.rank_str(p) if self.m.ranked else "",
-						name=get_nick(p)
-					)
-				) for p in self.m.teams[2]),
-				inline=False
-			)
 
+			# Easier to use
+			divs = self.m.cfg['division_roles']
+
+			# If teams have captains
 			if len(self.m.teams[0]) and len(self.m.teams[1]):
+				if len(divs):
+					# Sort the unpicked players by Division Role (descending)
+					unpicked_list=sorted(
+						self.m.teams[2], 
+						key=lambda u: divs.index(get_div_role(u,divs))
+					)
+				else:
+					unpicked_list = self.m.teams[2]
+				
+				# Post-msg 
 				msg = self.m.gt("Pick players with `/pick @player` command.")
 				pick_step = len(self.m.teams[0]) + len(self.m.teams[1]) - 2
 				picker_team = self.m.teams[self.m.draft.pick_order[pick_step]] if pick_step < len(self.m.draft.pick_order)-1 else None
 				if picker_team:
 					msg += "\n" + self.m.gt("{member}'s turn to pick!").format(member=f"<@{picker_team[0].id}>")
+
 			else:
+				# Keep the pre-sorting that we did to the Match.players variable (if any)
+				unpicked_list=[p for p in self.m.players if p in self.m.teams[2]]
+
+				# Post-msg
 				msg = self.m.gt("Type {cmd} to become a captain and start picking teams.").format(
 					cmd=f"`{self.m.qc.cfg.prefix}capfor {'/'.join((team.name.lower() for team in self.m.teams[:2]))}`"
 				)
 
+				# Temporary captains (if they exist)
+				if len(self.m.temporary_captains) == 2:
+					temporary_captains_list = [p for p in unpicked_list if p.id in self.m.temporary_captains]
+					plural_msg = " have been rolled as captains" if len(temporary_captains_list) > 1 else " has been rolled as captain"
+					embed.add_field(
+						name=self.m.gt(""),
+						value=" and ".join((
+							"{mention}".format(
+								mention=get_mention(p)
+							)
+						) for p in temporary_captains_list) + plural_msg + "\n",
+						inline=False
+					)
+
+			# Unpicked Players msg
+			embed.add_field(
+				name=self.m.gt("Unpicked:"),
+				value="\n".join((
+					(f" \u200b " + self.m.cfg['player_list_format']).format(
+						rank=self.m.rank_str(p) if self.m.ranked else "",
+						name=get_nick(p),
+						mention=get_mention(p),
+						div=get_div_role(p, divs),
+						classes=get_class_roles(p, self.m.cfg['class_roles']),
+						immune=f" - **IMMUNE: x{self.m.immune[int(p.id)]}**" if p.id in self.m.immune else ""
+					)
+				) for p in unpicked_list),
+				inline=False
+			)
+
+			# Create the post-msg
 			embed.add_field(name="—", value=msg + "\n\u200b", inline=False)
 
 		embed.set_footer(**self.footer)

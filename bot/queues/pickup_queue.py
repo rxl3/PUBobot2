@@ -2,7 +2,7 @@
 
 from core.console import log
 from core.cfg_factory import FactoryTable, CfgFactory, Variables, VariableTable
-from core.utils import get_nick, get, SafeTemplateDict
+from core.utils import get_nick, get_class_roles, get, SafeTemplateDict
 from core.client import dc
 
 import bot
@@ -260,7 +260,37 @@ class PickupQueue:
 				variables=[
 					Variables.StrVar("name", notnull=True)
 				]
-			)
+			),
+			Variables.IntVar(
+				"captain_immunity_games", display="Captain Immunity Games", section="General",
+				description="The number of subsequent games for which a player who was Captain is labelled as IMMUNE (set as 0 to disable)",
+				default=2,
+				notnull=True,
+			),
+			Variables.StrVar(
+				"division_roles", display="Division Roles List", section="General",
+				description="List of Roles for player Divisions",
+				default=[],
+				notnull=True,
+			),
+			Variables.StrVar(
+				"class_roles", display="Class Roles List", section="General",
+				description="List of Roles for player Classes",
+				default=[],
+				notnull=True,
+			),
+			Variables.BoolVar(
+				"show_checkin_timer", display="Show Check-in Expiry Timer", section="General",
+				description="Display the number of seconds remaining until Check-In expires (if all players are not ready)",
+				default=False,
+				notnull=True,
+			),
+			Variables.TextVar(
+				"player_list_format", display="Player name list format (for drafting stage)", section="General",
+				description="The format to use when printing the Player Names in Drafting Stage",
+				default="{name}",
+				notnull=True,
+			),
 		]
 	)
 
@@ -334,7 +364,11 @@ class PickupQueue:
 			maps=[i['name'] for i in self.cfg.maps], vote_maps=self.cfg.vote_maps,
 			map_count=self.cfg.map_count, check_in_timeout=self.cfg.check_in_timeout,
 			check_in_discard=self.cfg.check_in_discard, match_lifetime=self.cfg.match_lifetime,
-			start_msg=self.cfg.start_msg, server=self.cfg.server
+			start_msg=self.cfg.start_msg, server=self.cfg.server,
+			captain_immunity_games=self.cfg.captain_immunity_games,
+			division_roles=self.cfg.division_roles.split(",") if self.cfg.division_roles else None,
+			class_roles=self.cfg.class_roles.split(",") if self.cfg.class_roles else None,
+			show_checkin_timer=self.cfg.show_checkin_timer, player_list_format=self.cfg.player_list_format,
 		)
 
 	async def promote(self, ctx):
@@ -455,6 +489,7 @@ class PickupQueue:
 		await bot.Match.fake_ranked_match(
 			ctx, self, self.qc, winners, losers, draw=draw,
 			team_names=self.cfg.team_names.split(" ") if self.cfg.team_names else None,
+			captain_immunity_games=self.cfg.captain_immunity_games
 		)
 
 	async def revert(self, ctx, not_ready, ready):

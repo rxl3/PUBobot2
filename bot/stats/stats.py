@@ -6,6 +6,7 @@ import bot
 from core.console import log
 from core.database import db
 from core.utils import iter_to_dict, find, get_nick
+from core.client import dc
 
 db.ensure_table(dict(
 	tname="players",
@@ -30,7 +31,9 @@ db.ensure_table(dict(
 		dict(cname="wins", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="losses", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="draws", ctype=db.types.int, notnull=True, default=0),
-		dict(cname="streak", ctype=db.types.int, notnull=True, default=0)
+		dict(cname="streak", ctype=db.types.int, notnull=True, default=0),
+		dict(cname="auto_ready_on_add", ctype=db.types.int, notnull=True, default=120),
+		dict(cname="immunity", ctype=db.types.int, default=0)
 	],
 	primary_keys=["user_id", "channel_id"]
 ))
@@ -85,7 +88,8 @@ db.ensure_table(dict(
 		dict(cname="channel_id", ctype=db.types.int),
 		dict(cname="user_id", ctype=db.types.int),
 		dict(cname="nick", ctype=db.types.str),
-		dict(cname="team", ctype=db.types.bool)
+		dict(cname="team", ctype=db.types.bool),
+		dict(cname="captain", ctype=db.types.bool)
 	],
 	primary_keys=["match_id", "user_id"]
 ))
@@ -132,6 +136,12 @@ async def register_match_unranked(ctx, m):
 		for p in m.players
 	), on_dublicate="ignore")
 
+	results = [[
+		await m.qc.rating.get_players((p.id for p in m.teams[0])),
+		await m.qc.rating.get_players((p.id for p in m.teams[1])),
+	]]
+	before = iter_to_dict((*results[0][0], *results[0][1]), key='user_id')
+
 	for p in m.players:
 		nick = get_nick(p)
 		await db.update(
@@ -147,9 +157,28 @@ async def register_match_unranked(ctx, m):
 		else:
 			team = None
 
+		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
+
 		await db.insert(
 			'qc_player_matches',
-			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team)
+			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain)
+		)
+
+		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
+		new_immunity = before[p.id]['immunity']
+		if captain==1:
+			if new_immunity < m.cfg['captain_immunity_games']:
+				new_immunity = m.cfg['captain_immunity_games']
+		# If not captain reduce immunity by 1 (to a minimum of zero)
+		elif new_immunity > 0:
+			new_immunity -= 1
+
+		await db.update(
+			"qc_players",
+			dict(
+				immunity=new_immunity,
+			),
+			keys=dict(channel_id=m.qc.rating.channel_id, user_id=p.id)
 		)
 
 
@@ -192,6 +221,16 @@ async def register_match_ranked(ctx, m):
 	for p in m.players:
 		nick = get_nick(p)
 		team = 0 if p in m.teams[0] else 1
+		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
+
+		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
+		new_immunity = before[p.id]['immunity']
+		if captain==1:
+			if new_immunity < m.cfg['captain_immunity_games']:
+				new_immunity = m.cfg['captain_immunity_games']
+		# If not captain reduce immunity by 1 (to a minimum of zero)
+		elif new_immunity > 0:
+			new_immunity -= 1
 
 		await db.update(
 			"qc_players",
@@ -202,14 +241,15 @@ async def register_match_ranked(ctx, m):
 				wins=after[p.id]['wins'],
 				losses=after[p.id]['losses'],
 				draws=after[p.id]['draws'],
-				streak=after[p.id]['streak']
+				streak=after[p.id]['streak'],
+				immunity=new_immunity,
 			),
 			keys=dict(channel_id=m.qc.rating.channel_id, user_id=p.id)
 		)
 
 		await db.insert(
 			'qc_player_matches',
-			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team)
+			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain)
 		)
 		await db.insert('qc_rating_history', dict(
 			channel_id=m.qc.rating.channel_id,
@@ -314,6 +354,120 @@ async def user_stats(channel_id, user_id):
 	stats['queues'] = data
 	return stats
 
+# For each Player we run a fetchall which returns a list of tuples
+# results = [
+# 	[
+#		(match_id, user_id, captain),
+#		(match_id, user_id, captain)
+# 	],
+# 	[
+#		(match_id, user_id, captain),
+#		(match_id, user_id, captain)
+# 	],
+# 	[
+#		(match_id, user_id, captain),
+#		(match_id, user_id, captain)
+# 	],
+# }
+
+
+async def get_immune_players_old(channel_id, players, num: int):
+	player_matches = [await db.fetchall(
+		"SELECT match_id, user_id, captain FROM `qc_player_matches` " +
+		"WHERE channel_id=%s AND user_id=%s ORDER BY match_id DESC LIMIT %s",
+		(channel_id, str(p.id), num)
+	) for p in players]
+
+	immune = {}
+	for players in player_matches:
+		for index, match in enumerate(players):
+			if match['captain']==1:
+				immune[match['user_id']] = num - index
+				break
+	return immune
+
+async def get_immune_players(channel_id, players):
+	player_str = ', '.join(["'"+str(p.id)+"'" for p in players])
+	data = await db.fetchall("\n".join((
+			"SELECT user_id, immunity FROM `qc_players`",
+			"WHERE channel_id = '{}' AND user_id IN ({}) AND immunity > 0".format(channel_id, player_str)
+	)))
+	immune = {i['user_id']: i['immunity'] for i in data}
+	return immune
+
+async def get_all_immunity(ctx, channel_id, num):
+
+	# Get all Members in guild (as list of Members --> [Member1, Member2, Member3, ...])
+	members = dc.get_guild(ctx.qc.guild_id).members
+
+	# SELECT last {num} matches for each Member 
+	player_matches = [i for i in [await db.fetchall(
+		"SELECT match_id, user_id, nick, captain FROM `qc_player_matches` " +
+		"WHERE channel_id=%s AND user_id=%s ORDER BY match_id DESC LIMIT %s",
+		(channel_id, str(m.id), num)
+	) for m in members] if i]
+
+	# Calculate Immunity (as dict of user_id->immune {123: 2, 124: 0, 125: 1})
+	immunity = {}
+	for player in player_matches:
+		immune = 0
+		for index, match in enumerate(player):
+			if match['captain']==1:
+				immune = num - index
+				break
+		immunity[player[0]['user_id']] = immune
+
+	print(immunity)
+	return immunity
+
+
+# When we convert from the old immunity method (looking at captain col in user's last n games) to the new method we must ensure players do not lose their current immunity
+async def seed_immunity(ctx, channel_id, num):
+
+	# Get all Members in guild (as list of Members --> [Member1, Member2, Member3, ...])
+	members = dc.get_guild(ctx.qc.guild_id).members
+	
+	# Insert Members into qc_players if they're not there
+	await db.insert_many('qc_players', (
+		dict(channel_id=channel_id, user_id=m.id, nick=get_nick(m))
+			for m in members
+		), on_dublicate="ignore")
+
+	# Get Immunities
+	immunity = await get_all_immunity(ctx, channel_id, num)
+	
+	# set initial immunity for everyone
+	for i in immunity:
+		await db.update("qc_players", dict(immunity=immunity[i]), keys=dict(channel_id=channel_id, user_id=i))
+
+	return immunity
+
+async def luck(ctx, min_games=10, rows=10):
+	unlucky = await db.fetchall(
+		"\n".join((
+			"SELECT nick,",
+			"SUM(CASE WHEN captain = 1 THEN 1 ELSE 0 END) AS captain_games,",
+			"SUM(CASE WHEN captain = 0 THEN 1 ELSE 0 END) AS non_captain_games,",
+			"SUM(CASE WHEN captain = 1 THEN 1 ELSE 0 END) / COUNT(*) AS ratio,",
+			"COUNT(*) AS total_games",
+			"FROM qc_player_matches WHERE channel_id=%s",
+			"GROUP BY nick HAVING COUNT(*) >= %s ORDER BY ratio DESC LIMIT %s;"
+		)), (ctx.qc.id, min_games, rows)
+	)
+
+	lucky =  await db.fetchall(
+		"\n".join((
+			"SELECT nick,",
+			"SUM(CASE WHEN captain = 1 THEN 1 ELSE 0 END) AS captain_games,",
+			"SUM(CASE WHEN captain = 0 THEN 1 ELSE 0 END) AS non_captain_games,",
+			"SUM(CASE WHEN captain = 1 THEN 1 ELSE 0 END) / COUNT(*) AS ratio,",
+			"COUNT(*) AS total_games",
+			"FROM qc_player_matches WHERE channel_id=%s",
+			"GROUP BY nick HAVING COUNT(*) >= %s ORDER BY ratio ASC LIMIT %s;"
+		)), (ctx.qc.id, min_games, rows)
+	)
+
+	return dict(unlucky=unlucky, lucky=lucky)
 
 async def top(channel_id, time_gap=None):
 	total = await db.fetchone(
@@ -338,13 +492,15 @@ async def top(channel_id, time_gap=None):
 async def last_games(channel_id):
 	#  get last played ranked match for all players
 	data = await db.fetchall(
-		"SELECT m.at, p.* FROM `qc_players` AS p " +
-		"JOIN qc_matches AS m ON m.match_id=("
-		"	SELECT match_id FROM qc_rating_history as h WHERE h.user_id=p.user_id ORDER BY match_id DESC LIMIT 1"
-		") " +
-		"WHERE p.channel_id=%s AND p.rating IS NOT NULL AND p.deviation IS NOT NULL "
-		"GROUP BY p.user_id",
-		(channel_id, )
+		"SELECT tmp.at, p.* " +
+		"FROM `qc_players` AS p " +
+		"LEFT JOIN (" +
+		"  SELECT MAX(h.at) AS at, h.user_id FROM `qc_rating_history` AS h" +
+		"    WHERE h.channel_id=%s AND h.match_id IS NOT NULL" +
+		"    GROUP BY h.user_id" +
+		") AS tmp ON p.user_id=tmp.user_id " +
+		"WHERE p.channel_id=%s",
+		(channel_id, channel_id)
 	)
 	return data
 

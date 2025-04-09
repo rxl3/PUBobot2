@@ -59,7 +59,7 @@ class Context:
 	def check_perms(self, req_perms: Perms):
 		""" Raise PermissionError if specified permissions is not met by the author """
 		if self.access_level.value < req_perms.value:
-			if req_perms == 2:
+			if req_perms == 3:
 				raise bot.Exc.PermissionError(self.qc.gt("You must possess admin permissions."))
 			else:
 				raise bot.Exc.PermissionError(self.qc.gt("You must possess moderator permissions."))
@@ -75,6 +75,10 @@ class Context:
 	async def notice(self, content: str = None, embed: Embed = None):
 		""" Send message in chat without replying if possible """
 		pass
+
+	# async def ephemeral(self, content: str = None, embed: Embed = None):
+	# 	""" Reply ephemerally """
+	# 	pass
 
 	async def ignore(self, content: str = None, embed: Embed = None):
 		""" Send reply only if it's required to reply by the context class """
@@ -119,6 +123,9 @@ class SystemContext(Context):
 
 	async def reply_dm(self, content: str = None, embed: Embed = None):
 		await self.messagable.send(content=content, embed=embed)
+	
+	# async def ephemeral(self, content: str = None, embed: Embed = None):
+	# 	await self.messagable.send(content=content, embed=embed, ephemeral=True)
 
 	async def error(self, *args, **kwargs):
 		await self.messagable.send(embed=error_embed(*args, **kwargs))

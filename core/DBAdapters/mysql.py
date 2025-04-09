@@ -46,14 +46,15 @@ class Adapter:
 			raise(ValueError('Bad database address string: ' + self.dbAddress))
 
 		try:
-			self.pool = self.loop.run_until_complete(aiomysql.create_pool(
+			createpool = aiomysql.create_pool(
 				host=self.dbHost,
 				user=self.dbUser,
 				password=self.dbPassword,
 				db=self.dbName,
 				charset='utf8mb4',
 				autocommit=True,
-				cursorclass=aiomysql.cursors.DictCursor))
+				cursorclass=aiomysql.cursors.DictCursor)
+			self.pool = self.loop.run_until_complete(createpool)
 
 		except mysqlErr.Error as e:
 			self.wrap_exc(e)

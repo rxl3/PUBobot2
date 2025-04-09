@@ -1,6 +1,9 @@
 from typing import Callable
+from asyncio import wait_for, shield
+from asyncio.exceptions import TimeoutError as aTimeoutError
 from nextcord import Interaction, SlashOption, Member, TextChannel
 import traceback
+import time
 
 from core.client import dc
 from core.utils import error_embed, ok_embed, parse_duration, get_nick
@@ -24,6 +27,13 @@ def _parse_duration(ctx: SlashContext, s: str):
 
 
 async def run_slash(coro: Callable, interaction: Interaction, **kwargs):
+	# get passed time since interaction was created, convert snowflake into timestamp
+	passed_time = time.time() - (((int(interaction.id) >> 22) + 1420070400000) / 1000.0)
+
+	if passed_time >= 3.0:  # Interactions must be answered within 3 seconds or they time out
+		log.error('Skipping an outdated interaction.')
+		return
+
 	if not bot.bot_ready:
 		await interaction.response.send_message(
 			embed=error_embed("Bot is under connection, please try agian later...", title="Error")
@@ -35,6 +45,14 @@ async def run_slash(coro: Callable, interaction: Interaction, **kwargs):
 		return
 
 	ctx = SlashContext(qc, interaction)
+	try:
+		await wait_for(shield(run_slash_coro(ctx, coro, **kwargs)), timeout=max(2.5 - passed_time, 0))
+	except (TimeoutError, aTimeoutError):
+		log.info('Deferring /slash command')
+		await interaction.response.defer()
+
+
+async def run_slash_coro(ctx: SlashContext, coro: Callable, **kwargs):
 	log.command("{} | #{} | {}: /{} {}".format(
 		ctx.channel.guild.name, ctx.channel.name, get_nick(ctx.author), coro.__name__, kwargs
 	))
@@ -68,6 +86,30 @@ async def _create_pickup(
 	)
 ): await run_slash(bot.commands.create_pickup, interaction=interaction, name=name, size=size)
 
+# testing -> ...
+
+@groups.admin_testing.subcommand(name='add_multiple', description='For bot testing.')
+async def _add_multiple(
+	interaction: Interaction,
+	player_names_string: str = SlashOption(name="player_names_string", description="Member to add to the queue", required=False),
+	queue: str = SlashOption(name="queue", description="Queue to add to.", required=False)
+): 	
+	if not interaction.user.guild_permissions.administrator:
+		return await interaction.response.send_message(
+			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
+		)
+	await run_slash(bot.commands.add_multiple, interaction=interaction, player_names_string=player_names_string, queue=queue)
+_add_multiple.on_autocomplete("queue")(autocomplete.queues)
+
+@groups.admin_testing.subcommand(name='set_ready_all', description='For bot testing.')
+async def _set_ready_all(
+	interaction: Interaction
+): 
+	if not interaction.user.guild_permissions.administrator:
+		return await interaction.response.send_message(
+			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
+		)
+	await run_slash(bot.commands.set_ready_all, interaction=interaction)
 
 # queue -> ...
 
@@ -569,6 +611,22 @@ async def _rank(
 ): await run_slash(bot.commands.rank, interaction=interaction, player=player)
 
 
+@dc.slash_command(name='luck', description='Show luckiest players', **guild_kwargs)
+async def _luck(
+		interaction: Interaction,
+		rows: int = 10,
+		min_games: int = 10
+): await run_slash(bot.commands.luck, interaction=interaction, rows=rows, min_games=min_games)
+
+
+@dc.slash_command(name='set_immunity', description="Set a player's immunity value", **guild_kwargs)
+async def _set_immunity(
+		interaction: Interaction,
+		player: Member = SlashOption(required=False, verify=False),
+		immunity: int = 0
+): await run_slash(bot.commands.set_immunity, interaction=interaction, player=player, immunity=immunity)
+
+
 @dc.slash_command(name='leaderboard', description='Show rating leaderboard.', **guild_kwargs)
 async def _leaderboard(
 		interaction: Interaction,
@@ -592,6 +650,19 @@ async def _auto_ready(
 		if _duration:
 			_duration = _parse_duration(ctx, _duration)
 		await bot.commands.auto_ready(ctx, *args, duration=_duration, **kwargs)
+
+	await run_slash(_run, interaction=interaction, _duration=duration)
+
+
+@dc.slash_command(name='auto_ready_on_add', description='Apply auto-ready when you add to a queue.', **guild_kwargs)
+async def _auto_ready_on_add(
+		interaction: Interaction,
+		duration: str = SlashOption(required=False),
+):
+	async def _run(ctx, *args, _duration=None, **kwargs):
+		if _duration:
+			_duration = _parse_duration(ctx, _duration)
+		await bot.commands.auto_ready_on_add(ctx, *args, duration=_duration, **kwargs)
 
 	await run_slash(_run, interaction=interaction, _duration=duration)
 

@@ -19,6 +19,7 @@ class CheckIn:
 		self.allow_discard = self.m.cfg['check_in_discard']
 		self.ready_players = set()
 		self.message = None
+		self.time_to_timeout = timeout
 
 		for p in (p for p in self.m.players if p.id in bot.auto_ready.keys()):
 			self.ready_players.add(p)
@@ -40,6 +41,8 @@ class CheckIn:
 				await self.abort_timeout(ctx)
 			else:
 				await self.finish(ctx)
+		else:
+			self.time_to_timeout = self.m.start_time + self.timeout - frame_time
 
 	async def start(self, ctx):
 		text = f"!spawn message {self.m.id}"

@@ -442,7 +442,7 @@ class QueueChannel:
 
 	async def get_lb(self):
 		data = await db.select(
-			['user_id', 'nick', 'rating', 'deviation', 'wins', 'losses', 'draws', 'streak', 'is_hidden'], 'qc_players',
+			['user_id', 'nick', 'rating', 'deviation', 'wins', 'losses', 'draws', 'streak', 'is_hidden', 'immunity'], 'qc_players',
 			where={'channel_id': self.rating.channel_id}, order_by="rating"
 		)
 		return [
@@ -454,6 +454,12 @@ class QueueChannel:
 
 	async def update_rating_roles(self, *members):
 		asyncio.create_task(self._update_rating_roles(*members))
+
+	async def get_auto_ready_on_add(self, ctx):
+		""" return the database value for auto_ready_on_add for this user in this channel """
+		row = await db.select_one(['auto_ready_on_add'], 'qc_players', where={'user_id': ctx.author.id, 'channel_id': ctx.channel.id})
+		data = row.get('auto_ready_on_add') if row else 0
+		return data
 
 	async def update_expire(self, member):
 		""" update expire timer on !add command """

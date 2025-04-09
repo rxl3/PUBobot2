@@ -5,6 +5,7 @@ from prettytable import PrettyTable, MARKDOWN
 from nextcord import Embed
 from nextcord.utils import get, find, escape_markdown
 from datetime import timedelta
+from core import config
 
 
 class EmojiFormatter(object):
@@ -88,9 +89,15 @@ def parse_duration(string):
 	if string == 'inf':
 		return 0
 
+	if string == 'off' or string == '0':
+		return 'off'
+
 	if re.match(r"^\d\d:\d\d:\d\d$", string):
 		x = sum(x * int(t) for x, t in zip([3600, 60, 1], string.split(":")))
 		return timedelta(seconds=x)
+	
+	elif re.match(r"^\d+(\.\d+)?$", string):
+		return timedelta(minutes=float(string))
 
 	elif re.match(r"^(\d+\w ?)+$", string):
 		duration = 0
@@ -113,6 +120,7 @@ def parse_duration(string):
 			else:
 				raise ValueError()
 		return timedelta(seconds=int(duration))
+
 	else:
 		raise ValueError()
 
@@ -132,11 +140,43 @@ def escape_cb(string):
 
 
 def get_nick(user):
-	""" Remove rating tag and text formatting characters """
-	string = user.nick or user.name
-	if x := re.match(r"^\[\d+\] (.+)", string):
-		string = x.group(1)
-	return escape_cb(string)
+	try:
+		string = user.name
+		if x := re.match(r"^\[\d+\] (.+)", string): # Strip numeric prefix from user name
+			string = x.group(1)
+		return escape_cb(string)
+	except Exception as err:
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
+		return ""
+
+
+def get_div_role(user, division_roles):
+	try:
+		roles = sorted(
+			[r.name for r in user.roles if r.name in division_roles],  # User Roles that are in division_roles - Will be List or empty string
+			key=lambda x: division_roles.index(x) # Sort by division_roles order - Can assume index(x) exists or it wouldn't be in the List
+		) 
+		return escape_cb(roles[0]) # Remove invalid chars - Throws IndexError exception if User has no Roles in division_roles
+	except Exception as err:
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
+		return division_roles[0] # Just use the first division role if we hit an error
+
+
+def get_class_roles(user, class_roles):
+	try:
+		string = ", ".join(sorted([r.name for r in user.roles if r.name in class_roles]))
+		return escape_cb(string)
+	except Exception as err:
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
+		return ""
+
+
+def get_mention(user):
+	try:
+		return "<@" + str(user.id) + ">" # User must have an id, right?
+	except Exception as err:
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
+		return ""
 
 
 def discord_table(header, rows):

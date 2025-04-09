@@ -19,6 +19,9 @@ class MessageContext(Context):
 	async def notice(self, content: str = None, embed: Embed = None):
 		await (self.message.thread or self.message.channel).send(content=content, embed=embed)
 
+	# async def ephemeral(self, content: str = None, embed: Embed = None):
+	# 	await self.message.reply(content=content, embed=embed, ephemeral=True)
+
 	async def error(self, *args, **kwargs):
 		await self.message.reply(embed=error_embed(*args, **kwargs))
 

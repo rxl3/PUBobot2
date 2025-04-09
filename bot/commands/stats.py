@@ -1,4 +1,4 @@
-__all__ = ['last_game', 'stats', 'top', 'rank', 'leaderboard']
+__all__ = ['last_game', 'stats', 'top', 'luck', 'rank', 'leaderboard', 'set_immunity']
 
 from time import time
 from nextcord import Member, Embed, Colour
@@ -106,6 +106,82 @@ async def top(ctx, period=None):
 	await ctx.reply(embed=embed)
 
 
+async def luck(ctx, rows=10, min_games=10):
+	# Mods only (too spammy)
+	ctx.check_perms(ctx.Perms.MODERATOR)
+	
+	# Absolute Maximum of 10
+	rows = 10 if int(rows) > 10 else rows
+
+	# Get data
+	data = await bot.stats.luck(ctx,min_games,rows)
+
+	# UNLUCKY
+	unlucky = Embed(
+		title=ctx.qc.gt("Unluckiest {rows} players for __{target}__").format(
+			target=f"#{ctx.channel.name}",
+			min_games=min_games,
+			rows=rows
+		),
+		colour=Colour(0xff0000),
+		description=ctx.qc.gt("Highest percentage of Captain to Non-Captain games for players who have played at least {min_games} games").format(min_games=min_games)
+	)
+	for index,p in enumerate(data['unlucky']):
+		percent = '{0:.2f}'.format(p['ratio']*100)
+		unlucky.add_field(
+			name=f"**#{index+1}. {p['nick']}**", 
+			value=f"Captained {p['captain_games']} out of {p['total_games']} games played (**{percent}%**)",
+			inline=False
+		)
+
+	# LUCKY
+	lucky = Embed(
+		title=ctx.qc.gt("Luckiest {rows} players for __{target}__").format(
+			target=f"#{ctx.channel.name}",
+			min_games=min_games,
+			rows=rows
+		),
+		colour=Colour(0x00ff00),
+		description=ctx.qc.gt("Lowest percentage of Captain to Non-Captain games for players who have played at least {min_games} games").format(min_games=min_games)
+	)
+	for index,p in enumerate(data['lucky']):
+		percent = '{0:.2f}'.format(p['ratio']*100)
+		lucky.add_field(
+			name=f"**#{index+1}. {p['nick']}**", 
+			value=f"Captained {p['captain_games']} out of {p['total_games']} games played (**{percent}%**)",
+			inline=False
+		)
+
+	# Send Messages
+	await ctx.reply(embed=unlucky)
+	await ctx.reply(embed=lucky)
+
+
+async def set_immunity(ctx, player: Member = None, immunity=0):
+	ctx.check_perms(ctx.Perms.MODERATOR)
+
+	target = ctx.author if not player else await ctx.get_member(player)
+	if not target:
+		raise bot.Exc.SyntaxError(ctx.qc.gt("Specified user not found."))
+
+	await db.update(
+		"qc_players",
+		dict(immunity=immunity),
+		keys=dict(channel_id=ctx.qc.id, user_id=target.id, nick=get_nick(target))
+	)
+
+	await ctx.reply(embed=
+		Embed(
+			title=ctx.qc.gt("Immunity Updated!"),
+			colour=Colour(0x00ff00),
+			description=ctx.qc.gt("Set {target}'s immunity to {immunity}").format(
+				target=f"{get_nick(target)}",
+				immunity=immunity
+			),
+		)
+	)
+
+
 async def rank(ctx, player: Member = None):
 	target = ctx.author if not player else await ctx.get_member(player)
 	if not target:
@@ -117,7 +193,7 @@ async def rank(ctx, player: Member = None):
 		place = data.index(p) + 1
 	else:
 		data = await db.select(
-			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'is_hidden', 'streak'],
+			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'is_hidden', 'streak', 'immunity'],
 			"qc_players",
 			where={'channel_id': ctx.qc.rating.channel_id}
 		)
@@ -144,6 +220,12 @@ async def rank(ctx, player: Member = None):
 		), inline=True)
 		if target.display_avatar:
 			embed.set_thumbnail(url=target.display_avatar.url)
+
+		games_as_captain = await db.select(['COUNT(*) as count'], "qc_player_matches",
+			where=dict(channel_id=ctx.qc.rating.channel_id, user_id=target.id, captain=1))
+		embed.add_field(name="Games as Captain", value=f"**{games_as_captain[0]['count']}**", inline=True)
+
+		embed.add_field(name="Immunity", value=f"**{p['immunity']}**", inline=True)
 
 		changes = await db.select(
 			('at', 'rating_change', 'match_id', 'reason'),

@@ -111,6 +111,9 @@ async def _teams(ctx: MessageContext, args: str = None):
 async def _ready(ctx: MessageContext, args: str = None):
 	await bot.commands.set_ready(ctx, is_ready=True)
 
+@message_command('ready_all')
+async def _ready_all(ctx: MessageContext, args: str = None):
+	await bot.commands.set_ready_all(ctx)
 
 @message_command('notready', 'nr')
 async def _not_ready(ctx: MessageContext, args: str = None):
@@ -199,6 +202,17 @@ async def _auto_ready(ctx: MessageContext, args: str = None):
 	await bot.commands.auto_ready(ctx, duration=duration)
 
 
+@message_command('auto_ready_on_add', 'aar')
+async def _auto_ready_on_add(ctx: MessageContext, args: str = None):
+	duration = None
+	if args:
+		try:
+			duration = parse_duration(args)
+		except ValueError:
+			raise bot.Exc.SyntaxError(ctx.qc.gt("Invalid duration format. Syntax: 3h2m1s or 03:02:01."))
+	await bot.commands.auto_ready_on_add(ctx, duration=duration)
+
+
 @message_command('rank')
 async def _rank(ctx: MessageContext, args: str = None):
 	if not args:
@@ -206,6 +220,11 @@ async def _rank(ctx: MessageContext, args: str = None):
 		return
 	member = await ctx.get_member(args)
 	await bot.commands.rank(ctx, player=member)
+
+
+@message_command('luck')
+async def _luck(ctx: MessageContext, args: int = 10):
+	await bot.commands.luck(ctx, rows=args)
 
 
 @message_command('leaderboard', 'lb')
@@ -232,6 +251,16 @@ async def _cancel_match(ctx: MessageContext, args: str = None):
 	if not args or not args.isdigit():
 		raise bot.Exc.SyntaxError(f"Usage: {ctx.qc.cfg.prefix}cancel_match __match_id__")
 	await bot.commands.report_admin(ctx, match_id=int(args), abort=True)
+
+
+@message_command('get_all_immunity')
+async def _get_all_immunity(ctx: MessageContext, args: str = None):
+	await bot.commands.get_all_immunity(ctx, channel_id=ctx.qc.id, num=2)
+
+
+@message_command('seed_immunity')
+async def _seed_immunity(ctx: MessageContext, args: str = None):
+	await bot.commands.seed_immunity(ctx, channel_id=ctx.qc.id, num=2)
 
 
 @message_command('promote')

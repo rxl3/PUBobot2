@@ -3,6 +3,7 @@ from time import time
 from itertools import combinations
 import random
 from nextcord import DiscordException
+import json
 
 import bot
 from core.utils import find, get, iter_to_dict, join_and, get_nick
@@ -12,7 +13,7 @@ from core.client import dc
 from .check_in import CheckIn
 from .draft import Draft
 from .embeds import Embeds
-
+import random
 
 class Match:
 
@@ -27,10 +28,11 @@ class Match:
 	]
 
 	default_cfg = dict(
-		teams=None, team_names=['Alpha', 'Beta'], team_emojis=None, ranked=False,
+		teams=None, team_names=['Alpha', 'Beta'], team_emojis=":red_circle: :blue_circle:", ranked=False,
 		team_size=1, pick_captains="no captains", captains_role_id=None, pick_teams="draft",
 		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
-		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True
+		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True,
+		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="{name}",
 	)
 
 	class Team(list):
@@ -63,20 +65,23 @@ class Match:
 		match = cls(match_id, queue, ctx.qc, players, ratings, **kwargs)
 		# Prepare the Match object
 		match.maps = match.random_maps(match.cfg['maps'], match.cfg['map_count'], queue.last_maps)
+
 		match.init_captains(match.cfg['pick_captains'], match.cfg['captains_role_id'])
 		match.init_teams(match.cfg['pick_teams'])
+
 		if match.ranked:
 			match.states.append(match.WAITING_REPORT)
 		bot.active_matches.append(match)
 
 	@classmethod
-	async def fake_ranked_match(cls, ctx, queue, qc, winners, losers, draw=False, **kwargs):
+	async def fake_ranked_match(cls, ctx, queue, qc, winners, losers, draw=False, captain_immunity_games=0, **kwargs):
 		players = winners + losers
 		if len(set(players)) != len(players):
 			raise bot.Exc.ValueError("Players list can not contains duplicates.")
 		ratings = {p['user_id']: p['rating'] for p in await qc.rating.get_players((p.id for p in players))}
 		match_id = await bot.stats.next_match()
 		match = cls(match_id, queue, qc, players, ratings, pick_teams="premade", **kwargs)
+		match.cfg['captain_immunity_games'] = captain_immunity_games
 		match.teams[0].set(winners)
 		match.teams[1].set(losers)
 		if draw:
@@ -93,6 +98,8 @@ class Match:
 			channel_id=self.queue.qc.id,
 			cfg=self.cfg,
 			players=[p.id for p in self.players if p],
+			immune=self.immune,
+			temporary_captains=self.temporary_captains,
 			teams=[[p.id for p in team if p] for team in self.teams],
 			maps=self.maps,
 			state=self.state,
@@ -130,6 +137,8 @@ class Match:
 		match.maps = data['maps']
 		match.state = data['state']
 		match.states = data['states']
+		match.immune = {int(x):data['immune'][x] for x in data['immune']}
+		match.temporary_captains = data['temporary_captains']
 		if match.state == match.CHECK_IN:
 			ctx = bot.SystemContext(qc)
 			await match.check_in.start(ctx)  # Spawn a new check_in message
@@ -167,9 +176,12 @@ class Match:
 		self.captains = []
 		self.states = []
 		self.maps = []
+		self.immune = []
+		self.temporary_captains = []
 		self.lifetime = self.cfg['match_lifetime']
 		self.start_time = int(time())
 		self.state = self.INIT
+		self.match_start_time = 0
 
 		# Init self sections
 		self.check_in = CheckIn(self, self.cfg['check_in_timeout'])
@@ -231,6 +243,21 @@ class Match:
 			self.teams[1].set([p for p in self.players if p not in self.teams[0]][:self.cfg['team_size']])
 			self.teams[2].set([p for p in self.players if p not in [*self.teams[0], *self.teams[1]]])
 
+	async def init_immune(self, captain_immunity_games, pick_captains):
+		if captain_immunity_games>0:
+			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players)
+			p_a, p_b = [], []
+			for p in self.players:
+				(p_a,p_b)[p.id in self.immune.keys()].append(p)
+
+			random.shuffle(p_a)
+			random.shuffle(p_b)
+			self.players = p_a + p_b
+
+			# If captain_immunity_games is set and we have no automatic method of selecting captains: Assign temporary captains for the draft list
+			if (pick_captains == "no captains"):
+				self.temporary_captains = [p.id for p in self.players[:2]]
+
 	async def think(self, frame_time):
 		if self.state == self.INIT:
 			await self.next_state(bot.SystemContext(self.qc))
@@ -241,13 +268,10 @@ class Match:
 		elif frame_time > self.lifetime + self.start_time:
 			ctx = bot.SystemContext(self.qc)
 			try:
-				await ctx.error(self.gt("Match {queue} ({id}) has timed out.").format(
-					queue=self.queue.name,
-					id=self.id
-				))
+				self.winner = None
+				await self.finish_match(ctx)
 			except DiscordException:
 				pass
-			await self.cancel(ctx)
 
 	async def next_state(self, ctx):
 		if len(self.states):
@@ -255,6 +279,7 @@ class Match:
 			if self.state == self.CHECK_IN:
 				await self.check_in.start(ctx)
 			elif self.state == self.DRAFT:
+				await self.init_immune(self.cfg['captain_immunity_games'], self.cfg['pick_captains'])
 				await self.draft.start(ctx)
 			elif self.state == self.WAITING_REPORT:
 				await self.start_waiting_report(ctx)
@@ -267,6 +292,9 @@ class Match:
 		return self.queue.qc.rating_rank(self.ratings[member.id])['rank']
 
 	async def start_waiting_report(self, ctx):
+		# Set match start time
+		self.match_start_time = int(time())
+
 		# remove never picked players from the match
 		if len(self.teams[2]):
 			for p in self.teams[2]:
@@ -346,6 +374,10 @@ class Match:
 		msg = "```markdown\n"
 		msg += f"{self.queue.name.capitalize()}({self.id}) results\n"
 		msg += "-------------"
+
+		now = int(time())
+		msg += f"\nTime taken to pick teams: {((self.match_start_time - self.start_time) / 60):.2f} minutes"
+		msg += f"\nTime taken to play match: {((now - self.match_start_time) / 60):.2f} minutes\n-------------"
 
 		if self.winner is not None:
 			winners, losers = self.teams[self.winner], self.teams[abs(self.winner-1)]
