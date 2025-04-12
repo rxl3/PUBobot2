@@ -2,9 +2,6 @@
 import bot
 from core.utils import find
 from nextcord import DiscordException
-import requests
-from core import config
-
 
 class Draft:
 
@@ -24,20 +21,6 @@ class Draft:
 
 	async def start(self, ctx):
 		await self.refresh(ctx)
-		try:
-			response = requests.get("https://au.serveme.tf/api/reservations/new?api_key=" + config.SERVEME_API_KEY)
-
-			if response.status_code == 200:
-				serveme_resp = response.json()
-				print(serveme_resp)
-				return serveme_resp
-			else:
-				print('Error:', response.status_code)
-				return None
-			
-		except requests.exceptions.RequestException as e:
-			print('Error:', e)
-			return None
 
 	async def print(self, ctx):
 		try:
