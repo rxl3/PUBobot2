@@ -5,7 +5,6 @@ from prettytable import PrettyTable, MARKDOWN
 from nextcord import Embed
 from nextcord.utils import get, find, escape_markdown
 from datetime import timedelta
-from core import config
 
 
 class EmojiFormatter(object):
@@ -149,7 +148,6 @@ def get_nick(user):
 		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
 
-
 def get_div_role(user, division_roles):
 	try:
 		roles = sorted(
@@ -171,12 +169,12 @@ def get_class_roles(user, class_roles):
 		return ""
 
 class_role_icons_dict = {
-	"SCOUT": ":scout_1:",
-	"scout": ":scout_2:",
-	"SOLDIER": ":soldier_1:",
-	"soldier": ":soldier_2:",
-	"DEMO": ":demoman_1:",
-	"demoman": ":demoman_2:",
+	"SCOUT": "<:scout1:1360561390707937280>",
+	"scout": "<:scout2:1360561392721334332>",
+	"SOLDIER": "<:soldier1:1360561394726080573>",
+	"soldier": "<:soldier2:1360561396953255986>",
+	"DEMO": "<:demoman1:1360561385465057431>",
+	"demo": "<:demoman2:1360561387746758706>",
 }
 
 def get_icon_for_role(role):
@@ -185,7 +183,7 @@ def get_icon_for_role(role):
 def get_class_role_icons(user, class_roles):
 	try:
 		string = "\u200b ".join(map(get_icon_for_role, sorted([r.name for r in user.roles if r.name in class_roles])))
-		return escape_cb(string)
+		return string
 	except Exception as err:
 		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
@@ -223,7 +221,6 @@ def split_big_text(string: str, limit: int = 2000, delimiter: str = None, prefix
 			string = string[_limit:]
 	if len(string):
 		yield prefix + string + suffix
-
 
 class SafeTemplateDict(dict):
 	""" returns {key} for missing keys, useful for string.format_map() """
