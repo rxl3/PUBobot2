@@ -170,6 +170,25 @@ def get_class_roles(user, class_roles):
 		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
 		return ""
 
+class_role_icons_dict = {
+	"SCOUT": ":scout_1:",
+	"scout": ":scout_2:",
+	"SOLDIER": ":soldier_1:",
+	"soldier": ":soldier_2:",
+	"DEMO": ":demoman_1:",
+	"demoman": ":demoman_2:",
+}
+
+def get_icon_for_role(role):
+	return class_role_icons_dict[role]
+
+def get_class_role_icons(user, class_roles):
+	try:
+		string = "\u200b ".join(map(get_icon_for_role, sorted([r.name for r in user.roles if r.name in class_roles])))
+		return escape_cb(string)
+	except Exception as err:
+		print(f"SOMETHING FAILED FOR USER {user.id} {user.name}\n{err}")
+		return ""
 
 def get_mention(user):
 	try:
