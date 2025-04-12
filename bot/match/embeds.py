@@ -1,6 +1,6 @@
 from nextcord import Embed, Colour, Streaming
 from core.client import dc
-from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and
+from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and, get_class_role_icons
 from core import config
 import random
 
@@ -87,8 +87,9 @@ class Embeds:
 		]
 		team_players = [
 			" \u200b ".join([
-					" \u200b {mention}".format(
+					" \u200b {mention} {role_icons}".format(
 						mention=get_mention(p),
+						role_icons=get_class_role_icons(p, self.m.cfg['class_roles'])
 					)
 				for p in t
 			]) if len(t) else self.m.gt("empty")

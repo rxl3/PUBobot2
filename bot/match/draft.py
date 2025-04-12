@@ -3,7 +3,6 @@ import bot
 from core.utils import find
 from nextcord import DiscordException
 
-
 class Draft:
 
 	pick_steps = {
