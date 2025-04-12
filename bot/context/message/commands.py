@@ -312,3 +312,8 @@ async def _rating_unhide(ctx: MessageContext, args: str = None):
 		raise bot.Exc.SyntaxError(f"Usage: {ctx.qc.cfg.prefix}rating_unhide_player __@player__")
 
 	await bot.commands.rating_hide(ctx, player=args, hide=False)
+
+
+@message_command('book')
+async def _book(ctx: MessageContext):
+	await bot.commands.book(ctx)

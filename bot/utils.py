@@ -7,7 +7,6 @@ from core.console import log
 
 import bot
 
-
 async def _leave_empty_guilds():
 	""" Leave all guilds which does not have any QueueChannels """
 	used_ids = set((qc.guild_id for qc in bot.queue_channels.values()))

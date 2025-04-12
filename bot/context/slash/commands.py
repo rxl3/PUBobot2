@@ -734,3 +734,9 @@ async def _nick(
 		nick: str
 ): await run_slash(bot.commands.set_nick, interaction=interaction, nick=nick)
 
+
+@dc.slash_command(name='book', description='Book a serveme server.', **guild_kwargs)
+async def _book(
+		interaction: Interaction,
+): await run_slash(bot.commands.book, interaction=interaction)
+
