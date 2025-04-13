@@ -10,6 +10,7 @@ import datetime
 async def book_serveme(ctx):
     try:
         strings_channel = dc.get_channel(config.cfg.DC_STRINGS_CHANNEL_ID)
+        rcon_channel = dc.get_channel(config.cfg.DC_RCON_CHANNEL_ID)
 		
         matches = [m for m in bot.active_matches if m.qc.id == ctx.qc.id]
 
@@ -61,7 +62,12 @@ async def book_serveme(ctx):
                         string_message += "connect " + serveme_server['ip_and_port'] + "; password \"" + server_password + "\";"
                         string_message += "```"
 
+                        rcon_message = "```markdown\n"
+                        rcon_message += "rcon_address " + serveme_server['ip_and_port'] + "; rcon_password \"" + rcon_password + "\";"
+                        rcon_message += "```"
+
                         str_msg = await strings_channel.send(content=string_message)
+                        rcon_msg = await rcon_channel.send(content=rcon_message)
                         
                         return "Connect string: " + str_msg.jump_url
                     else:

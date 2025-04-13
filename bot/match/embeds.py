@@ -233,7 +233,7 @@ class Embeds:
 			embed.add_field(name=self.m.qc.gt("Server"), value=f"`{self.m.cfg['server']}`", inline=True)
 
 		if self.m.connect_url:
-			embed.add_field(name="Connect to Server", value=f"`{self.m.connect_url}`", inline=False)
+			embed.add_field(name="Connect to Server", value=f"{self.m.connect_url}", inline=False)
 
 		if self.m.cfg['start_msg']:
 			embed.add_field(name="—", value=self.m.cfg['start_msg'] + "\n\u200b", inline=False)
