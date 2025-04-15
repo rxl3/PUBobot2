@@ -9,6 +9,7 @@ import bot
 from core.utils import find, get, iter_to_dict, join_and, get_nick
 from core.console import log
 from core.client import dc
+from bot.autobook import book_serveme
 
 from .check_in import CheckIn
 from .draft import Draft
@@ -164,6 +165,7 @@ class Match:
 		self.ratings = ratings
 		self.winner = None
 		self.scores = [0, 0]
+		self.connect_url = None
 
 		team_names = self.cfg['team_names']
 		team_emojis = self.cfg['team_emojis'] or random.sample(self.TEAM_EMOJIS, 2)
@@ -281,6 +283,7 @@ class Match:
 			elif self.state == self.DRAFT:
 				await self.init_immune(self.cfg['captain_immunity_games'], self.cfg['pick_captains'])
 				await self.draft.start(ctx)
+				self.connect_url = await book_serveme(ctx)
 			elif self.state == self.WAITING_REPORT:
 				await self.start_waiting_report(ctx)
 		else:

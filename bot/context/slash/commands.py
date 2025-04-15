@@ -111,6 +111,13 @@ async def _set_ready_all(
 		)
 	await run_slash(bot.commands.set_ready_all, interaction=interaction)
 
+@groups.admin_testing.subcommand(name='book', description='Book a serveme server.')
+async def _book(
+		interaction: Interaction,
+): 
+	await run_slash(bot.commands.book, interaction=interaction)
+
+
 # queue -> ...
 
 @groups.admin_queue.subcommand(name='list', description='List all queues on the channel.')
@@ -733,4 +740,5 @@ async def _nick(
 		interaction: Interaction,
 		nick: str
 ): await run_slash(bot.commands.set_nick, interaction=interaction, nick=nick)
+
 

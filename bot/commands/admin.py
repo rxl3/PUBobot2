@@ -1,7 +1,7 @@
 __all__ = [
 	'noadds', 'noadd', 'forgive', 'rating_seed', 'rating_penality', 'rating_hide',
 	'rating_reset', 'rating_snap', 'stats_reset', 'stats_reset_player', 'stats_replace_player',
-	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity'
+	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity', 'book'
 ]
 
 from time import time
@@ -9,6 +9,8 @@ from datetime import timedelta
 from nextcord import Member
 
 from core.utils import seconds_to_str, get_nick
+
+from bot.autobook import book_serveme
 
 import bot
 
@@ -162,3 +164,8 @@ async def seed_immunity(ctx, channel_id, num):
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Failed"))
 # async def save_bot_state(ctx):
+
+async def book(ctx):
+	str_msg = await book_serveme(ctx)
+	
+	await ctx.success(ctx.qc.gt(str_msg))
