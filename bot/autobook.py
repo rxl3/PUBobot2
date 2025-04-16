@@ -52,6 +52,7 @@ async def book_serveme(ctx):
                             "password": server_password,
                             "rcon": rcon_password,
                             "first_map": "cp_process_f12",
+                            "server_config": "ozfortress_6v6_scrim"
                         }
                     })
 
