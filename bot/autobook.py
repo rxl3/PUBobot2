@@ -72,11 +72,8 @@ async def book_serveme(ctx):
                         return "Connect string: " + str_msg.jump_url
                     else:
                         return "Auto-booking didn't work :( please manually book a server."
-
-
                 else:
                     raise bot.Exc.NotFoundError(ctx.qc.gt("No available servers."))
-
             else:
                 print('Error:', response.status_code)
                 raise bot.Exc.NotFoundError(ctx.qc.gt("Error booking serveme."))

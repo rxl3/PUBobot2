@@ -1,4 +1,4 @@
-__all__ = ['last_game', 'stats', 'top', 'luck', 'rank', 'leaderboard', 'set_immunity']
+__all__ = ['last_game', 'stats', 'top', 'luck', 'rank', 'leaderboard', 'set_immunity', 'set_forced_med']
 
 from time import time
 from nextcord import Member, Embed, Colour
@@ -182,6 +182,32 @@ async def set_immunity(ctx, player: Member = None, immunity=0):
 	)
 
 
+async def set_forced_med(ctx, player: Member = None, count=0):
+	ctx.check_perms(ctx.Perms.MODERATOR)
+
+	target = ctx.author if not player else await ctx.get_member(player)
+	if not target:
+		raise bot.Exc.SyntaxError(ctx.qc.gt("Specified user not found."))
+
+	await db.update(
+		"qc_players",
+		dict(force_med=count),
+		keys=dict(channel_id=ctx.qc.id, user_id=target.id, nick=get_nick(target))
+	)
+
+	await ctx.reply(embed=
+		Embed(
+			title=ctx.qc.gt("Forced Med Count Updated!"),
+			colour=Colour(0x00ff00),
+			description=ctx.qc.gt("Set {target}'s forced med games to {count}").format(
+				target=f"{get_nick(target)}",
+				count=count
+			),
+		),
+		ephemeral=True
+	)
+
+
 async def rank(ctx, player: Member = None):
 	target = ctx.author if not player else await ctx.get_member(player)
 	if not target:
@@ -243,7 +269,6 @@ async def rank(ctx, player: Member = None):
 				) for c in changes))
 			)
 		await ctx.reply(embed=embed)
-
 	else:
 		raise bot.Exc.ValueError(ctx.qc.gt("No rating data found."))
 

@@ -33,7 +33,8 @@ db.ensure_table(dict(
 		dict(cname="draws", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="streak", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="auto_ready_on_add", ctype=db.types.int, notnull=True, default=120),
-		dict(cname="immunity", ctype=db.types.int, default=0)
+		dict(cname="immunity", ctype=db.types.int, default=0),
+		dict(cname="force_med", ctype=db.types.int, default=0)
 	],
 	primary_keys=["user_id", "channel_id"]
 ))

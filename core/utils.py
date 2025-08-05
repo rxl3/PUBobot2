@@ -119,7 +119,6 @@ def parse_duration(string):
 			else:
 				raise ValueError()
 		return timedelta(seconds=int(duration))
-
 	else:
 		raise ValueError()
 

@@ -121,7 +121,6 @@ class Embeds:
 				picker_team = self.m.teams[self.m.draft.pick_order[pick_step]] if pick_step < len(self.m.draft.pick_order)-1 else None
 				if picker_team:
 					msg += "\n" + self.m.gt("{member}'s turn to pick!").format(member=f"<@{picker_team[0].id}>")
-
 			else:
 				# Keep the pre-sorting that we did to the Match.players variable (if any)
 				unpicked_list=[p for p in self.m.players if p in self.m.teams[2]]
@@ -209,7 +208,6 @@ class Embeds:
 					value=" \u200b " + join_and([self.m.teams[0][0].mention, self.m.teams[1][0].mention]),
 					inline=False
 				)
-
 		else:  # just players list
 			embed.add_field(
 				name=self.m.gt("Players"),

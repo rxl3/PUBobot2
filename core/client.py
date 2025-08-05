@@ -59,7 +59,6 @@ class DiscordClient(nextcord.Client):
 					await task(*args, **kwargs)
 
 			setattr(self, coro.__name__, run_event)
-
 		else:
 			self.events[coro.__name__].append(coro)
 
