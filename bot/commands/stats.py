@@ -252,6 +252,8 @@ async def rank(ctx, player: Member = None):
 		embed.add_field(name="Games as Captain", value=f"**{games_as_captain[0]['count']}**", inline=True)
 
 		embed.add_field(name="Immunity", value=f"**{p['immunity']}**", inline=True)
+		
+		embed.add_field(name="Med games remaining", value=f"**{p['force_med']}**", inline=True)
 
 		changes = await db.select(
 			('at', 'rating_change', 'match_id', 'reason'),

@@ -100,6 +100,7 @@ class Match:
 			cfg=self.cfg,
 			players=[p.id for p in self.players if p],
 			immune=self.immune,
+			forced_captains=self.forced_captains,
 			temporary_captains=self.temporary_captains,
 			teams=[[p.id for p in team if p] for team in self.teams],
 			maps=self.maps,
@@ -179,6 +180,7 @@ class Match:
 		self.states = []
 		self.maps = []
 		self.immune = []
+		self.forced_captains = []
 		self.temporary_captains = []
 		self.lifetime = self.cfg['match_lifetime']
 		self.start_time = int(time())
@@ -248,13 +250,21 @@ class Match:
 	async def init_immune(self, captain_immunity_games, pick_captains):
 		if captain_immunity_games>0:
 			self.immune = await bot.stats.get_immune_players(self.qc.id, self.players)
-			p_a, p_b = [], []
+			self.forced_captains = await bot.stats.get_forced_meds(self.qc.id, self.players)
+			p_f, p_a, p_b = [], [], []
 			for p in self.players:
-				(p_a,p_b)[p.id in self.immune.keys()].append(p)
+				# (p_a,p_b)[p.id in self.immune.keys()].append(p)
+				if p.id in self.forced_captains.keys():
+					p_f.append(p)
+				elif p.id in self.immune.keys():
+					p_b.append(p)
+				else:
+					p_a.append(p)
 
+			random.shuffle(p_f)
 			random.shuffle(p_a)
 			random.shuffle(p_b)
-			self.players = p_a + p_b
+			self.players = p_f + p_a + p_b
 
 			# If captain_immunity_games is set and we have no automatic method of selecting captains: Assign temporary captains for the draft list
 			if (pick_captains == "no captains"):

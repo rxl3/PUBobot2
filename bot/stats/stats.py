@@ -226,9 +226,12 @@ async def register_match_ranked(ctx, m):
 
 		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
 		new_immunity = before[p.id]['immunity']
+		new_forced_med_count = before[p.id]['force_med']
 		if captain==1:
 			if new_immunity < m.cfg['captain_immunity_games']:
 				new_immunity = m.cfg['captain_immunity_games']
+			if new_forced_med_count > 0:
+				new_forced_med_count = new_forced_med_count - 1
 		# If not captain reduce immunity by 1 (to a minimum of zero)
 		elif new_immunity > 0:
 			new_immunity -= 1
@@ -244,6 +247,7 @@ async def register_match_ranked(ctx, m):
 				draws=after[p.id]['draws'],
 				streak=after[p.id]['streak'],
 				immunity=new_immunity,
+				force_med=new_forced_med_count
 			),
 			keys=dict(channel_id=m.qc.rating.channel_id, user_id=p.id)
 		)
@@ -504,6 +508,17 @@ async def last_games(channel_id):
 		(channel_id, channel_id)
 	)
 	return data
+
+
+async def get_forced_meds(channel_id, players):
+	player_str = ', '.join(["'"+str(p.id)+"'" for p in players])
+	data = await db.fetchall("\n".join((
+			"SELECT user_id, force_med FROM `qc_players`",
+			"WHERE channel_id = '{}' AND user_id IN ({}) AND force_med > 0".format(channel_id, player_str)
+	)))
+	force_med = {i['user_id']: i['force_med'] for i in data}
+	return force_med
+
 
 
 class StatsJobs:
