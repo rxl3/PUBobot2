@@ -219,7 +219,7 @@ async def rank(ctx, player: Member = None):
 		place = data.index(p) + 1
 	else:
 		data = await db.select(
-			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'is_hidden', 'streak', 'immunity'],
+			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'is_hidden', 'streak', 'immunity', 'force_med'],
 			"qc_players",
 			where={'channel_id': ctx.qc.rating.channel_id}
 		)
@@ -285,7 +285,7 @@ async def leaderboard(ctx, page: int = 1):
 				["№", "Rating〈Ξ〉", "Nickname", "Matches", "W/L/D"],
 				[[
 					(page * 10) + (n + 1),
-					str(data[n]['rating']) + ctx.qc.rating_rank(data[n]['rating'])['rank'],
+					str(data[n]['rating']) + ' ' + ctx.qc.rating_rank(data[n]['rating'])['rank'],
 					data[n]['nick'].strip(),
 					int(data[n]['wins'] + data[n]['losses'] + data[n]['draws']),
 					"{0}/{1}/{2} ({3}%)".format(
