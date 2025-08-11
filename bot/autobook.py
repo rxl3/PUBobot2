@@ -53,6 +53,7 @@ async def book_serveme(ctx):
                             "rcon": rcon_password,
                             "first_map": "cp_process_f12",
                             "server_config": "ozfortress_6v6_5cp"
+                        }
                     })
 
                     if book_response.status_code == 200:
