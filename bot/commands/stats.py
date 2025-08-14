@@ -280,22 +280,34 @@ async def leaderboard(ctx, page: int = 1):
 
 	data = (await ctx.qc.get_lb())[page * 10:(page + 1) * 10]
 	if len(data):
+		embed = Embed(title=f"Leaderboard", colour=Colour(0x7289DA))
+		embed.description=["{0}. {1} - {2} ({3}) - {4}/{5}/{6} ({7}%)".format(
+			(page * 10) + (n + 1),
+			data[n]['nick'].strip(),
+			ctx.qc.rating_rank(data[n]['rating'])['rank'],
+			str(data[n]['rating']),
+			data[n]['wins'],
+			data[n]['losses'],
+			data[n]['draws'],
+			int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))) for n in range(len(data))
+		]
 		await ctx.reply(
-			discord_table(
-				["№", "Rating〈Ξ〉", "Nickname", "Matches", "W/L/D"],
-				[[
-					(page * 10) + (n + 1),
-					str(data[n]['rating']) + ' ' + ctx.qc.rating_rank(data[n]['rating'])['rank'],
-					data[n]['nick'].strip(),
-					int(data[n]['wins'] + data[n]['losses'] + data[n]['draws']),
-					"{0}/{1}/{2} ({3}%)".format(
-						data[n]['wins'],
-						data[n]['losses'],
-						data[n]['draws'],
-						int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))
-					)
-				] for n in range(len(data))]
-			)
+			embed=embed
+			# discord_table(
+			# 	["№", "Rating〈Ξ〉", "Nickname", "Matches", "W/L/D"],
+			# 	[[
+			# 		(page * 10) + (n + 1),
+			# 		str(data[n]['rating']) + ' ' + ctx.qc.rating_rank(data[n]['rating'])['rank'],
+			# 		data[n]['nick'].strip(),
+			# 		int(data[n]['wins'] + data[n]['losses'] + data[n]['draws']),
+			# 		"{0}/{1}/{2} ({3}%)".format(
+			# 			data[n]['wins'],
+			# 			data[n]['losses'],
+			# 			data[n]['draws'],
+			# 			int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))
+			# 		)
+			# 	] for n in range(len(data))]
+			# )
 		)
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Leaderboard is empty."))
