@@ -284,7 +284,7 @@ async def leaderboard(ctx, page: int = 1):
 		embed.description="\n".join(["{0}. {1} - {2} ({3}) - {4}/{5}/{6} ({7}%)".format(
 			(page * 10) + (n + 1),
 			data[n]['nick'].strip(),
-			ctx.qc.rating_rank(data[n]['rating'])['rank'],
+			"<a:" + ctx.qc.rating_rank(data[n]['rating'])['rank'][1:],
 			str(data[n]['rating']),
 			data[n]['wins'],
 			data[n]['losses'],
