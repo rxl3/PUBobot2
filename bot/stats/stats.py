@@ -8,6 +8,11 @@ from core.database import db
 from core.utils import iter_to_dict, find, get_nick
 from core.client import dc
 
+from nextcord import Embed, Colour
+from core.client import dc
+from core import config
+import math
+
 db.ensure_table(dict(
 	tname="players",
 	columns=[
@@ -270,6 +275,37 @@ async def register_match_ranked(ctx, m):
 
 	await m.qc.update_rating_roles(*m.players)
 	await m.print_rating_results(ctx, before, after)
+	await bot.stats.update_leaderboard(ctx)
+
+async def generate_lb_page(ctx, rawdata, page):
+	data = (rawdata)[page * 10:(page + 1) * 10]
+	embed = Embed(title=f"Leaderboard", colour=Colour(0x7289DA))
+	embed.description="**\\# - Nickname - Rank - W/L/D**\n" + "\n".join(["{0}. {1} - {2} ({3}) - {4}/{5}/{6} ({7}%)".format(
+		(page * 10) + (n + 1),
+		data[n]['nick'].strip(),
+		"<:" + ctx.qc.rating_rank(data[n]['rating'])['rank'][2:],
+		str(data[n]['rating']),
+		data[n]['wins'],
+		data[n]['losses'],
+		data[n]['draws'],
+		int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))) for n in range(len(data))
+	])
+	embed.set_footer(text="Page {0} of {1}".format(page + 1,  math.ceil(len(rawdata) / 10) ))
+	return embed
+
+
+async def update_leaderboard(ctx):
+	lb_channel = dc.get_channel(config.cfg.DC_LEADERBOARD_CHANNEL_ID)
+
+	# do some stuff, delete all messages here then create pages to post
+		
+	rawdata = await ctx.qc.get_lb()
+	if (rawdata and lb_channel):
+		await lb_channel.purge(limit=10)
+
+		for n in range(math.ceil(len(rawdata) / 10)):
+			embed = await generate_lb_page(ctx, rawdata, n)
+			await lb_channel.send(embed=embed)
 
 
 async def undo_match(ctx, match_id):
