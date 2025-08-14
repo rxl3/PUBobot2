@@ -7,6 +7,7 @@ from core.utils import get, find, seconds_to_str, get_nick, discord_table
 from core.database import db
 
 import bot
+import math
 
 
 async def last_game(ctx, queue: str = None, player: Member = None, match_id: int = None):
@@ -277,11 +278,12 @@ async def rank(ctx, player: Member = None):
 
 async def leaderboard(ctx, page: int = 1):
 	page = (page or 1) - 1
+	rawdata = await ctx.qc.get_lb()
 
-	data = (await ctx.qc.get_lb())[page * 10:(page + 1) * 10]
+	data = (rawdata)[page * 10:(page + 1) * 10]
 	if len(data):
 		embed = Embed(title=f"Leaderboard", colour=Colour(0x7289DA))
-		embed.description="\n".join(["{0}. {1} - {2} ({3}) - {4}/{5}/{6} ({7}%)".format(
+		embed.description="**\\# - Nickname - Rank - W/L/D**\n" + "\n".join(["{0}. {1} - {2} ({3}) - {4}/{5}/{6} ({7}%)".format(
 			(page * 10) + (n + 1),
 			data[n]['nick'].strip(),
 			"<:" + ctx.qc.rating_rank(data[n]['rating'])['rank'][2:],
@@ -291,6 +293,7 @@ async def leaderboard(ctx, page: int = 1):
 			data[n]['draws'],
 			int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))) for n in range(len(data))
 		])
+		embed.set_footer(text="Page {0} of {1}".format(page + 1,  math.ceil(len(rawdata) / 10) ))
 		await ctx.reply(
 			embed=embed
 			# discord_table(
