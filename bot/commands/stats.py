@@ -5,6 +5,8 @@ from nextcord import Member, Embed, Colour
 
 from core.utils import get, find, seconds_to_str, get_nick, discord_table
 from core.database import db
+from core.client import dc
+from core import config
 
 import bot
 import math
@@ -274,43 +276,47 @@ async def rank(ctx, player: Member = None):
 		await ctx.reply(embed=embed)
 	else:
 		raise bot.Exc.ValueError(ctx.qc.gt("No rating data found."))
+	
+async def update_leaderboard(ctx):
+	lb_channel = dc.get_channel(config.cfg.DC_LEADERBOARD_CHANNEL_ID)
+
+	# do some stuff, delete all messages here then create pages to post
+		
+	rawdata = await ctx.qc.get_lb()
+	if (rawdata and lb_channel):
+		await lb_channel.purge(limit=10)
+
+		for n in range(math.ceil(len(rawdata) / 10)):
+			embed = generate_lb_page(ctx, rawdata, n)
+			await lb_channel.send(embed=embed)
+	
+async def generate_lb_page(ctx, rawdata, page):
+	data = (rawdata)[page * 10:(page + 1) * 10]
+	embed = Embed(title=f"Leaderboard", colour=Colour(0x7289DA))
+	embed.description="**\\# - Nickname - Rank - W/L/D**\n" + "\n".join(["{0}. {1} - {2} ({3}) - {4}/{5}/{6} ({7}%)".format(
+		(page * 10) + (n + 1),
+		data[n]['nick'].strip(),
+		"<:" + ctx.qc.rating_rank(data[n]['rating'])['rank'][2:],
+		str(data[n]['rating']),
+		data[n]['wins'],
+		data[n]['losses'],
+		data[n]['draws'],
+		int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))) for n in range(len(rawdata))
+	])
+	embed.set_footer(text="Page {0} of {1}".format(page + 1,  math.ceil(len(data) / 10) ))
+	return embed
 
 
 async def leaderboard(ctx, page: int = 1):
 	page = (page or 1) - 1
 	rawdata = await ctx.qc.get_lb()
 
-	data = (rawdata)[page * 10:(page + 1) * 10]
-	if len(data):
-		embed = Embed(title=f"Leaderboard", colour=Colour(0x7289DA))
-		embed.description="**\\# - Nickname - Rank - W/L/D**\n" + "\n".join(["{0}. {1} - {2} ({3}) - {4}/{5}/{6} ({7}%)".format(
-			(page * 10) + (n + 1),
-			data[n]['nick'].strip(),
-			"<:" + ctx.qc.rating_rank(data[n]['rating'])['rank'][2:],
-			str(data[n]['rating']),
-			data[n]['wins'],
-			data[n]['losses'],
-			data[n]['draws'],
-			int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))) for n in range(len(data))
-		])
-		embed.set_footer(text="Page {0} of {1}".format(page + 1,  math.ceil(len(rawdata) / 10) ))
+	if len(rawdata):
+		embed = await generate_lb_page(ctx, rawdata, page)
 		await ctx.reply(
 			embed=embed
-			# discord_table(
-			# 	["№", "Rating〈Ξ〉", "Nickname", "Matches", "W/L/D"],
-			# 	[[
-			# 		(page * 10) + (n + 1),
-			# 		str(data[n]['rating']) + ' ' + ctx.qc.rating_rank(data[n]['rating'])['rank'],
-			# 		data[n]['nick'].strip(),
-			# 		int(data[n]['wins'] + data[n]['losses'] + data[n]['draws']),
-			# 		"{0}/{1}/{2} ({3}%)".format(
-			# 			data[n]['wins'],
-			# 			data[n]['losses'],
-			# 			data[n]['draws'],
-			# 			int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))
-			# 		)
-			# 	] for n in range(len(data))]
-			# )
 		)
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Leaderboard is empty."))
+
+	await update_leaderboard(ctx)
