@@ -286,7 +286,7 @@ async def update_leaderboard(ctx):
 	if (rawdata and lb_channel):
 		await lb_channel.purge(limit=10)
 
-		for n in range(math.ceil(len(rawdata) / 10)):
+		for n in range(math.floor(len(rawdata) / 10)):
 			embed = generate_lb_page(ctx, rawdata, n)
 			await lb_channel.send(embed=embed)
 	
