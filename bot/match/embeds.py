@@ -195,7 +195,7 @@ class Embeds:
 			team_players = [
 				" \u200b " +
 				" \u200b ".join([
-					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"<@{p.id}>"
+					(f"{self.m.rank_str(p)}" if show_ranks else "") + f"<@{p.id}>"
 					for p in t
 				])
 				for t in self.m.teams[:2]
