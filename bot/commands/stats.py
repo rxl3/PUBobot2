@@ -7,6 +7,7 @@ from core.utils import get, find, seconds_to_str, get_nick, discord_table
 from core.database import db
 
 import bot
+import collections
 
 
 async def last_game(ctx, queue: str = None, player: Member = None, match_id: int = None):
@@ -234,7 +235,31 @@ async def rank(ctx, player: Member = None):
 	print(matchData)
 
 	me = [x for x in matchData if x['user_id'] == target.id]
-	print(me)
+	wonWith = [] # list of players I won with
+	lostWith = [] # list of players I lost with
+	wonAgainst = [] # list of players I won against
+	lostAgainst = [] # list of players I lost against
+
+	for my in me:
+		for m in matchData:
+			uid = m['user_id']
+
+			if matchData['match_id'] != my['match_id'] or uid == target.id:
+				continue
+			
+			if m['team'] == my['team']:
+				if m['team'] == m['winner']:
+					wonWith.append(uid)
+				else:
+					lostWith.append(uid)
+			else:
+				if m['team'] == m['winner']:
+					lostAgainst.append(uid)
+				else:
+					wonAgainst.append(uid)
+	counterWW = collections.Counter(wonWith)
+	countsWW = counterWW.most_common()
+	print(countsWW)
 
 	if p:
 		embed = Embed(title=f"__{get_nick(target)}__", colour=Colour(0x7289DA))
