@@ -229,18 +229,12 @@ async def rank(ctx, player: Member = None):
 
 	# Do some cool data analysis
 	myMatches = await db.fetchall("SELECT qcpm.match_id FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.user_id = {id}".format(id=target.id))
-	print(myMatches)
 	matchIds = ", ".join(str(match['match_id']) for match in myMatches)
 	matchData = await db.fetchall("SELECT qcpm.match_id, user_id, team, winner, nick FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.match_id IN ({matches})".format(matches=matchIds))
-	print(matchData)
 
 	me = [x for x in matchData if x['user_id'] == target.id]
 	wlfdict = {}
 	wledict = {}
-	# wonWith = [] # list of players I won with
-	# lostWith = [] # list of players I lost with
-	# wonAgainst = [] # list of players I won against
-	# lostAgainst = [] # list of players I lost against
 
 	for my in me:
 		for m in matchData:
@@ -249,8 +243,8 @@ async def rank(ctx, player: Member = None):
 			if m['match_id'] != my['match_id'] or uid == target.id:
 				continue
 			
-			if m['team'] == my['team']:
-				if m['team'] == m['winner']:
+			if m['team'] == my['team']: # if they are a teammate
+				if m['team'] == m['winner']:  # we won!
 					if uid in wlfdict:
 						wlfdict[uid]['wins'] += 1
 					else:
@@ -259,8 +253,7 @@ async def rank(ctx, player: Member = None):
 							"losses": 0,
 							"total": 0
 						}
-					# wonWith.append(uid)
-				else:
+				else: # we lost :(
 					if uid in wlfdict:
 						wlfdict[uid]['losses'] += 1
 					else:
@@ -269,10 +262,9 @@ async def rank(ctx, player: Member = None):
 							"losses": 1,
 							"total": 0
 						}
-					# lostWith.append(uid)
 				wlfdict[uid]['total'] += 1
-			else:
-				if m['team'] == m['winner']:
+			else: ## they are on enemy team
+				if m['team'] == m['winner']: # enemy won, means I lost
 					if uid in wledict:
 						wledict[uid]['wins'] += 1
 					else:
@@ -281,8 +273,7 @@ async def rank(ctx, player: Member = None):
 							"losses": 0,
 							"total": 0
 						}
-					# lostAgainst.append(uid)
-				else:
+				else: # enemy lost, means I won
 					if uid in wledict:
 						wledict[uid]['losses'] += 1
 					else:
@@ -291,23 +282,11 @@ async def rank(ctx, player: Member = None):
 							"losses": 1,
 							"total": 0
 						}
-					# wonAgainst.append(uid)
 			
 				wledict[uid]['total'] += 1
 	
-	print(sorted(wlfdict.items(), key=lambda item: item[1]['total'], reverse=True)[:4])
-	print(sorted(wledict.items(), key=lambda item: item[1]['total'], reverse=True)[:4])
-	
 	topTeammates = sorted(wlfdict.items(), key=lambda item: item[1]['total'], reverse=True)[:4]
 	topEnemies = sorted(wledict.items(), key=lambda item: item[1]['total'], reverse=True)[:4]
-	# counterWW = collections.Counter(wonWith)
-	# countsWW = counterWW.most_common()
-	# counterLW = collections.Counter(wonWith)
-	# countsLW = counterLW.most_common()
-	# print(countsWW)
-
-	# nick = [x for x in matchData if x['user_id'] == countsWW[0][0]][0]['nick']
-	# print(nick)
 
 	if p:
 		embed = Embed(title=f"__{get_nick(target)}__", colour=Colour(0x7289DA))
@@ -371,7 +350,7 @@ async def rank(ctx, player: Member = None):
 				name="Enemies",
 				value="\n".join("{name} ({percent}%, {count} games)".format(
 					name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
-					percent=int(100 * t[1]['wins'] / (t[1]['total'] or 1)),
+					percent=int(100 * t[1]['losses'] / (t[1]['total'] or 1)), # using losses because this tracks enemy team losses, and we want to display our winrate still
 					count=t[1]['total']
 				) for t in topEnemies),
 				inline=True
