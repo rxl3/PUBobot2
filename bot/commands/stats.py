@@ -351,27 +351,31 @@ async def rank(ctx, player: Member = None):
 					reason=c['reason'],
 					match_id=f"(__{c['match_id']}__)" if c['match_id'] else "",
 					change=("+" if c['rating_change'] >= 0 else "") + str(c['rating_change'])
-				) for c in changes))
+				) for c in changes)),
+				inline=False
 			)
 
-		embed.add_field(
-			name="Teammates",
-			value="\n".join("{name} ({percent}%, {count} games)".format(
-				name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
-				percent=100 * int(t[1]['wins'] / (t[1]['total'] or 1)),
-				count=t[1]['total']
-			) for t in topTeammates),
-		)
+		if len(topTeammates):
+			embed.add_field(
+				name="Teammates",
+				value="\n".join("{name} ({percent}%, {count} games)".format(
+					name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
+					percent=int(100 * t[1]['wins'] / (t[1]['total'] or 1)),
+					count=t[1]['total']
+				) for t in topTeammates),
+				inline=True
+			)
 
-		embed.add_field(
-			name="Enemies",
-			value="\n".join("{name} ({percent}%, {count} games)".format(
-				name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
-				percent=100 * int(t[1]['wins'] / (t[1]['total'] or 1)),
-				count=t[1]['total']
-			) for t in topEnemies),
-			inline=True
-		)
+		if len(topEnemies):
+			embed.add_field(
+				name="Enemies",
+				value="\n".join("{name} ({percent}%, {count} games)".format(
+					name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
+					percent=int(100 * t[1]['wins'] / (t[1]['total'] or 1)),
+					count=t[1]['total']
+				) for t in topEnemies),
+				inline=True
+			)
 
 		await ctx.reply(embed=embed)
 	else:
