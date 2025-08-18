@@ -236,7 +236,7 @@ async def rank(ctx, player: Member = None):
 
 	me = [x for x in matchData if x['user_id'] == target.id]
 	wlfdict = {}
-	wledict = {}
+	wledict = {}=
 	# wonWith = [] # list of players I won with
 	# lostWith = [] # list of players I lost with
 	# wonAgainst = [] # list of players I won against
@@ -293,12 +293,13 @@ async def rank(ctx, player: Member = None):
 						}
 					# wonAgainst.append(uid)
 			
-				wledict[uid]['total']
+				wledict[uid]['total'] += 1
 	
-	print(sorted(wlfdict.items(), key=lambda item: item[1]['total'], reverse=True)[:3])
-	print(sorted(wledict.items(), key=lambda item: item[1]['total'], reverse=True)[:3])
+	print(sorted(wlfdict.items(), key=lambda item: item[1]['total'], reverse=True)[:4])
+	print(sorted(wledict.items(), key=lambda item: item[1]['total'], reverse=True)[:4])
 	
-
+	topTeammates = sorted(wlfdict.items(), key=lambda item: item[1]['total'], reverse=True)[:4]
+	topEnemies = sorted(wledict.items(), key=lambda item: item[1]['total'], reverse=True)[:4]
 	# counterWW = collections.Counter(wonWith)
 	# countsWW = counterWW.most_common()
 	# counterLW = collections.Counter(wonWith)
@@ -353,41 +354,25 @@ async def rank(ctx, player: Member = None):
 				) for c in changes))
 			)
 
-		# embed.add_field(
-		# 	name="Highest winrate with",
-		# 	value="\n".join("{name} ({percent}%)".format(
-		# 		name="",
-		# 		percent=""
-		# 	) for c in changes),
-		# 	inline=True
-		# )
+		embed.add_field(
+			name="Teammates",
+			value="\n".join("{name} ({percent}%, {count} games)".format(
+				name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
+				percent=100 * t[1]['wins'] / (t[1]['total'] or 1),
+				count=t[1]['total']
+			) for t in topTeammates),
+			inline=True
+		)
 
-		# embed.add_field(
-		# 	name="Lowest winrate with",
-		# 	value="\n".join("{name} ({percent}%)".format(
-		# 		name="",
-		# 		percent=""
-		# 	) for c in changes),
-		# 	inline=True
-		# )
-
-		# embed.add_field(
-		# 	name="Highest winrate against",
-		# 	value="\n".join("{name} ({percent}%)".format(
-		# 		name="",
-		# 		percent=""
-		# 	) for c in changes),
-		# 	inline=True
-		# )
-
-		# embed.add_field(
-		# 	name="Lowest winrate against",
-		# 	value="\n".join("{name} ({percent}%)".format(
-		# 		name="",
-		# 		percent=""
-		# 	) for c in changes),
-		# 	inline=True
-		# )
+		embed.add_field(
+			name="Enemies",
+			value="\n".join("{name} ({percent}%, {count} games)".format(
+				name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
+				percent=100 * t[1]['wins'] / (t[1]['total'] or 1),
+				count=t[1]['total']
+			) for t in topEnemies),
+			inline=True
+		)
 
 		await ctx.reply(embed=embed)
 	else:
