@@ -16,11 +16,15 @@ async def book_serveme(ctx):
 
         existing_booking = False
         existing_message = None
-        async for message in strings_channel.history(limit=5):
-            if message.author == dc.user and datetime.datetime.now(datetime.timezone.utc) - message.created_at < timedelta(minutes=90):
-                existing_booking = True
-                existing_message = message
-                break
+        existingR = requests.get("https://au.serveme.tf/api/reservations?api_key=" + config.cfg.SERVEME_API_KEY + "&limit=1")
+        if existingR.status_code == 200:
+            existingJson = existingR.json()
+            existing_booking = len(existingJson['reservations'] > 0) and existingJson['reservations'][0]['status'] == "Ready"
+        # async for message in strings_channel.history(limit=5):
+        #     if message.author == dc.user and datetime.datetime.now(datetime.timezone.utc) - message.created_at < timedelta(minutes=90):
+        #         existing_booking = True
+        #         existing_message = message
+        #         break
 
         if existing_booking:
             if len(matches) > 0:
@@ -52,7 +56,7 @@ async def book_serveme(ctx):
                             "password": server_password,
                             "rcon": rcon_password,
                             "first_map": "cp_process_f12",
-                            "server_config": "ozfortress_6v6_pug"
+                            "server_config_id": 21 # ozfortress_6v6_pug
                         }
                     })
 
