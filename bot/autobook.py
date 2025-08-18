@@ -19,7 +19,7 @@ async def book_serveme(ctx):
         existingR = requests.get("https://au.serveme.tf/api/reservations?api_key=" + config.cfg.SERVEME_API_KEY + "&limit=1")
         if existingR.status_code == 200:
             existingJson = existingR.json()
-            existing_booking = len(existingJson['reservations'] > 0) and existingJson['reservations'][0]['status'] == "Ready"
+            existing_booking = len(existingJson['reservations']) > 0 and existingJson['reservations'][0]['status'] == "Ready"
         # async for message in strings_channel.history(limit=5):
         #     if message.author == dc.user and datetime.datetime.now(datetime.timezone.utc) - message.created_at < timedelta(minutes=90):
         #         existing_booking = True
