@@ -295,7 +295,8 @@ async def rank(ctx, player: Member = None):
 			
 				wledict[uid]['total']
 	
-	print(sorted(wlfdict.items(), key=lambda item: item[1]['total']))
+	print(sorted(wlfdict.items(), key=lambda item: item[1]['total'], reverse=True)[:3])
+	print(sorted(wledict.items(), key=lambda item: item[1]['total'], reverse=True)[:3])
 	
 
 	# counterWW = collections.Counter(wonWith)
