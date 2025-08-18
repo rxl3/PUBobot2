@@ -233,7 +233,8 @@ async def rank(ctx, player: Member = None):
 	matchData = await db.fetchall("SELECT qcpm.match_id, user_id, team, winner FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.match_id IN ({matches})".format(matches=matchIds))
 	print(matchData)
 
-
+	me = [x for x in matchData if x['user_id'] == target.id]
+	print(me)
 
 	if p:
 		embed = Embed(title=f"__{get_nick(target)}__", colour=Colour(0x7289DA))
