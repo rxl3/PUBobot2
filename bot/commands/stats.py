@@ -358,17 +358,16 @@ async def rank(ctx, player: Member = None):
 			name="Teammates",
 			value="\n".join("{name} ({percent}%, {count} games)".format(
 				name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
-				percent=100 * t[1]['wins'] / (t[1]['total'] or 1),
+				percent=100 * int(t[1]['wins'] / (t[1]['total'] or 1)),
 				count=t[1]['total']
 			) for t in topTeammates),
-			inline=True
 		)
 
 		embed.add_field(
 			name="Enemies",
 			value="\n".join("{name} ({percent}%, {count} games)".format(
 				name=[x for x in matchData if x['user_id'] == t[0]][0]['nick'],
-				percent=100 * t[1]['wins'] / (t[1]['total'] or 1),
+				percent=100 * int(t[1]['wins'] / (t[1]['total'] or 1)),
 				count=t[1]['total']
 			) for t in topEnemies),
 			inline=True
