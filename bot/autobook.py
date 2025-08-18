@@ -20,8 +20,6 @@ async def book_serveme(ctx):
         if existingR.status_code == 200:
             existingJson = existingR.json()
             existing_booking = len(existingJson['reservations']) > 0 and existingJson['reservations'][0]['status'] == "Ready"
-            print(len(existingJson['reservations']) > 0)
-            print(existingJson['reservations'][0]['status'] == "Ready")
         async for message in strings_channel.history(limit=5):
             if message.author == dc.user:
                 existing_message = message
