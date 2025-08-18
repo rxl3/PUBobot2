@@ -229,7 +229,7 @@ async def rank(ctx, player: Member = None):
 	# Do some cool data analysis
 	myMatches = await db.fetchall("SELECT qcpm.match_id FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.user_id = {id}".format(id=target.id))
 	print(myMatches)
-	matchData = await db.fetchall("SELECT qcpm.match_id, user_id, team, winner FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.match_id IN {matches}".format(matches=myMatches))
+	matchData = await db.fetchall("SELECT qcpm.match_id, user_id, team, winner FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.match_id IN {matches}".format(matches=map(lambda m: m['match_id'],myMatches)))
 	print(matchData)
 
 
