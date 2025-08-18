@@ -231,7 +231,7 @@ async def rank(ctx, player: Member = None):
 	myMatches = await db.fetchall("SELECT qcpm.match_id FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.user_id = {id}".format(id=target.id))
 	print(myMatches)
 	matchIds = ", ".join(str(match['match_id']) for match in myMatches)
-	matchData = await db.fetchall("SELECT qcpm.match_id, user_id, team, winner FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.match_id IN ({matches})".format(matches=matchIds))
+	matchData = await db.fetchall("SELECT qcpm.match_id, user_id, team, winner, nick FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.match_id IN ({matches})".format(matches=matchIds))
 	print(matchData)
 
 	me = [x for x in matchData if x['user_id'] == target.id]
@@ -260,6 +260,9 @@ async def rank(ctx, player: Member = None):
 	counterWW = collections.Counter(wonWith)
 	countsWW = counterWW.most_common()
 	print(countsWW)
+
+	nick = [x for x in matchData if x['user_id'] == countsWW[0][0]][0]
+	print(nick)
 
 	if p:
 		embed = Embed(title=f"__{get_nick(target)}__", colour=Colour(0x7289DA))
