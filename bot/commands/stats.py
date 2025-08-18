@@ -236,7 +236,7 @@ async def rank(ctx, player: Member = None):
 
 	me = [x for x in matchData if x['user_id'] == target.id]
 	wlfdict = {}
-	wledict = {}=
+	wledict = {}
 	# wonWith = [] # list of players I won with
 	# lostWith = [] # list of players I lost with
 	# wonAgainst = [] # list of players I won against
