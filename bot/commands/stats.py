@@ -244,7 +244,7 @@ async def rank(ctx, player: Member = None):
 		for m in matchData:
 			uid = m['user_id']
 
-			if matchData['match_id'] != my['match_id'] or uid == target.id:
+			if m['match_id'] != my['match_id'] or uid == target.id:
 				continue
 			
 			if m['team'] == my['team']:
