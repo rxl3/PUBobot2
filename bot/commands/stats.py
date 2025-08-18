@@ -226,6 +226,14 @@ async def rank(ctx, player: Member = None):
 		p = find(lambda i: i['user_id'] == target.id, data)
 		place = "?"
 
+	# Do some cool data analysis
+	myMatches = await db.fetchall("SELECT qcpm.match_id FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.user_id = " + target.id)
+	print(myMatches)
+	matchData = await db.fetchall("SELECT qcpm.match_id, user_id, team, winner FROM qc_player_matches qcpm JOIN qc_matches qcm ON qcpm.match_id = qcm.match_id WHERE qcpm.match_id IN {matches}".format(matches=myMatches))
+	print(matchData)
+
+
+
 	if p:
 		embed = Embed(title=f"__{get_nick(target)}__", colour=Colour(0x7289DA))
 		embed.add_field(name="№", value=f"**{place}**", inline=True)
@@ -270,6 +278,43 @@ async def rank(ctx, player: Member = None):
 					change=("+" if c['rating_change'] >= 0 else "") + str(c['rating_change'])
 				) for c in changes))
 			)
+
+		# embed.add_field(
+		# 	name="Highest winrate with",
+		# 	value="\n".join("{name} ({percent}%)".format(
+		# 		name="",
+		# 		percent=""
+		# 	) for c in changes),
+		# 	inline=True
+		# )
+
+		# embed.add_field(
+		# 	name="Lowest winrate with",
+		# 	value="\n".join("{name} ({percent}%)".format(
+		# 		name="",
+		# 		percent=""
+		# 	) for c in changes),
+		# 	inline=True
+		# )
+
+		# embed.add_field(
+		# 	name="Highest winrate against",
+		# 	value="\n".join("{name} ({percent}%)".format(
+		# 		name="",
+		# 		percent=""
+		# 	) for c in changes),
+		# 	inline=True
+		# )
+
+		# embed.add_field(
+		# 	name="Lowest winrate against",
+		# 	value="\n".join("{name} ({percent}%)".format(
+		# 		name="",
+		# 		percent=""
+		# 	) for c in changes),
+		# 	inline=True
+		# )
+
 		await ctx.reply(embed=embed)
 	else:
 		raise bot.Exc.ValueError(ctx.qc.gt("No rating data found."))
