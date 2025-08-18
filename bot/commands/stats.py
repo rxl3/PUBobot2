@@ -235,10 +235,12 @@ async def rank(ctx, player: Member = None):
 	print(matchData)
 
 	me = [x for x in matchData if x['user_id'] == target.id]
-	wonWith = [] # list of players I won with
-	lostWith = [] # list of players I lost with
-	wonAgainst = [] # list of players I won against
-	lostAgainst = [] # list of players I lost against
+	wlfdict = {}
+	wledict = {}
+	# wonWith = [] # list of players I won with
+	# lostWith = [] # list of players I lost with
+	# wonAgainst = [] # list of players I won against
+	# lostAgainst = [] # list of players I lost against
 
 	for my in me:
 		for m in matchData:
@@ -249,20 +251,61 @@ async def rank(ctx, player: Member = None):
 			
 			if m['team'] == my['team']:
 				if m['team'] == m['winner']:
-					wonWith.append(uid)
+					if uid in wlfdict:
+						wlfdict[uid]['wins'] += 1
+					else:
+						wlfdict[uid] = {
+							"wins": 1,
+							"losses": 0,
+							"total": 0
+						}
+					# wonWith.append(uid)
 				else:
-					lostWith.append(uid)
+					if uid in wlfdict:
+						wlfdict[uid]['losses'] += 1
+					else:
+						wlfdict[uid] = {
+							"wins": 0,
+							"losses": 1,
+							"total": 0
+						}
+					# lostWith.append(uid)
+				wlfdict[uid]['total'] += 1
 			else:
 				if m['team'] == m['winner']:
-					lostAgainst.append(uid)
+					if uid in wledict:
+						wledict[uid]['wins'] += 1
+					else:
+						wledict[uid] = {
+							"wins": 1,
+							"losses": 0,
+							"total": 0
+						}
+					# lostAgainst.append(uid)
 				else:
-					wonAgainst.append(uid)
-	counterWW = collections.Counter(wonWith)
-	countsWW = counterWW.most_common()
-	print(countsWW)
+					if uid in wledict:
+						wledict[uid]['losses'] += 1
+					else:
+						wledict[uid] = {
+							"wins": 0,
+							"losses": 1,
+							"total": 0
+						}
+					# wonAgainst.append(uid)
+			
+				wledict[uid]['total']
+	
+	print(sorted(wlfdict.items(), key=lambda item: item[1]['total']))
+	
 
-	nick = [x for x in matchData if x['user_id'] == countsWW[0][0]][0]
-	print(nick)
+	# counterWW = collections.Counter(wonWith)
+	# countsWW = counterWW.most_common()
+	# counterLW = collections.Counter(wonWith)
+	# countsLW = counterLW.most_common()
+	# print(countsWW)
+
+	# nick = [x for x in matchData if x['user_id'] == countsWW[0][0]][0]['nick']
+	# print(nick)
 
 	if p:
 		embed = Embed(title=f"__{get_nick(target)}__", colour=Colour(0x7289DA))
