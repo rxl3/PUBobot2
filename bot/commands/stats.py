@@ -80,9 +80,10 @@ async def stats(ctx, player: Member = None):
 	)
 	print(data['queues'])
 	for q in data['queues']:
+		print(q)
 		embed.add_field(name=q[0]['queue_name'], value=str(q[0]['count']), inline=True)
-		embed.add_field(name='Red wins', value=str(q[1]['count']), inline=True)
-		embed.add_field(name='Blu wins', value=str(q[2]['count']), inline=True)
+		embed.add_field(name='Red wins', value=str(q[1]['rcount']), inline=True)
+		embed.add_field(name='Blu wins', value=str(q[2]['bcount']), inline=True)
 
 	await ctx.reply(embed=embed)
 
