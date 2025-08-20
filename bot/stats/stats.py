@@ -288,7 +288,7 @@ async def generate_lb_page(ctx, rawdata, page):
 		data[n]['wins'],
 		data[n]['losses'],
 		data[n]['draws'],
-		int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))) for n in range(len(data))
+		int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses'] + data[n]['draws']) or 1))) for n in range(len(data))
 	])
 	embed.set_footer(text="Page {0} of {1}".format(page + 1,  math.ceil(len(rawdata) / 10) ))
 	return embed

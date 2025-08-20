@@ -7,12 +7,12 @@ import random
 import string
 import datetime
 
-async def book_serveme(ctx):
+async def book_serveme(ctx, match_id = None):
     try:
         strings_channel = dc.get_channel(config.cfg.DC_STRINGS_CHANNEL_ID)
         rcon_channel = dc.get_channel(config.cfg.DC_RCON_CHANNEL_ID)
 		
-        matches = [m for m in bot.active_matches if m.qc.id == ctx.qc.id]
+        matches = [m for m in bot.active_matches if m.qc.id == ctx.qc.id and m.id != match_id]
 
         existing_booking = False
         existing_message = None
@@ -26,7 +26,7 @@ async def book_serveme(ctx):
                 break
 
         if existing_booking:
-            if len(matches) > 0:
+            if len(matches) > 1: 
                 return "Auto-booked server is already in use, please manually book a server."
             else:
                 return "Connect string: " + existing_message.jump_url

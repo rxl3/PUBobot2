@@ -14,7 +14,7 @@ class BaseRating:
 	table = "qc_players"
 
 	def __init__(
-			self, channel_id, init_rp=1500, init_deviation=300, min_deviation=None, scale=100,
+			self, channel_id, init_rp=1500, init_deviation=350, min_deviation=None, scale=100,
 			loss_scale=100, win_scale=100, draw_bonus=0, ws_boost=False, ls_boost=False
 	):
 		self.channel_id = channel_id

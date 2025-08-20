@@ -293,7 +293,7 @@ class Match:
 			elif self.state == self.DRAFT:
 				await self.init_immune(self.cfg['captain_immunity_games'], self.cfg['pick_captains'])
 				await self.draft.start(ctx)
-				self.connect_url = await book_serveme(ctx)
+				self.connect_url = await book_serveme(ctx, self.id)
 			elif self.state == self.WAITING_REPORT:
 				await self.start_waiting_report(ctx)
 		else:
