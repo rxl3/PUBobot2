@@ -379,12 +379,12 @@ async def qc_stats(channel_id):
 		(channel_id,)
 	)
 	red = await db.fetchall(
-		"SELECT `queue_name`, COUNT(*) as rcount FROM `qc_matches` WHERE `channel_id`=%s AND `winner`=0" +
+		"SELECT `queue_name`, COUNT(*) as rcount FROM `qc_matches` WHERE `channel_id`=%s AND `winner`=0 " +
 		"GROUP BY `queue_name` ORDER BY count DESC",
 		(channel_id,)
 	)
 	blu = await db.fetchall(
-		"SELECT `queue_name`, COUNT(*) as bcount FROM `qc_matches` WHERE `channel_id`=%s AND `winner`=1" +
+		"SELECT `queue_name`, COUNT(*) as bcount FROM `qc_matches` WHERE `channel_id`=%s AND `winner`=1 " +
 		"GROUP BY `queue_name` ORDER BY count DESC",
 		(channel_id,)
 	)
