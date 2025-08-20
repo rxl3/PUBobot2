@@ -79,7 +79,9 @@ async def stats(ctx, player: Member = None):
 		description=ctx.qc.gt("**Total matches: {count}**").format(count=data['total'])
 	)
 	for q in data['queues']:
-		embed.add_field(name=q['queue_name'], value=str(q['count']), inline=True)
+		embed.add_field(name=q[0]['queue_name'], value=str(q[0]['count']), inline=True)
+		embed.add_field(name='Red wins', value=str(q[1]['count']), inline=True)
+		embed.add_field(name='Blu wins', value=str(q[2]['count']), inline=True)
 
 	await ctx.reply(embed=embed)
 

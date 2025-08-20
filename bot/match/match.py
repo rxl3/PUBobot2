@@ -326,9 +326,10 @@ class Match:
 		if self.state != self.WAITING_REPORT:
 			raise bot.Exc.MatchStateError(self.gt("The match must be on the waiting report stage."))
 
-		team = find(lambda team: member in team[:1], self.teams[:2])
+		team = find(lambda team: member in team, self.teams[:2])
 		if team is None:
-			raise bot.Exc.PermissionError(self.gt("You must be a team captain to report a loss or draw."))
+			# raise bot.Exc.PermissionError(self.gt("You must be a team captain to report a loss or draw."))
+			raise bot.Exc.PermissionError(self.gt("You must be in the match to report a loss or draw."))
 
 		enemy_team = self.teams[1-team.idx]
 		if draw_flag and not enemy_team.draw_flag == draw_flag:
