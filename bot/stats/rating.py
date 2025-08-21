@@ -223,15 +223,15 @@ class FlatRating(BaseRating):
 		r1, r2 = [], []
 		if not draw:
 			for p in winners:
-				new = self._scale_changes(p, 10, 0, 1)
+				new = self._scale_changes(p, 30, 0, 1)
 				r1.append(new)
 
 			for p in losers:
-				new = self._scale_changes(p, -10, 0, -1)
+				new = self._scale_changes(p, -30, 0, -1)
 				r2.append(new)
 		else:
-			r1 = [self._scale_changes(p, 0, 0, 0) for p in winners]
-			r2 = [self._scale_changes(p, 0, 0, 0) for p in losers]
+			r1 = [self._scale_changes(p, 10, 0, 0) for p in winners]
+			r2 = [self._scale_changes(p, 10, 0, 0) for p in losers]
 
 		return [r1, r2]
 
