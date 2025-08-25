@@ -227,7 +227,7 @@ class FlatRating(BaseRating):
 				r1.append(new)
 
 			for p in losers:
-				new = self._scale_changes(p, -30, 0, -1)
+				new = self._scale_changes(p, -20, 0, -1)
 				r2.append(new)
 		else:
 			r1 = [self._scale_changes(p, 10, 0, 0) for p in winners]
