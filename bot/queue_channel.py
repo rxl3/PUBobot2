@@ -442,8 +442,8 @@ class QueueChannel:
 
 	async def get_lb(self):
 		data = await db.select(
-			['user_id', 'nick', 'rating', 'deviation', 'wins', 'losses', 'draws', 'streak', 'is_hidden', 'immunity', 'force_med'], 'qc_players',
-			where={'channel_id': self.rating.channel_id}, order_by="rating"
+			['user_id', 'nick', 'rating', 'deviation', 'wins', 'losses', 'draws', 'streak', 'is_hidden', 'immunity', 'force_med', '(wins + losses + draws) as total'], 'qc_players',
+			where={'channel_id': self.rating.channel_id}, order_by="rating DESC, total"
 		)
 		return [
 			i for i in data
