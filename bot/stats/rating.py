@@ -14,7 +14,7 @@ class BaseRating:
 	table = "qc_players"
 
 	def __init__(
-			self, channel_id, init_rp=1500, init_deviation=300, min_deviation=None, scale=100,
+			self, channel_id, init_rp=1500, init_deviation=350, min_deviation=None, scale=100,
 			loss_scale=100, win_scale=100, draw_bonus=0, ws_boost=False, ls_boost=False
 	):
 		self.channel_id = channel_id
@@ -64,7 +64,7 @@ class BaseRating:
 	async def get_players(self, user_ids):
 		""" Return rating or initial rating for each member """
 		data = await db.select(
-			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'streak', 'immunity'], self.table,
+			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'streak', 'immunity', 'force_med'], self.table,
 			where={'channel_id': self.channel_id}
 		)
 		results = []
@@ -223,15 +223,15 @@ class FlatRating(BaseRating):
 		r1, r2 = [], []
 		if not draw:
 			for p in winners:
-				new = self._scale_changes(p, 10, 0, 1)
+				new = self._scale_changes(p, 30, 0, 1)
 				r1.append(new)
 
 			for p in losers:
-				new = self._scale_changes(p, -10, 0, -1)
+				new = self._scale_changes(p, -20, 0, -1)
 				r2.append(new)
 		else:
-			r1 = [self._scale_changes(p, 0, 0, 0) for p in winners]
-			r2 = [self._scale_changes(p, 0, 0, 0) for p in losers]
+			r1 = [self._scale_changes(p, 5, 0, 0) for p in winners]
+			r2 = [self._scale_changes(p, 5, 0, 0) for p in losers]
 
 		return [r1, r2]
 

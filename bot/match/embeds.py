@@ -121,7 +121,6 @@ class Embeds:
 				picker_team = self.m.teams[self.m.draft.pick_order[pick_step]] if pick_step < len(self.m.draft.pick_order)-1 else None
 				if picker_team:
 					msg += "\n" + self.m.gt("{member}'s turn to pick!").format(member=f"<@{picker_team[0].id}>")
-
 			else:
 				# Keep the pre-sorting that we did to the Match.players variable (if any)
 				unpicked_list=[p for p in self.m.players if p in self.m.teams[2]]
@@ -151,11 +150,13 @@ class Embeds:
 				value="\n".join((
 					(f" \u200b " + self.m.cfg['player_list_format']).format(
 						rank=self.m.rank_str(p) if self.m.ranked else "",
+						rating=self.m.ratings[p.id],
 						name=get_nick(p),
 						mention=get_mention(p),
-						div=get_div_role(p, divs),
-						classes=get_class_roles(p, self.m.cfg['class_roles']),
-						immune=f" - **IMMUNE: x{self.m.immune[int(p.id)]}**" if p.id in self.m.immune else ""
+						# div=get_div_role(p, divs),
+						# classes=get_class_roles(p, self.m.cfg['class_roles']),
+						immune=f" - **IMMUNE: x{self.m.immune[int(p.id)]}**" if p.id in self.m.immune else "",
+						forced_meds=f" - {self.m.forced_captains[int(p.id)]} med games left" if p.id in self.m.forced_captains else ""
 					)
 				) for p in unpicked_list),
 				inline=False
@@ -180,9 +181,9 @@ class Embeds:
 		if len(self.m.teams[0]) == 1 and len(self.m.teams[1]) == 1:  # 1v1
 			p1, p2 = self.m.teams[0][0], self.m.teams[1][0]
 			players = " \u200b {player1}{rating1}\n \u200b {player2}{rating2}".format(
-				rating1=f" \u200b `〈{self.m.ratings[p1.id]}〉`" if show_ranks else "",
+				rating1=f" \u200b {self.m.ratings[p1.id]}" if show_ranks else "",
 				player1=f"<@{p1.id}>",
-				rating2=f" \u200b `〈{self.m.ratings[p2.id]}〉`" if show_ranks else "",
+				rating2=f" \u200b {self.m.ratings[p2.id]}" if show_ranks else "",
 				player2=f"<@{p2.id}>",
 			)
 			embed.add_field(name=self.m.gt("Players"), value=players, inline=False)
@@ -195,7 +196,7 @@ class Embeds:
 			team_players = [
 				" \u200b " +
 				" \u200b ".join([
-					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"<@{p.id}>"
+					(f"{self.m.rank_str(p)}" if show_ranks else "") + f"<@{p.id}>"
 					for p in t
 				])
 				for t in self.m.teams[:2]
@@ -209,7 +210,6 @@ class Embeds:
 					value=" \u200b " + join_and([self.m.teams[0][0].mention, self.m.teams[1][0].mention]),
 					inline=False
 				)
-
 		else:  # just players list
 			embed.add_field(
 				name=self.m.gt("Players"),
@@ -231,6 +231,9 @@ class Embeds:
 			)
 		if self.m.cfg['server']:
 			embed.add_field(name=self.m.qc.gt("Server"), value=f"`{self.m.cfg['server']}`", inline=True)
+
+		if self.m.connect_url:
+			embed.add_field(name="Connect to Server", value=f"{self.m.connect_url}", inline=False)
 
 		if self.m.cfg['start_msg']:
 			embed.add_field(name="—", value=self.m.cfg['start_msg'] + "\n\u200b", inline=False)

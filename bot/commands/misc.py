@@ -74,7 +74,6 @@ async def auto_ready_on_add(ctx, duration: timedelta = None):
 	print(exists)
 	if exists:
 		await db.update('qc_players', {'auto_ready_on_add': d}, keys={'channel_id': ctx.channel.id, 'user_id': ctx.author.id})
-		
 	else:
 		await db.insert('qc_players', {'channel_id': ctx.channel.id, 'user_id': ctx.author.id, 'nick': get_nick(ctx.author), 'auto_ready_on_add': d})
 

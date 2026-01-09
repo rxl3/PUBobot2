@@ -213,7 +213,6 @@ async def subscribe(ctx, queues: str = None, unsub: bool = False):
 		await ctx.success(ctx.qc.gt("Removed `{count}` roles from you.").format(
 			count=len(roles)
 		))
-
 	else:
 		roles = [r for r in roles if r not in ctx.author.roles]
 		if not len(roles):

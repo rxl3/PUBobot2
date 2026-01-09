@@ -111,6 +111,13 @@ async def _set_ready_all(
 		)
 	await run_slash(bot.commands.set_ready_all, interaction=interaction)
 
+@groups.admin_testing.subcommand(name='book', description='Book a serveme server.')
+async def _book(
+		interaction: Interaction,
+): 
+	await run_slash(bot.commands.book, interaction=interaction)
+
+
 # queue -> ...
 
 @groups.admin_queue.subcommand(name='list', description='List all queues on the channel.')
@@ -558,7 +565,7 @@ async def _sub_for(
 ): await run_slash(bot.commands.sub_for, interaction=interaction, player=player)
 
 
-@dc.slash_command(name='capme', description="Leave captain's position.")
+@dc.slash_command(name='capme', description="Leave captain's position.", **guild_kwargs)
 async def _cap_me(
 		interaction: Interaction,
 ): await run_slash(bot.commands.cap_me, interaction=interaction)
@@ -619,12 +626,20 @@ async def _luck(
 ): await run_slash(bot.commands.luck, interaction=interaction, rows=rows, min_games=min_games)
 
 
-@dc.slash_command(name='set_immunity', description="Set a player's immunity value", **guild_kwargs)
+@dc.slash_command(name='set_immunity', description='Set immunity value for a player', **guild_kwargs)
 async def _set_immunity(
 		interaction: Interaction,
 		player: Member = SlashOption(required=False, verify=False),
 		immunity: int = 0
 ): await run_slash(bot.commands.set_immunity, interaction=interaction, player=player, immunity=immunity)
+
+
+@dc.slash_command(name='set_forced_med', description='Set forced med game count for a player', **guild_kwargs)
+async def _set_forced_med(
+		interaction: Interaction,
+		player: Member = SlashOption(required=False, verify=False),
+		count: int = 0
+): await run_slash(bot.commands.set_forced_med, interaction=interaction, player=player, count=count)
 
 
 @dc.slash_command(name='leaderboard', description='Show rating leaderboard.', **guild_kwargs)
@@ -733,4 +748,5 @@ async def _nick(
 		interaction: Interaction,
 		nick: str
 ): await run_slash(bot.commands.set_nick, interaction=interaction, nick=nick)
+
 

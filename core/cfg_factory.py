@@ -345,7 +345,6 @@ class RoleVar(Variable):
 			role_id = int(mention.group(1))
 			if not guild.get_role(role_id):
 				raise ValueError("Role '{}' not found on the dc guild.".format(string))
-
 		else:
 			try:
 				role_id = next((role for role in guild.roles if role.name == string or str(role.id) == string)).id
@@ -439,7 +438,6 @@ class TextChanVar(Variable):
 			channel_id = int(mention.group(1))
 			if not guild.get_channel(channel_id):
 				raise ValueError("Channel '{}' not found on the dc guild.".format(string))
-
 		else:
 			try:
 				channel_id = next((channel for channel in guild.channels if

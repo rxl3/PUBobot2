@@ -75,6 +75,8 @@ I eventually hope to have these changes implemented in a way that is convenient,
   - Prints a list of the Players with the highest and lowest ratio of Captain to Non-Captain games
 - `/set_immunity <player:self> <num:0>` (**Moderator Only**)
   - Manually set the immunity value for a Player
+- `/set_forced_med <player:self> <num:0>` (**Moderator Only**)
+  - Manually set a number of forced med games for a Player
 - `/testing add_multiple <player_namews_string:all> <queue:default>` (**Admin Only**)
   - FOR TESTING PURPOSES
   - Forcibly add Players to the queue

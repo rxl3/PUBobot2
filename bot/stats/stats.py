@@ -8,6 +8,11 @@ from core.database import db
 from core.utils import iter_to_dict, find, get_nick
 from core.client import dc
 
+from nextcord import Embed, Colour
+from core.client import dc
+from core import config
+import math
+
 db.ensure_table(dict(
 	tname="players",
 	columns=[
@@ -32,8 +37,9 @@ db.ensure_table(dict(
 		dict(cname="losses", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="draws", ctype=db.types.int, notnull=True, default=0),
 		dict(cname="streak", ctype=db.types.int, notnull=True, default=0),
-		dict(cname="auto_ready_on_add", ctype=db.types.int, notnull=True, default=120),
-		dict(cname="immunity", ctype=db.types.int, default=0)
+		dict(cname="auto_ready_on_add", ctype=db.types.int, notnull=True, default=900),
+		dict(cname="immunity", ctype=db.types.int, default=0),
+		dict(cname="force_med", ctype=db.types.int, default=0)
 	],
 	primary_keys=["user_id", "channel_id"]
 ))
@@ -225,9 +231,12 @@ async def register_match_ranked(ctx, m):
 
 		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
 		new_immunity = before[p.id]['immunity']
+		new_forced_med_count = before[p.id]['force_med']
 		if captain==1:
 			if new_immunity < m.cfg['captain_immunity_games']:
 				new_immunity = m.cfg['captain_immunity_games']
+			if new_forced_med_count > 0:
+				new_forced_med_count = new_forced_med_count - 1
 		# If not captain reduce immunity by 1 (to a minimum of zero)
 		elif new_immunity > 0:
 			new_immunity -= 1
@@ -243,6 +252,7 @@ async def register_match_ranked(ctx, m):
 				draws=after[p.id]['draws'],
 				streak=after[p.id]['streak'],
 				immunity=new_immunity,
+				force_med=new_forced_med_count
 			),
 			keys=dict(channel_id=m.qc.rating.channel_id, user_id=p.id)
 		)
@@ -265,6 +275,37 @@ async def register_match_ranked(ctx, m):
 
 	await m.qc.update_rating_roles(*m.players)
 	await m.print_rating_results(ctx, before, after)
+	await bot.stats.update_leaderboard(ctx)
+
+async def generate_lb_page(ctx, rawdata, page):
+	data = (rawdata)[page * 10:(page + 1) * 10]
+	embed = Embed(title=f"Leaderboard", colour=Colour(0x7289DA))
+	embed.description="**\\# - Nickname - Rank - W/L/D**\n" + "\n".join(["{0}. {1} - {2} ({3}) - {4}/{5}/{6} ({7}%)".format(
+		(page * 10) + (n + 1),
+		data[n]['nick'].strip(),
+		"<:" + ctx.qc.rating_rank(data[n]['rating'])['rank'][2:],
+		str(data[n]['rating']),
+		data[n]['wins'],
+		data[n]['losses'],
+		data[n]['draws'],
+		int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses'] + (0.5 * data[n]['draws'])) or 1))) for n in range(len(data)) # Copeland score
+	])
+	embed.set_footer(text="Page {0} of {1}".format(page + 1,  math.ceil(len(rawdata) / 10) ))
+	return embed
+
+
+async def update_leaderboard(ctx):
+	lb_channel = dc.get_channel(config.cfg.DC_LEADERBOARD_CHANNEL_ID)
+
+	# do some stuff, delete all messages here then create pages to post
+		
+	rawdata = await ctx.qc.get_lb()
+	if (rawdata and lb_channel):
+		await lb_channel.purge(limit=10)
+
+		for n in range(math.ceil(len(rawdata) / 10)):
+			embed = await generate_lb_page(ctx, rawdata, n)
+			await lb_channel.send(embed=embed)
 
 
 async def undo_match(ctx, match_id):
@@ -337,8 +378,18 @@ async def qc_stats(channel_id):
 		"GROUP BY `queue_name` ORDER BY count DESC",
 		(channel_id,)
 	)
+	red = await db.fetchall(
+		"SELECT `queue_name`, COUNT(*) as rcount FROM `qc_matches` WHERE `channel_id`=%s AND `winner`=0 " +
+		"GROUP BY `queue_name` ORDER BY rcount DESC",
+		(channel_id,)
+	)
+	blu = await db.fetchall(
+		"SELECT `queue_name`, COUNT(*) as bcount FROM `qc_matches` WHERE `channel_id`=%s AND `winner`=1 " +
+		"GROUP BY `queue_name` ORDER BY bcount DESC",
+		(channel_id,)
+	)
 	stats = dict(total=sum((i['count'] for i in data)))
-	stats['queues'] = data
+	stats['queues'] = [data, red, blu]
 	return stats
 
 
@@ -503,6 +554,17 @@ async def last_games(channel_id):
 		(channel_id, channel_id)
 	)
 	return data
+
+
+async def get_forced_meds(channel_id, players):
+	player_str = ', '.join(["'"+str(p.id)+"'" for p in players])
+	data = await db.fetchall("\n".join((
+			"SELECT user_id, force_med FROM `qc_players`",
+			"WHERE channel_id = '{}' AND user_id IN ({}) AND force_med > 0".format(channel_id, player_str)
+	)))
+	force_med = {i['user_id']: i['force_med'] for i in data}
+	return force_med
+
 
 
 class StatsJobs:
