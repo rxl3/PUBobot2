@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+from typing import List
+
 import bot
+from .match import Role
 from core.utils import find
-from nextcord import DiscordException
+from nextcord import DiscordException, Member
 
 
 class Draft:
@@ -11,11 +14,13 @@ class Draft:
 		"b": 1
 	}
 
-	def __init__(self, match, pick_order, captains_role_id):
+	def __init__(self, match, pick_order, captains_role_id, pick_roles: List[Role]):
 		self.m = match
 		self.pick_order = [self.pick_steps[i] for i in pick_order] if pick_order else []
 		self.captains_role_id = captains_role_id
 		self.sub_queue = []
+		self.pick_roles: List[List[Role]] = [[pick_roles[i % len(pick_roles)] for i in self.m.cfg['team_size']], [pick_roles[i % len(pick_roles)] for i in self.m.cfg['team_size']]] if pick_order else []
+		self.picked_roles: List[List[Role]] = [[],[]]
 
 		if self.m.cfg['pick_teams'] == "draft":
 			self.m.states.append(self.m.DRAFT)
@@ -67,35 +72,39 @@ class Draft:
 		team.insert(0, author)
 		await self.print(ctx)
 
-	async def pick(self, ctx, author, players):
-		for player in players:
-			pick_step = max(0, (len(self.m.teams[0]) + len(self.m.teams[1]) - 2))
-			picker_team = self.m.teams[self.pick_order[pick_step]] if pick_step < len(self.pick_order) - 1 else None
+	async def pick(self, ctx, author, player: Member, role: Role):
+		# for player in players:
+		pick_step = max(0, (len(self.m.teams[0]) + len(self.m.teams[1]) - 2))
+		picker_team = self.m.teams[self.pick_order[pick_step]] if pick_step < len(self.pick_order) - 1 else None
 
-			if self.m.state != self.m.DRAFT:
-				raise bot.Exc.MatchStateError(self.m.gt("The match is not on the draft stage."))
-			elif (team := find(lambda t: author in t[:1], self.m.teams[:2])) is None:
-				raise bot.Exc.PermissionError(self.m.gt("You are not a captain."))
-			elif picker_team is not None and picker_team is not team:
-				raise bot.Exc.PermissionError(self.m.gt("Not your turn to pick."))
-			elif player not in self.m.teams[2]:
-				raise bot.Exc.NotFoundError(self.m.gt("Specified player not in the unpicked list."))
+		if self.m.state != self.m.DRAFT:
+			raise bot.Exc.MatchStateError(self.m.gt("The match is not on the draft stage."))
+		elif (team := find(lambda t: author in t[:1], self.m.teams[:2])) is None:
+			raise bot.Exc.PermissionError(self.m.gt("You are not a captain."))
+		elif picker_team is not None and picker_team is not team:
+			raise bot.Exc.PermissionError(self.m.gt("Not your turn to pick."))
+		elif player not in self.m.teams[2]:
+			raise bot.Exc.NotFoundError(self.m.gt("Specified player not in the unpicked list."))
+		elif find(lambda r: r == role, self.pick_roles[self.pick_order[pick_step]]) is None:
+			raise bot.Exc.ValueError(self.m.gt("Specified role cannot be picked."))
 
-			self.m.teams[2].remove(player)
-			team.append(player)
+		self.m.teams[2].remove(player)
+		team.append(player)
+		self.pick_roles[self.pick_order[pick_step]].remove(role)
+		self.picked_roles[self.pick_order[pick_step]].append(role)
 
-			# auto last-pick rest of the players if possible
-			# if rest of pick_order covers the unpicked list
-			if len(self.m.teams[2]) and len(self.pick_order[pick_step+1:]) >= len(self.m.teams[2]):
-				# if rest of pick_order is a single team
-				if len(set(self.pick_order[pick_step+1:])) == 1:
-					picker_team = self.m.teams[self.pick_order[pick_step+1]]
-					picker_team.extend(self.m.teams[2])
-					self.m.teams[2].clear()
+		# auto last-pick rest of the players if possible
+		# if rest of pick_order covers the unpicked list
+		if len(self.m.teams[2]) and len(self.pick_order[pick_step+1:]) >= len(self.m.teams[2]):
+			# if rest of pick_order is a single team
+			if len(set(self.pick_order[pick_step+1:])) == 1:
+				picker_team = self.m.teams[self.pick_order[pick_step+1]]
+				picker_team.extend(self.m.teams[2])
+				self.m.teams[2].clear()
 
 		await self.refresh(ctx)
 
-	async def put(self, ctx, player, team_name):
+	async def put(self, ctx, player: Member, team_name, pos: int):
 		if (team := find(lambda t: t.name.lower() == team_name.lower(), self.m.teams)) is None:
 			raise bot.Exc.SyntaxError(self.m.gt("Specified team name not found."))
 		if self.m.state not in [self.m.DRAFT, self.m.WAITING_REPORT]:

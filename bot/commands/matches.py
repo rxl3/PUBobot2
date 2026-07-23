@@ -7,6 +7,7 @@ from nextcord import Member
 from typing import List
 from functools import wraps
 
+from bot.match.match import Role
 from core.utils import get, find
 
 import bot
@@ -78,15 +79,15 @@ async def cap_for(ctx, match: bot.Match, team_name: str):
 
 
 @author_match
-async def pick(ctx, match: bot.Match, players: List[Member]):
-	await match.draft.pick(ctx, ctx.author, players)
+async def pick(ctx, match: bot.Match, player: Member, role: Role):
+	await match.draft.pick(ctx, ctx.author, player, role)
 
 
-async def put(ctx, match_id: int, player: Member, team_name: str):
+async def put(ctx, match_id: int, player: Member, team_name: str, pos: int):
 	ctx.check_perms(ctx.Perms.MODERATOR)
 	if (match := find(lambda m: m.qc == ctx.qc and m.id == match_id, bot.active_matches)) is None:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Could not find match with specified id. Check `/matches`."))
-	await match.draft.put(ctx, player, team_name)
+	await match.draft.put(ctx, player, team_name, pos)
 
 
 async def report_admin(ctx, match_id: int, winner_team=None, draw=False, abort=False):

@@ -2,6 +2,7 @@ from typing import Callable
 from nextcord import Interaction, SlashOption, Member, TextChannel
 import traceback
 
+from bot.match.match import Role
 from core.client import dc
 from core.utils import error_embed, ok_embed, parse_duration, get_nick
 from core.console import log
@@ -554,12 +555,12 @@ async def _cap_for(
 _cap_for.on_autocomplete('team')(autocomplete.teams_by_author)
 
 
-# TODO: make possible to pick multiple players within singe command
 @dc.slash_command(name='pick', description='Pick a player.', **guild_kwargs)
 async def _pick(
 		interaction: Interaction,
 		player: Member = SlashOption(name="player", verify=False),
-): await run_slash(bot.commands.pick, interaction=interaction, players=[player])
+		role: Role = SlashOption(name="role", choices=["scout", "soldier", "demo"])
+): await run_slash(bot.commands.pick, interaction=interaction, player=player, role=role)
 
 
 @dc.slash_command(name='report', description='Report match result.', **guild_kwargs)
