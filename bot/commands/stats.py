@@ -250,25 +250,14 @@ async def rank(ctx, player: Member = None):
 
 async def leaderboard(ctx, page: int = 1):
 	page = (page or 1) - 1
+	rawdata = await ctx.qc.get_lb()
 
-	data = (await ctx.qc.get_lb())[page * 10:(page + 1) * 10]
-	if len(data):
+	if len(rawdata):
+		embed = await bot.stats.generate_lb_page(ctx, rawdata, page)
 		await ctx.reply(
-			discord_table(
-				["№", "Rating〈Ξ〉", "Nickname", "Matches", "W/L/D"],
-				[[
-					(page * 10) + (n + 1),
-					str(data[n]['rating']) + ctx.qc.rating_rank(data[n]['rating'])['rank'],
-					data[n]['nick'].strip(),
-					int(data[n]['wins'] + data[n]['losses'] + data[n]['draws']),
-					"{0}/{1}/{2} ({3}%)".format(
-						data[n]['wins'],
-						data[n]['losses'],
-						data[n]['draws'],
-						int(data[n]['wins'] * 100 / ((data[n]['wins'] + data[n]['losses']) or 1))
-					)
-				] for n in range(len(data))]
-			)
+			embed=embed
 		)
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Leaderboard is empty."))
+	
+	await bot.stats.update_leaderboard(ctx)
