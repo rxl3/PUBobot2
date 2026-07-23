@@ -5,7 +5,7 @@ from nextcord import Interaction, SlashOption, Member, TextChannel
 import traceback
 import time
 
-from bot.match.match import Role
+from bot.match.enums import Role
 from core.client import dc
 from core.utils import error_embed, ok_embed, parse_duration, get_nick
 from core.console import log

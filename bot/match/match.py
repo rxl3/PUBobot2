@@ -6,6 +6,7 @@ from nextcord import DiscordException
 import json
 
 import bot
+from .enums import Role
 from core.utils import find, get, iter_to_dict, join_and, get_nick
 from core.console import log
 from core.client import dc
@@ -14,14 +15,6 @@ from .check_in import CheckIn
 from .draft import Draft
 from .embeds import Embeds
 import random
-
-from enum import Enum
-
-class Role(Enum):
-	scout = "scout"
-	soldier = "soldier"
-	demo = "demo"
-	flex = "flex"
 
 class Match:
 
