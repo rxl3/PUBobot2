@@ -64,7 +64,7 @@ class BaseRating:
 	async def get_players(self, user_ids):
 		""" Return rating or initial rating for each member """
 		data = await db.select(
-			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'streak'], self.table,
+			['user_id', 'rating', 'deviation', 'channel_id', 'wins', 'losses', 'draws', 'streak', 'immunity'], self.table,
 			where={'channel_id': self.channel_id}
 		)
 		results = []
@@ -78,7 +78,7 @@ class BaseRating:
 			else:
 				d = dict(
 					channel_id=self.channel_id, user_id=user_id, rating=self.init_rp,
-					deviation=self.init_deviation, wins=0, losses=0, draws=0
+					deviation=self.init_deviation, wins=0, losses=0, draws=0, immunity=0
 				)
 			results.append(d)
 		return results

@@ -59,7 +59,7 @@ class Context:
 	def check_perms(self, req_perms: Perms):
 		""" Raise PermissionError if specified permissions is not met by the author """
 		if self.access_level.value < req_perms.value:
-			if req_perms == 2:
+			if req_perms == 3:
 				raise bot.Exc.PermissionError(self.qc.gt("You must possess admin permissions."))
 			else:
 				raise bot.Exc.PermissionError(self.qc.gt("You must possess moderator permissions."))

@@ -6,7 +6,6 @@ from .match import Role
 from core.utils import find
 from nextcord import DiscordException, Member
 
-
 class Draft:
 
 	pick_steps = {

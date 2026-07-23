@@ -1,6 +1,6 @@
 from nextcord import Embed, Colour, Streaming
 from core.client import dc
-from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and
+from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and, get_class_role_icons
 from core import config
 import random
 
@@ -36,6 +36,12 @@ class Embeds:
 			value="\n".join((f" \u200b <@{p.id}>" for p in not_ready)),
 			inline=False
 		)
+		embed.add_field(
+			name=self.m.gt("Ready to play:"),
+			value="\n".join((f" \u200b `{get_nick(p)}`" for p in self.m.check_in.ready_players)),
+			inline=False
+		)
+
 		if not len(self.m.check_in.maps):
 			embed.add_field(
 				name="—",
@@ -81,9 +87,10 @@ class Embeds:
 		]
 		team_players = [
 			" \u200b ".join([
-					" \u200b {mention} {pick_role}".format(
+					" \u200b {mention} {pick_role} {role_icons}".format(
 						mention=get_mention(p),
-						pick_role=self.m.draft.picked_roles[tindex][index]
+						pick_role=self.m.draft.picked_roles[tindex][index],
+						role_icons=get_class_role_icons(p, self.m.cfg['class_roles'])
 					)
 				for index, p in t
 			]) if len(t) else self.m.gt("empty")

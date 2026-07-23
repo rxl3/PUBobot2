@@ -1,6 +1,9 @@
 from typing import Callable
+from asyncio import wait_for, shield
+from asyncio.exceptions import TimeoutError as aTimeoutError
 from nextcord import Interaction, SlashOption, Member, TextChannel
 import traceback
+import time
 
 from bot.match.match import Role
 from core.client import dc
@@ -25,6 +28,13 @@ def _parse_duration(ctx: SlashContext, s: str):
 
 
 async def run_slash(coro: Callable, interaction: Interaction, **kwargs):
+	# get passed time since interaction was created, convert snowflake into timestamp
+	passed_time = time.time() - (((int(interaction.id) >> 22) + 1420070400000) / 1000.0)
+
+	if passed_time >= 3.0:  # Interactions must be answered within 3 seconds or they time out
+		log.error('Skipping an outdated interaction.')
+		return
+
 	if not bot.bot_ready:
 		await interaction.response.send_message(
 			embed=error_embed("Bot is under connection, please try agian later...", title="Error")
@@ -36,6 +46,14 @@ async def run_slash(coro: Callable, interaction: Interaction, **kwargs):
 		return
 
 	ctx = SlashContext(qc, interaction)
+	try:
+		await wait_for(shield(run_slash_coro(ctx, coro, **kwargs)), timeout=max(2.5 - passed_time, 0))
+	except (TimeoutError, aTimeoutError):
+		log.info('Deferring /slash command')
+		await interaction.response.defer()
+
+
+async def run_slash_coro(ctx: SlashContext, coro: Callable, **kwargs):
 	log.command("{} | #{} | {}: /{} {}".format(
 		ctx.channel.guild.name, ctx.channel.name, get_nick(ctx.author), coro.__name__, kwargs
 	))
@@ -592,6 +610,22 @@ async def _rank(
 		interaction: Interaction,
 		player: Member = SlashOption(required=False, verify=False),
 ): await run_slash(bot.commands.rank, interaction=interaction, player=player)
+
+
+@dc.slash_command(name='luck', description='Show luckiest players', **guild_kwargs)
+async def _luck(
+		interaction: Interaction,
+		rows: int = 10,
+		min_games: int = 10
+): await run_slash(bot.commands.luck, interaction=interaction, rows=rows, min_games=min_games)
+
+
+@dc.slash_command(name='set_immunity', description="Set a player's immunity value", **guild_kwargs)
+async def _set_immunity(
+		interaction: Interaction,
+		player: Member = SlashOption(required=False, verify=False),
+		immunity: int = 0
+): await run_slash(bot.commands.set_immunity, interaction=interaction, player=player, immunity=immunity)
 
 
 @dc.slash_command(name='leaderboard', description='Show rating leaderboard.', **guild_kwargs)
