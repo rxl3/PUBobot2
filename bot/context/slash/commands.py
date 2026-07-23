@@ -111,6 +111,16 @@ async def _set_ready_all(
 			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
 		)
 	await run_slash(bot.commands.set_ready_all, interaction=interaction)
+	
+@groups.admin_testing.subcommand(name='book', description='Book serveme.')
+async def _book(
+	interaction: Interaction
+): 
+	if not interaction.user.guild_permissions.administrator:
+		return await interaction.response.send_message(
+			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
+		)
+	await run_slash(bot.commands.book, interaction=interaction)
 
 # queue -> ...
 
