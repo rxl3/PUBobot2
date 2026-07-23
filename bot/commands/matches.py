@@ -79,8 +79,8 @@ async def cap_for(ctx, match: bot.Match, team_name: str):
 
 
 @author_match
-async def pick(ctx, match: bot.Match, player: Member, role: Role):
-	await match.draft.pick(ctx, ctx.author, player, role)
+async def pick(ctx, match: bot.Match, player: Member, role: str):
+	await match.draft.pick(ctx, ctx.author, player, Role[role])
 
 
 async def put(ctx, match_id: int, player: Member, team_name: str, pos: int):
