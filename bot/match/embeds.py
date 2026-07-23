@@ -87,13 +87,14 @@ class Embeds:
 		]
 		team_players = [
 			" \u200b ".join([
-					" \u200b {mention} {role_icons}".format(
+					" \u200b {mention} {pick_role} {role_icons}".format(
 						mention=get_mention(p),
+						pick_role=self.m.draft.picked_roles[tindex][index],
 						role_icons=get_class_role_icons(p, self.m.cfg['class_roles'])
 					)
-				for p in t
+				for index, p in t
 			]) if len(t) else self.m.gt("empty")
-			for t in self.m.teams[:2]
+			for tindex, t in self.m.teams[:2]
 		]
 		embed.add_field(name=teams_names[0], value=" \u200b ❲ \u200b " + team_players[0] + " \u200b ❳", inline=False)
 		embed.add_field(name=teams_names[1], value=" \u200b ❲ \u200b " + team_players[1] + " \u200b ❳\n\u200b", inline=False)
@@ -195,10 +196,10 @@ class Embeds:
 			team_players = [
 				" \u200b " +
 				" \u200b ".join([
-					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"<@{p.id}>"
-					for p in t
+					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"`{self.m.draft.picked_roles[tindex][index]}` " + f"<@{p.id}>"
+					for index, p in t
 				])
-				for t in self.m.teams[:2]
+				for tindex, t in self.m.teams[:2]
 			]
 			team_players[1] += "\n\u200b"  # Extra empty line
 			embed.add_field(name=teams_names[0], value=team_players[0], inline=False)

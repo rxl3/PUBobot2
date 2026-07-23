@@ -15,6 +15,14 @@ from .draft import Draft
 from .embeds import Embeds
 import random
 
+from enum import Enum
+
+class Role(Enum):
+	scout = "scout"
+	soldier = "soldier"
+	demo = "demo"
+	flex = "flex"
+
 class Match:
 
 	INIT = 0
@@ -28,11 +36,12 @@ class Match:
 	]
 
 	default_cfg = dict(
-		teams=None, team_names=['Alpha', 'Beta'], team_emojis=":red_circle: :blue_circle:", ranked=False,
+		teams=None, team_names=['RED', 'BLU'], team_emojis=":red_circle: :blue_circle:", ranked=False,
 		team_size=1, pick_captains="no captains", captains_role_id=None, pick_teams="draft",
 		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
 		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True,
 		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="{name}",
+		pick_roles=[Role.flex]
 	)
 
 	class Team(list):
@@ -185,7 +194,7 @@ class Match:
 
 		# Init self sections
 		self.check_in = CheckIn(self, self.cfg['check_in_timeout'])
-		self.draft = Draft(self, self.cfg['pick_order'], self.cfg['captains_role_id'])
+		self.draft = Draft(self, self.cfg['pick_order'], self.cfg['captains_role_id'], self.cfg['pick_roles'])
 		self.embeds = Embeds(self)
 
 	@staticmethod
