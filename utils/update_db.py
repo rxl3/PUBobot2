@@ -172,7 +172,8 @@ for chan in channels:
 				'channel_id': record['channel_id'],
 				'user_id': record['user_id'],
 				'nick': record['user_name'] or 'None',
-				'team': None
+				'team': None,
+				'role': None
 			}
 			dict_insert(c2, 'qc_player_matches', new_record)
 

@@ -89,7 +89,8 @@ db.ensure_table(dict(
 		dict(cname="user_id", ctype=db.types.int),
 		dict(cname="nick", ctype=db.types.str),
 		dict(cname="team", ctype=db.types.bool),
-		dict(cname="captain", ctype=db.types.bool)
+		dict(cname="captain", ctype=db.types.bool),
+		dict(cname="role", ctype=db.types.str)
 	],
 	primary_keys=["match_id", "user_id"]
 ))
@@ -157,11 +158,13 @@ async def register_match_unranked(ctx, m):
 		else:
 			team = None
 
+		role = m.picked_roles[team][m.teams[team].index(p)]
+
 		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
 
 		await db.insert(
 			'qc_player_matches',
-			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain)
+			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain, role=role)
 		)
 
 		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
@@ -222,6 +225,7 @@ async def register_match_ranked(ctx, m):
 		nick = get_nick(p)
 		team = 0 if p in m.teams[0] else 1
 		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
+		role = m.picked_roles[team][m.teams[team].index(p)]
 
 		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
 		new_immunity = before[p.id]['immunity']
@@ -249,7 +253,7 @@ async def register_match_ranked(ctx, m):
 
 		await db.insert(
 			'qc_player_matches',
-			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain)
+			dict(match_id=m.id, channel_id=m.qc.id, user_id=p.id, nick=nick, team=team, captain=captain, role=role)
 		)
 		await db.insert('qc_rating_history', dict(
 			channel_id=m.qc.rating.channel_id,
