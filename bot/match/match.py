@@ -6,6 +6,7 @@ from nextcord import DiscordException
 import json
 
 import bot
+from bot.autobook import book_serveme
 from .enums import Role
 from core.utils import find, get, iter_to_dict, join_and, get_nick
 from core.console import log
@@ -34,7 +35,7 @@ class Match:
 		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
 		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True,
 		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="{name}",
-		pick_roles=[Role.flex]
+		pick_roles=[Role.flex], autobook=False
 	)
 
 	class Team(list):
@@ -106,7 +107,7 @@ class Match:
 			maps=self.maps,
 			state=self.state,
 			states=self.states,
-			ready_players=[p.id for p in self.check_in.ready_players if p]
+			ready_players=[p.id for p in self.check_in.ready_players if p],
 		)
 
 	@classmethod
@@ -283,6 +284,8 @@ class Match:
 			elif self.state == self.DRAFT:
 				await self.init_immune(self.cfg['captain_immunity_games'], self.cfg['pick_captains'])
 				await self.draft.start(ctx)
+				if self.cfg['autobook']:
+					self.connect_url = await book_serveme(ctx, self.id)
 			elif self.state == self.WAITING_REPORT:
 				await self.start_waiting_report(ctx)
 		else:

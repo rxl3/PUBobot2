@@ -291,6 +291,18 @@ class PickupQueue:
 				default="{name}",
 				notnull=True,
 			),
+			Variables.StrVar(
+				"pick_roles", display="List of roles each team must pick", section="General",
+				description="Can be list of [scout, soldier, demo, flex]",
+				default="scout,scout,soldier,soldier,demo",
+				notnull=True,
+			),
+			Variables.BoolVar(
+				"autobook", display="ServeMe Autobook Enabled", section="General",
+				description="ServeMe Autobook Enabled",
+				default=False,
+				notnull=True,
+			),
 		]
 	)
 
@@ -368,7 +380,8 @@ class PickupQueue:
 			captain_immunity_games=self.cfg.captain_immunity_games,
 			division_roles=self.cfg.division_roles.split(",") if self.cfg.division_roles else None,
 			class_roles=self.cfg.class_roles.split(",") if self.cfg.class_roles else None,
-			show_checkin_timer=self.cfg.show_checkin_timer, player_list_format=self.cfg.player_list_format,
+			show_checkin_timer=self.cfg.show_checkin_timer, player_list_format=self.cfg.player_list_format, 
+			autobook=self.cfg.autobook
 		)
 
 	async def promote(self, ctx):

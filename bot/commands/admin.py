@@ -8,6 +8,7 @@ from time import time
 from datetime import timedelta
 from nextcord import Member
 
+from bot.autobook import book_serveme
 from core.utils import seconds_to_str, get_nick
 
 import bot
@@ -161,4 +162,9 @@ async def seed_immunity(ctx, channel_id, num):
 		await ctx.success(ctx.qc.gt("\n".join([f"<@{i}> IMMUNITY: x{result[i]}" for i in result])))
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Failed"))
+
+async def book(ctx):
+	str_msg = await book_serveme(ctx)
+	
+	await ctx.success(ctx.qc.gt(str_msg))
 # async def save_bot_state(ctx):
