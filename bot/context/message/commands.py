@@ -2,6 +2,7 @@ import traceback
 import re
 from typing import Callable
 
+from bot.match.enums import Role
 from core.client import dc
 from core.console import log
 from core.utils import get_nick, parse_duration
@@ -154,10 +155,13 @@ async def _pick(ctx: MessageContext, args: str = None):
 		raise bot.Exc.SyntaxError(f"Usage: {ctx.qc.cfg.prefix}pick __player__")
 
 	members = [await ctx.get_member(i.strip()) for i in args.strip().split(" ")]
+	role = [args.strip().split(" ").pop()]
 	if None in members:
 		raise bot.Exc.SyntaxError(ctx.qc.gt("Specified user not found."))
+	elif len(args.strip().split(" ")) < 3 or Role[role] is None:
+		raise bot.Exc.SyntaxError(ctx.qc.gt("Missing role."))
 
-	await bot.commands.pick(ctx, players=members)
+	await bot.commands.pick(ctx, players=members, role=role)
 
 
 @message_command('report_loss', 'rl')
