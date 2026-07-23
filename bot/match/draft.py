@@ -18,7 +18,7 @@ class Draft:
 		self.pick_order = [self.pick_steps[i] for i in pick_order] if pick_order else []
 		self.captains_role_id = captains_role_id
 		self.sub_queue = []
-		self.pick_roles: List[List[Role]] = [[pick_roles[i % len(pick_roles)] for i in self.m.cfg['team_size']], [pick_roles[i % len(pick_roles)] for i in self.m.cfg['team_size']]] if pick_order else []
+		self.pick_roles: List[List[Role]] = [[pick_roles[i % len(pick_roles)] for i in [0] * self.m.cfg['team_size']], [pick_roles[i % len(pick_roles)] for i in [0] * self.m.cfg['team_size']]] if pick_order else []
 		self.picked_roles: List[List[Role]] = [[],[]]
 
 		if self.m.cfg['pick_teams'] == "draft":
