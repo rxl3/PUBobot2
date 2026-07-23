@@ -2,6 +2,7 @@ config.cfg
 logs/*
 .env
 /bot/__pycache__
+saved_state.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

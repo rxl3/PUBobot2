@@ -290,7 +290,7 @@ class PickupQueue:
 				description="The format to use when printing the Player Names in Drafting Stage",
 				default="{name}",
 				notnull=True,
-			)
+			),
 		]
 	)
 
@@ -368,7 +368,7 @@ class PickupQueue:
 			captain_immunity_games=self.cfg.captain_immunity_games,
 			division_roles=self.cfg.division_roles.split(",") if self.cfg.division_roles else None,
 			class_roles=self.cfg.class_roles.split(",") if self.cfg.class_roles else None,
-			show_checkin_timer=self.cfg.show_checkin_timer, player_list_format=self.cfg.player_list_format
+			show_checkin_timer=self.cfg.show_checkin_timer, player_list_format=self.cfg.player_list_format,
 		)
 
 	async def promote(self, ctx):

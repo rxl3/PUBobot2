@@ -75,7 +75,6 @@ class Match:
 		# Prepare the Match object
 		match.maps = match.random_maps(match.cfg['maps'], match.cfg['map_count'], queue.last_maps)
 
-		
 		match.init_captains(match.cfg['pick_captains'], match.cfg['captains_role_id'])
 		match.init_teams(match.cfg['pick_teams'])
 
@@ -190,6 +189,7 @@ class Match:
 		self.lifetime = self.cfg['match_lifetime']
 		self.start_time = int(time())
 		self.state = self.INIT
+		self.match_start_time = 0
 
 		# Init self sections
 		self.check_in = CheckIn(self, self.cfg['check_in_timeout'])
@@ -300,6 +300,9 @@ class Match:
 		return self.queue.qc.rating_rank(self.ratings[member.id])['rank']
 
 	async def start_waiting_report(self, ctx):
+		# Set match start time
+		self.match_start_time = int(time())
+
 		# remove never picked players from the match
 		if len(self.teams[2]):
 			for p in self.teams[2]:
@@ -379,6 +382,10 @@ class Match:
 		msg = "```markdown\n"
 		msg += f"{self.queue.name.capitalize()}({self.id}) results\n"
 		msg += "-------------"
+
+		now = int(time())
+		msg += f"\nTime taken to pick teams: {((self.match_start_time - self.start_time) / 60):.2f} minutes"
+		msg += f"\nTime taken to play match: {((now - self.match_start_time) / 60):.2f} minutes\n-------------"
 
 		if self.winner is not None:
 			winners, losers = self.teams[self.winner], self.teams[abs(self.winner-1)]
