@@ -72,6 +72,7 @@ class Draft:
 		await self.print(ctx)
 
 	async def pick(self, ctx, author, player: Member, role: Role):
+		print(role)
 		# for player in players:
 		pick_step = max(0, (len(self.m.teams[0]) + len(self.m.teams[1]) - 2))
 		picker_team = self.m.teams[self.pick_order[pick_step]] if pick_step < len(self.pick_order) - 1 else None
