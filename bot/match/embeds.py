@@ -87,9 +87,9 @@ class Embeds:
 		]
 		team_players = [
 			" \u200b ".join([
-					" \u200b {mention} {pick_role} {role_icons}".format(
+					" \u200b {mention} {pick_role}".format(
 						mention=get_mention(p),
-						pick_role=self.m.draft.picked_roles[tindex][index],
+						pick_role=get_class_role_icons(p, self.m.draft.picked_roles[tindex][index].value),
 						role_icons=get_class_role_icons(p, self.m.cfg['class_roles'])
 					)
 				for index, p in enumerate(t)
