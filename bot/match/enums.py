@@ -5,3 +5,4 @@ class Role(Enum):
 	soldier = "soldier"
 	demo = "demo"
 	flex = "flex"
+	medic = "medic"
