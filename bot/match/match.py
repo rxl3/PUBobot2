@@ -35,7 +35,7 @@ class Match:
 		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
 		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True,
 		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="{name}",
-		pick_roles=[Role.flex], autobook=False
+		pick_roles=["flex"], autobook=False
 	)
 
 	class Team(list):
