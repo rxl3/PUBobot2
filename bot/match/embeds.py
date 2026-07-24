@@ -1,6 +1,6 @@
 from nextcord import Embed, Colour, Streaming
 from core.client import dc
-from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and, get_class_role_icons
+from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and, get_class_role_icons, get_icon_for_role
 from core import config
 import random
 
@@ -89,7 +89,7 @@ class Embeds:
 			" \u200b ".join([
 					" \u200b {mention} {pick_role}".format(
 						mention=get_mention(p),
-						pick_role=get_class_role_icons(p, self.m.draft.picked_roles[tindex][index].value),
+						pick_role=get_icon_for_role(self.m.draft.picked_roles[tindex][index].value),
 						role_icons=get_class_role_icons(p, self.m.cfg['class_roles'])
 					)
 				for index, p in enumerate(t)
