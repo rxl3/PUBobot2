@@ -186,6 +186,8 @@ class Match:
 		self.state = self.INIT
 		self.match_start_time = 0
 
+		print(self.cfg['pick_roles'])
+
 		# Init self sections
 		self.check_in = CheckIn(self, self.cfg['check_in_timeout'])
 		self.draft = Draft(self, self.cfg['pick_order'], self.cfg['captains_role_id'], list(map(lambda r: Role[r], self.cfg['pick_roles'])))
