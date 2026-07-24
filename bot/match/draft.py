@@ -13,7 +13,8 @@ class Draft:
 		"b": 1
 	}
 
-	def __init__(self, match, pick_order, captains_role_id, pick_roles: List[str]):
+	def __init__(self, match, pick_order, captains_role_id, pick_roles: List[Role]):
+
 		self.m = match
 		self.pick_order = [self.pick_steps[i] for i in pick_order] if pick_order else []
 		self.captains_role_id = captains_role_id
