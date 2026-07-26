@@ -134,23 +134,23 @@ async def report_manual(ctx, queue: str, winners: List[Member], losers: List[Mem
 	await q.fake_ranked_match(ctx, winners, losers, draw=draw)
 
 async def vote_map(ctx):
+	rolls = random.sample(MAPS, 3)
 	class Buttons(nextcord.ui.View):
 		def __init__(self):
 			super().__init__()
 			self.value = None
-			self.rolls = random.sample(MAPS, 3)
 		
-		@nextcord.ui.button(label="{self.rolls[0]}", style=nextcord.ButtonStyle.blurple)
+		@nextcord.ui.button(label=rolls[0], style=nextcord.ButtonStyle.blurple)
 		async def button1(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			self.stop()
 			# insert function that somehow cancels the wait_for()
 			# return "some value"
-		@nextcord.ui.button(label="{self.rolls[1]}", style=nextcord.ButtonStyle.blurple)
+		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
 		async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			self.stop()
 			# insert function that somehow cancels the wait_for()
 			# return "some value"
-		@nextcord.ui.button(label="{self.rolls[2]}", style=nextcord.ButtonStyle.blurple)
+		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
 		async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			self.stop()
 			# insert function that somehow cancels the wait_for()
