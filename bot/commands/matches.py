@@ -149,6 +149,10 @@ async def vote_map(ctx):
 				await interact.response.edit_message(view=self)
 				self.count += 1
 			else:
+				for c in self.children:
+					if isinstance(c, nextcord.ui.Button):
+						c.disabled = True
+				await interact.response.edit_message(view=self)
 				self.stop()
 		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
 		async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
@@ -158,6 +162,10 @@ async def vote_map(ctx):
 				await interact.response.edit_message(view=self)
 				self.count += 1
 			else:
+				for c in self.children:
+					if isinstance(c, nextcord.ui.Button):
+						c.disabled = True
+				await interact.response.edit_message(view=self)
 				self.stop()
 		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
 		async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
@@ -167,6 +175,10 @@ async def vote_map(ctx):
 				await interact.response.edit_message(view=self)
 				self.count += 1
 			else:
+				for c in self.children:
+					if isinstance(c, nextcord.ui.Button):
+						c.disabled = True
+				await interact.response.edit_message(view=self)
 				self.stop()
 	view = Buttons()
 	await ctx.notice(view=view)
