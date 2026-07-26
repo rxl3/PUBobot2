@@ -426,6 +426,7 @@ class Match:
 
 			lastmap = str(get_last_map(ctx))
 			self.tfmap = await self.vote_map(ctx, self.captains, lastmap)
+			print(self.tfmap)
 		except DiscordException:
 			pass
 
@@ -550,4 +551,5 @@ class Match:
 		if isinstance(user, User):
 			message = user.name + "'s turn to ban a map"
 		await ctx.notice(content=message, view=view)
+		print('votemap')
 		return opts.pop()
