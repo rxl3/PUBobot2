@@ -146,39 +146,36 @@ async def vote_map(ctx):
 			if self.count < 2:
 				button.style = nextcord.ButtonStyle.gray
 				button.disabled = True
-				await interact.response.edit_message(view=self)
 				self.count += 1
 			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
-				await interact.response.edit_message(view=self)
 				self.stop()
+			await interact.response.edit_message(view=self)
 		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
 		async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			if self.count < 2:
 				button.style = nextcord.ButtonStyle.gray
 				button.disabled = True
-				await interact.response.edit_message(view=self)
 				self.count += 1
 			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
-				await interact.response.edit_message(view=self)
 				self.stop()
+			await interact.response.edit_message(view=self)
 		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
 		async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			if self.count < 2:
 				button.style = nextcord.ButtonStyle.gray
 				button.disabled = True
-				await interact.response.edit_message(view=self)
 				self.count += 1
 			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
-				await interact.response.edit_message(view=self)
 				self.stop()
+			await interact.response.edit_message(view=self)
 	view = Buttons()
 	await ctx.notice(view=view)
