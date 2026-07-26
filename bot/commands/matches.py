@@ -133,10 +133,13 @@ async def report_manual(ctx, queue: str, winners: List[Member], losers: List[Mem
 		raise bot.Exc.ValueError(f"Teams can not be empty.")
 	await q.fake_ranked_match(ctx, winners, losers, draw=draw)
 
-async def vote_map(ctx):
-	rolls = random.sample(list(filter(lambda m: m != 'cp_process', MAPS)), 3) # replace string with lastmap
+async def vote_map(ctx, users: List[User | Member | None], lastmap: str | None):
+	
+	rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
 
-	users: List[User | Member | None] = []
+	opts = set(rolls)
+
+	# users: List[User | Member | None] = []
 
 	class Buttons(nextcord.ui.View):
 		def __init__(self):
@@ -157,12 +160,19 @@ async def vote_map(ctx):
 				button.style = nextcord.ButtonStyle.gray
 				button.disabled = True
 				self.count += 1
+				opts.remove(rolls[0])
+				newmessage = ""
+				if len(users) >= self.turn + 1:
+					user = users[self.turn]
+				if isinstance(user, User):
+					newmessage = user.name + "'s turn to ban a map"
 			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
 				self.stop()
-			await interact.response.edit_message(view=self)
+			await interact.response.edit_message(content=newmessage, view=self)
+
 		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
 		async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			if len(users) < self.turn + 1:
@@ -175,12 +185,19 @@ async def vote_map(ctx):
 				button.style = nextcord.ButtonStyle.gray
 				button.disabled = True
 				self.count += 1
+				opts.remove(rolls[1])
+				newmessage = ""
+				if len(users) >= self.turn + 1:
+					user = users[self.turn]
+				if isinstance(user, User):
+					newmessage = user.name + "'s turn to ban a map"
 			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
 				self.stop()
-			await interact.response.edit_message(view=self)
+			await interact.response.edit_message(content=newmessage, view=self)
+
 		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
 		async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			if len(users) < self.turn + 1:
@@ -193,12 +210,18 @@ async def vote_map(ctx):
 				button.style = nextcord.ButtonStyle.gray
 				button.disabled = True
 				self.count += 1
+				opts.remove(rolls[2])
+				newmessage = ""
+				if len(users) >= self.turn + 1:
+					user = users[self.turn]
+				if isinstance(user, User):
+					newmessage = user.name + "'s turn to ban a map"
 			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
 				self.stop()
-			await interact.response.edit_message(view=self)
+			await interact.response.edit_message(content=newmessage, view=self)
 	view = Buttons()
 	user = None
 	message = ""
@@ -207,3 +230,4 @@ async def vote_map(ctx):
 	if isinstance(user, User):
 		message = user.name + "'s turn to ban a map"
 	await ctx.notice(content=message, view=view)
+	return opts.pop()

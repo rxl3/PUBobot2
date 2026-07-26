@@ -72,7 +72,8 @@ db.ensure_table(dict(
 		dict(cname="winner", ctype=db.types.bool),
 		dict(cname="alpha_score", ctype=db.types.int),
 		dict(cname="beta_score", ctype=db.types.int),
-		dict(cname="maps", ctype=db.types.str)
+		dict(cname="maps", ctype=db.types.str),
+		dict(cname="tfmap", ctype=db.types.str)
 	],
 	primary_keys=["match_id"]
 ))
@@ -132,7 +133,7 @@ async def register_match_unranked(ctx, m):
 	await db.insert('qc_matches', dict(
 		match_id=m.id, channel_id=m.qc.id, queue_id=m.queue.cfg.p_key, queue_name=m.queue.name,
 		alpha_name=m.teams[0].name, beta_name=m.teams[1].name,
-		at=int(time.time()), ranked=0, winner=None, maps="\n".join(m.maps)
+		at=int(time.time()), ranked=0, winner=None, maps="\n".join(m.maps), tfmap=m.tfmap
 	))
 
 	await db.insert_many('qc_players', (
@@ -193,7 +194,7 @@ async def register_match_ranked(ctx, m):
 		match_id=m.id, channel_id=m.qc.id, queue_id=m.queue.cfg.p_key, queue_name=m.queue.name,
 		alpha_name=m.teams[0].name, beta_name=m.teams[1].name,
 		at=int(time.time()), ranked=1, winner=m.winner,
-		alpha_score=m.scores[0], beta_score=m.scores[1], maps="\n".join(m.maps)
+		alpha_score=m.scores[0], beta_score=m.scores[1], maps="\n".join(m.maps), tfmap=m.tfmap
 	))
 
 	for channel_id in {m.qc.id, m.qc.rating.channel_id}:
@@ -304,6 +305,11 @@ async def update_leaderboard(ctx):
 			embed = await generate_lb_page(ctx, rawdata, n)
 			await lb_channel.send(embed=embed)
 
+async def get_last_map(ctx):
+	match = await db.select_one(('tfmap'), 'qc_matches', where=dict(channel_id=ctx.qc.id))
+	if not match:
+		return None
+	return match['tfmap']
 
 
 async def undo_match(ctx, match_id):
