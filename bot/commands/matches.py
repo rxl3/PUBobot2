@@ -1,17 +1,22 @@
 __all__ = [
 	'show_matches', 'show_teams', 'set_ready', 'set_ready_all', 'sub_me', 'sub_for', 'put',
-	'sub_force', 'cap_me', 'cap_for', 'pick', 'report_admin', 'report', 'report_manual'
+	'sub_force', 'cap_me', 'cap_for', 'pick', 'report_admin', 'report', 'report_manual', 'vote_map'
 ]
 
+import random
+
+import nextcord
 from nextcord import Member
 from typing import List
 from functools import wraps
 
+from bot.match.embeds import Embeds
 from bot.match.match import Role
 from core.utils import get, find
 
 import bot
 
+MAPS = ["cp_process", "cp_snakewater", "cp_sunshine", "cp_gullywash", "cp_reckoner", "cp_sultry", "cp_granary", "koth_product", "koth_bagel", "koth_clearcut"]
 
 def author_match(coro):
 	@wraps(coro)
@@ -127,3 +132,29 @@ async def report_manual(ctx, queue: str, winners: List[Member], losers: List[Mem
 	if not len(winners) or not len(losers):
 		raise bot.Exc.ValueError(f"Teams can not be empty.")
 	await q.fake_ranked_match(ctx, winners, losers, draw=draw)
+
+async def vote_map(ctx, match):
+	class Buttons(nextcord.ui.View):
+		def __init__(self):
+			super().__init__()
+			self.value = None
+			self.rolls = random.sample(MAPS, 3)
+		
+		@nextcord.ui.button(label="{self.rolls[0]}", style=nextcord.ButtonStyle.blurple)
+		async def button1(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
+			self.stop()
+			# insert function that somehow cancels the wait_for()
+			# return "some value"
+		@nextcord.ui.button(label="{self.rolls[1]}", style=nextcord.ButtonStyle.blurple)
+		async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
+			self.stop()
+			# insert function that somehow cancels the wait_for()
+			# return "some value"
+		@nextcord.ui.button(label="{self.rolls[2]}", style=nextcord.ButtonStyle.blurple)
+		async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
+			self.stop()
+			# insert function that somehow cancels the wait_for()
+			# return "some value"
+	view = Buttons()
+	await ctx.notice(view=view)
+	# await ctx.notice(view=Embeds(self).map_vote())

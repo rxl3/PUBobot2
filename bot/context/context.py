@@ -1,5 +1,6 @@
 from nextcord import abc
 from nextcord import Member, Embed
+from nextcord.ui import View
 from enum import IntEnum
 import re
 
@@ -72,7 +73,7 @@ class Context:
 		""" Reply in DM or only visibly by the author """
 		pass
 
-	async def notice(self, content: str = None, embed: Embed = None):
+	async def notice(self, content: str = None, embed: Embed = None, view: View = None):
 		""" Send message in chat without replying if possible """
 		pass
 

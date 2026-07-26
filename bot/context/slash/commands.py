@@ -121,6 +121,16 @@ async def _book(
 			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
 		)
 	await run_slash(bot.commands.book, interaction=interaction)
+	
+@groups.admin_testing.subcommand(name='mapvote', description='Vote map')
+async def _map_vote(
+	interaction: Interaction
+): 
+	if not interaction.user.guild_permissions.administrator:
+		return await interaction.response.send_message(
+			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
+		)
+	await run_slash(bot.commands.vote_map, interaction=interaction)
 
 # queue -> ...
 
