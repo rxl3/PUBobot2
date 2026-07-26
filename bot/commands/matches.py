@@ -1,6 +1,6 @@
 __all__ = [
 	'show_matches', 'show_teams', 'set_ready', 'set_ready_all', 'sub_me', 'sub_for', 'put',
-	'sub_force', 'cap_me', 'cap_for', 'pick', 'report_admin', 'report', 'report_manual', 'vote_map'
+	'sub_force', 'cap_me', 'cap_for', 'pick', 'report_admin', 'report', 'report_manual'
 ]
 
 import random
