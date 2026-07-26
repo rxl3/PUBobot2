@@ -133,7 +133,7 @@ async def report_manual(ctx, queue: str, winners: List[Member], losers: List[Mem
 		raise bot.Exc.ValueError(f"Teams can not be empty.")
 	await q.fake_ranked_match(ctx, winners, losers, draw=draw)
 
-async def vote_map(ctx, match):
+async def vote_map(ctx):
 	class Buttons(nextcord.ui.View):
 		def __init__(self):
 			super().__init__()
