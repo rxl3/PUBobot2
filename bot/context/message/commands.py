@@ -154,8 +154,8 @@ async def _pick(ctx: MessageContext, args: str = None):
 	if not args:
 		raise bot.Exc.SyntaxError(f"Usage: {ctx.qc.cfg.prefix}pick __player__")
 
-	members = [await ctx.get_member(i.strip()) for i in args.strip().split(" ")]
-	role = [args.strip().split(" ").pop()]
+	members = [await ctx.get_member(i.strip()) for i in args.strip().split(" ")[:-1]]
+	role = args.strip().split(" ").pop()
 	if None in members:
 		raise bot.Exc.SyntaxError(ctx.qc.gt("Specified user not found."))
 	elif len(args.strip().split(" ")) < 3 or Role[role] is None:
