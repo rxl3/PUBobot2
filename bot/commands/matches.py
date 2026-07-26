@@ -11,7 +11,7 @@ from typing import List
 from functools import wraps
 
 from bot.match.embeds import Embeds
-from bot.match.match import Role
+from bot.match.enums import Role
 from core.utils import get, find
 
 import bot
