@@ -148,10 +148,10 @@ async def vote_map(ctx):
 		@nextcord.ui.button(label=rolls[0], style=nextcord.ButtonStyle.blurple)
 		async def button1(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			if len(users) < self.turn + 1:
-				pass
+				return
 			if interact.user != users[self.turn]:
 				await interact.response.send_message(ephemeral=True, content="not your turn")
-				pass
+				return
 			if self.count < 2:
 				self.turn += 1
 				button.style = nextcord.ButtonStyle.gray
@@ -166,10 +166,10 @@ async def vote_map(ctx):
 		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
 		async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			if len(users) < self.turn + 1:
-				pass
+				return
 			if interact.user != users[self.turn]:
 				await interact.response.send_message(ephemeral=True, content="not your turn")
-				pass
+				return
 			if self.count < 2:
 				self.turn += 1
 				button.style = nextcord.ButtonStyle.gray
@@ -184,10 +184,10 @@ async def vote_map(ctx):
 		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
 		async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			if len(users) < self.turn + 1:
-				pass
+				return
 			if interact.user != users[self.turn]:
 				await interact.response.send_message(ephemeral=True, content="not your turn")
-				pass
+				return
 			if self.count < 2:
 				self.turn += 1
 				button.style = nextcord.ButtonStyle.gray
