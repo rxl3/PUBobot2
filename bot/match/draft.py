@@ -19,7 +19,7 @@ class Draft:
 		self.pick_order = [self.pick_steps[i] for i in pick_order] if pick_order else []
 		self.captains_role_id = captains_role_id
 		self.sub_queue = []
-		self.pick_roles: List[List[Role]] = [pick_roles, pick_roles]
+		self.pick_roles: List[List[Role]] = [pick_roles[:], pick_roles[:]]
 		self.picked_roles: List[List[Role]] = [[Role.medic],[Role.medic]]
 
 		if self.m.cfg['pick_teams'] == "draft":
