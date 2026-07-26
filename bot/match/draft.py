@@ -104,6 +104,7 @@ class Draft:
 				picker_team = self.m.teams[self.pick_order[pick_step+1]]
 				picker_team.extend(self.m.teams[2])
 				self.m.teams[2].clear()
+				self.picked_roles[self.pick_order[pick_step+1]].append(self.pick_roles[self.pick_order[pick_step+1]].pop())
 
 		await self.refresh(ctx)
 
