@@ -148,7 +148,7 @@ async def vote_map(ctx):
 				button.disabled = True
 				await interact.response.edit_message(view=self)
 				self.count += 1
-			else:
+			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
@@ -161,7 +161,7 @@ async def vote_map(ctx):
 				button.disabled = True
 				await interact.response.edit_message(view=self)
 				self.count += 1
-			else:
+			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
@@ -174,7 +174,7 @@ async def vote_map(ctx):
 				button.disabled = True
 				await interact.response.edit_message(view=self)
 				self.count += 1
-			else:
+			if self.count >= 2:
 				for c in self.children:
 					if isinstance(c, nextcord.ui.Button):
 						c.disabled = True
