@@ -194,8 +194,10 @@ async def vote_map(ctx):
 				self.stop()
 			await interact.response.edit_message(view=self)
 	view = Buttons()
-	user = users[view.turn]
+	user = None
 	message = ""
+	if len(users) >= view.turn + 1:
+		user = users[view.turn]
 	if isinstance(user, User):
 		message = user.name + "'s turn to ban a map"
 	await ctx.notice(content=message, view=view)
