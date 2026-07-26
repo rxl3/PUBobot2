@@ -142,17 +142,20 @@ async def vote_map(ctx):
 		
 		@nextcord.ui.button(label=rolls[0], style=nextcord.ButtonStyle.blurple)
 		async def button1(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
-			self.stop()
+			# self.stop()
+			button.disabled = True
 			# insert function that somehow cancels the wait_for()
 			# return "some value"
 		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
 		async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
-			self.stop()
+			# self.stop()
+			button.disabled = True
 			# insert function that somehow cancels the wait_for()
 			# return "some value"
 		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
 		async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
-			self.stop()
+			# self.stop()
+			button.disabled = True
 			# insert function that somehow cancels the wait_for()
 			# return "some value"
 	view = Buttons()
