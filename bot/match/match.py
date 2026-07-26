@@ -7,6 +7,8 @@ import json
 
 import bot
 from bot.autobook import book_serveme
+from bot.commands.matches import vote_map
+from bot.stats.stats import get_last_map
 from .enums import Role
 from core.utils import find, get, iter_to_dict, join_and, get_nick
 from core.console import log
@@ -108,6 +110,7 @@ class Match:
 			state=self.state,
 			states=self.states,
 			ready_players=[p.id for p in self.check_in.ready_players if p],
+			tfmap=self.tfmap
 		)
 
 	@classmethod
@@ -185,6 +188,8 @@ class Match:
 		self.start_time = int(time())
 		self.state = self.INIT
 		self.match_start_time = 0
+		self.tfmap = ""
+		self.connect_url = ""
 
 		print(self.cfg['pick_roles'])
 
@@ -413,6 +418,9 @@ class Match:
 		#  Embed message with teams
 		try:
 			await ctx.notice(embed=self.embeds.final_message())
+
+			lastmap = str(get_last_map(ctx))
+			self.tfmap = await vote_map(ctx, self.captains, lastmap)
 		except DiscordException:
 			pass
 

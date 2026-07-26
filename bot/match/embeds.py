@@ -3,6 +3,8 @@ from core.client import dc
 from core.utils import get_nick, get_mention, get_div_role, get_class_roles, join_and, get_class_role_icons, get_icon_for_role
 from core import config
 import random
+import discord
+from discord.ext import commands
 
 class Embeds:
 	""" This class generates discord embeds for various match states """
@@ -170,6 +172,7 @@ class Embeds:
 		return embed
 
 	def final_message(self):
+		print(self.m.draft.picked_roles)
 		show_ranks = bool(self.m.ranked and not self.m.qc.cfg.rating_nicks)
 		embed = Embed(
 			colour=Colour(0x27b75e),
@@ -247,3 +250,4 @@ class Embeds:
 		embed.set_footer(**self.footer)
 
 		return embed
+
