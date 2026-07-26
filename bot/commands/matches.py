@@ -134,33 +134,39 @@ async def report_manual(ctx, queue: str, winners: List[Member], losers: List[Mem
 	await q.fake_ranked_match(ctx, winners, losers, draw=draw)
 
 async def vote_map(ctx):
-	rolls = random.sample(MAPS, 3)
+	rolls = random.sample(list(filter(lambda m: m != 'cp_process', MAPS)), 3) # replace string with lastmap
 	class Buttons(nextcord.ui.View):
 		def __init__(self):
 			super().__init__()
 			self.value = None
+			self.count = 0
 		
 		@nextcord.ui.button(label=rolls[0], style=nextcord.ButtonStyle.blurple)
 		async def button1(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
-			# self.stop()
-			button.disabled = True
-			await interact.response.edit_message(view=self)
-			# insert function that somehow cancels the wait_for()
-			# return "some value"
+			if self.count < 2:
+				button.style = nextcord.ButtonStyle.gray
+				button.disabled = True
+				await interact.response.edit_message(view=self)
+				self.count += 1
+			else:
+				self.stop()
 		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
 		async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
-			# self.stop()
-			button.disabled = True
-			await interact.response.edit_message(view=self)
-			# insert function that somehow cancels the wait_for()
-			# return "some value"
+			if self.count < 2:
+				button.style = nextcord.ButtonStyle.gray
+				button.disabled = True
+				await interact.response.edit_message(view=self)
+				self.count += 1
+			else:
+				self.stop()
 		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
 		async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
-			# self.stop()
-			button.disabled = True
-			await interact.response.edit_message(view=self)
-			# insert function that somehow cancels the wait_for()
-			# return "some value"
+			if self.count < 2:
+				button.style = nextcord.ButtonStyle.gray
+				button.disabled = True
+				await interact.response.edit_message(view=self)
+				self.count += 1
+			else:
+				self.stop()
 	view = Buttons()
 	await ctx.notice(view=view)
-	# await ctx.notice(view=Embeds(self).map_vote())
