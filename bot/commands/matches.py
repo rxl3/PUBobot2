@@ -148,7 +148,6 @@ async def vote_map(ctx):
 		@nextcord.ui.button(label=rolls[0], style=nextcord.ButtonStyle.blurple)
 		async def button1(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
 			if len(users) < self.turn + 1:
-				await interact.response.send_message(ephemeral=True, content="not your turn")
 				return
 			if interact.user != users[self.turn]:
 				await interact.response.send_message(ephemeral=True, content="not your turn")
