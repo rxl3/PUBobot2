@@ -5,6 +5,14 @@ from core import config
 import random
 import discord
 from discord.ext import commands
+from bot.match.enums import Role
+
+role_emojis_dict = {
+	Role.scout: "<:scout:1529763050842886164>",
+	Role.soldier: "<:soldier:1529763008199397476>",
+	Role.demo: "<:demo:1529763123391627314>",
+	Role.medic: "<:medic:1530230678292271324>"
+}
 
 class Embeds:
 	""" This class generates discord embeds for various match states """
@@ -199,7 +207,7 @@ class Embeds:
 			team_players = [
 				" \u200b " +
 				" \u200b ".join([
-					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"`{self.m.draft.picked_roles[tindex][index]}` " + f"<@{p.id}>"
+					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"`{self.get_emoji_for_role(self.m.draft.picked_roles[tindex][index])}` " + f"<@{p.id}>"
 					for index, p in enumerate(t)
 				])
 				for tindex, t in enumerate(self.m.teams[:2])
@@ -250,4 +258,6 @@ class Embeds:
 		embed.set_footer(**self.footer)
 
 		return embed
-
+	
+	def get_emoji_for_role(self, role: Role):
+		return role_emojis_dict[role]

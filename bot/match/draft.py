@@ -20,7 +20,9 @@ class Draft:
 		self.captains_role_id = captains_role_id
 		self.sub_queue = []
 		self.pick_roles: List[List[Role]] = [pick_roles[:], pick_roles[:]]
-		self.picked_roles: List[List[Role]] = [[Role.medic],[Role.medic]]
+		# self.picked_roles: List[List[Role]] = [[Role.medic],[Role.medic]]
+
+		self.m.picked_roles = [[Role.medic],[Role.medic]]
 
 		if self.m.cfg['pick_teams'] == "draft":
 			self.m.states.append(self.m.DRAFT)
@@ -94,7 +96,7 @@ class Draft:
 		self.m.teams[2].remove(player)
 		team.append(player)
 		self.pick_roles[self.pick_order[pick_step]].remove(role)
-		self.picked_roles[self.pick_order[pick_step]].append(role)
+		self.m.picked_roles[self.pick_order[pick_step]].append(role)
 
 		# auto last-pick rest of the players if possible
 		# if rest of pick_order covers the unpicked list
@@ -104,7 +106,7 @@ class Draft:
 				picker_team = self.m.teams[self.pick_order[pick_step+1]]
 				picker_team.extend(self.m.teams[2])
 				self.m.teams[2].clear()
-				self.picked_roles[self.pick_order[pick_step+1]].append(self.pick_roles[self.pick_order[pick_step+1]].pop())
+				self.m.picked_roles[self.pick_order[pick_step+1]].append(self.pick_roles[self.pick_order[pick_step+1]].pop())
 
 		await self.refresh(ctx)
 
