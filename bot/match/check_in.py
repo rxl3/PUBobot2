@@ -59,7 +59,7 @@ class CheckIn:
 		await self.refresh(ctx)
 
 	async def refresh(self, ctx):
-		await self.finish(ctx)
+		# await self.finish(ctx)
 		pass
 		not_ready = list(filter(lambda m: m not in self.ready_players, self.m.players))
 		if len(not_ready):
