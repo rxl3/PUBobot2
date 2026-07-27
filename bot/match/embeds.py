@@ -99,7 +99,7 @@ class Embeds:
 			" \u200b ".join([
 					" \u200b {mention} {pick_role}".format(
 						mention=get_mention(p),
-						pick_role=get_icon_for_role(self.m.draft.picked_roles[tindex][index].value),
+						pick_role=get_icon_for_role(self.m.picked_roles[tindex][index].value),
 						role_icons=get_class_role_icons(p, self.m.cfg['class_roles'])
 					)
 				for index, p in enumerate(t)
