@@ -1,3 +1,9 @@
+# copy files: cp pubobot.service /etc/systemd/system
+# enable service: sudo systemctl daemon-reload
+# sudo systemctl enable --now pubobot
+# sudo systemctl start pubobot
+# sudo systemctl status pubobot
+# sudo journalctl -u pubobot
 [Unit]
 Description=Pubobot
 
