@@ -1,17 +1,24 @@
 __all__ = [
 	'noadds', 'noadd', 'forgive', 'rating_seed', 'rating_penality', 'rating_hide',
 	'rating_reset', 'rating_snap', 'stats_reset', 'stats_reset_player', 'stats_replace_player',
-	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity', 'book'
+	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity', 'book', 'VoteMap'
 ]
 
 from time import time
 from datetime import timedelta
-from nextcord import Member
+from nextcord import Member, Message, TextChannel
 
 from bot.autobook import book_serveme
+from bot.match.match import MAPS, Match
 from core.utils import seconds_to_str, get_nick
 
 import bot
+
+import random
+
+import nextcord
+from nextcord import Member, User
+from typing import List
 
 
 async def noadds(ctx):
@@ -168,3 +175,114 @@ async def book(ctx):
 	
 	await ctx.success(ctx.qc.gt(str_msg))
 # async def save_bot_state(ctx):
+
+class VoteMap:
+
+	def __init__(self):
+		self.vmm: Message
+		self.tfmap = ""
+
+	def set_tfmap(self, tfmap):
+		self.tfmap = tfmap
+
+	async def vote_map_msg(self, ctx, users: List[User | Member], step = 0):
+		c: TextChannel = ctx.channel
+		if step == 0:
+			self.vmm = await c.send(users[0].name + "'s turn to ban a map")
+		elif step == 1:
+			await self.vmm.edit(content=users[1].name + "'s turn to ban a map")
+		elif step == 2:
+			await self.vmm.edit(content="map picked")
+
+	async def vote_map(self, ctx, users, lastmap):
+		await self.vote_map_msg(ctx, users, 0)
+
+		print(users)
+		
+		rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
+
+		opts = set(rolls)
+
+		class Buttons(nextcord.ui.View):
+			def __init__(self, parent):
+				# super().__init__()
+				self.value = None
+				self.count = 0
+				self.turn = 0
+				self.parent = parent
+				self.users = users
+				print(self.users)
+			
+			@nextcord.ui.button(label=rolls[0], style=nextcord.ButtonStyle.blurple)
+			async def button1(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
+				if len(self.users) < self.turn + 1:
+					print('user length error')
+					return
+				# user: User | Member = interact.user
+				if interact.user != self.users[self.turn]:
+					await interact.response.send_message(ephemeral=True, content="not your turn")
+					return
+				if self.count < 2:
+					self.turn += 1
+					button.style = nextcord.ButtonStyle.gray
+					button.disabled = True
+					self.count += 1
+					opts.remove(rolls[0])
+					await self.parent.vote_map_msg(ctx, self.users, 1)
+				if self.count >= 2:
+					for c in self.children:
+						if isinstance(c, nextcord.ui.Button):
+							c.disabled = True
+					self.stop()
+					self.parent.set_tfmap(opts.pop())
+					await self.parent.vote_map_msg(ctx, self.users, 2)
+				await interact.response.edit_message(view=self)
+
+			@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
+			async def button2(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
+				if len(self.users) < self.turn + 1:
+					return
+				if interact.user != self.users[self.turn]:
+					await interact.response.send_message(ephemeral=True, content="not your turn")
+					return
+				if self.count < 2:
+					self.turn += 1
+					button.style = nextcord.ButtonStyle.gray
+					button.disabled = True
+					self.count += 1
+					opts.remove(rolls[1])
+					await self.parent.vote_map_msg(ctx, self.users, 1)
+				if self.count >= 2:
+					for c in self.children:
+						if isinstance(c, nextcord.ui.Button):
+							c.disabled = True
+					self.stop()
+					self.parent.set_tfmap(opts.pop())
+					await self.parent.vote_map_msg(ctx, self.users, 2)
+				await interact.response.edit_message(view=self)
+
+			@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
+			async def button3(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
+				if len(self.users) < self.turn + 1:
+					return
+				if interact.user != self.users[self.turn]:
+					await interact.response.send_message(ephemeral=True, content="not your turn")
+					return
+				if self.count < 2:
+					self.turn += 1
+					button.style = nextcord.ButtonStyle.gray
+					button.disabled = True
+					self.count += 1
+					opts.remove(rolls[2])
+					await self.parent.vote_map_msg(ctx, self.users, 1)
+				if self.count >= 2:
+					for c in self.children:
+						if isinstance(c, nextcord.ui.Button):
+							c.disabled = True
+					self.stop()
+					self.parent.set_tfmap(opts.pop())
+					await self.parent.vote_map_msg(ctx, self.users, 2)
+				await interact.response.edit_message(view=self)
+		view = Buttons(self)
+		await ctx.notice(view=view)
+		print('votemap')
