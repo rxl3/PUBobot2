@@ -215,8 +215,6 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 			# self.children = []
 			print(self.users)
 			self.add_item(nextcord.ui.Item())
-
-			TextDisplay
 		
 		@nextcord.ui.button(label=rolls[0], style=nextcord.ButtonStyle.blurple)
 		async def button1(self, button: nextcord.ui.Button, interact: nextcord.Interaction):
