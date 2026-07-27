@@ -180,7 +180,7 @@ class Embeds:
 		return embed
 
 	def final_message(self):
-		print(self.m.draft.picked_roles)
+		print(self.m.picked_roles)
 		show_ranks = bool(self.m.ranked and not self.m.qc.cfg.rating_nicks)
 		embed = Embed(
 			colour=Colour(0x27b75e),
@@ -207,7 +207,7 @@ class Embeds:
 			team_players = [
 				" \u200b " +
 				" \u200b ".join([
-					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"`{self.get_emoji_for_role(self.m.draft.picked_roles[tindex][index])}` " + f"<@{p.id}>"
+					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"`{self.get_emoji_for_role(self.m.picked_roles[tindex][index])}` " + f"<@{p.id}>"
 					for index, p in enumerate(t)
 				])
 				for tindex, t in enumerate(self.m.teams[:2])
