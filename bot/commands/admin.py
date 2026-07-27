@@ -196,9 +196,9 @@ async def vote_map_msg(ctx, users: List[User | Member], vmm: Message | None = No
 	return
 
 async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
-	vmm = await vote_map_msg(ctx, users, step=0)
-
 	print(users)
+
+	vmm = await vote_map_msg(ctx, users=users, step=0)
 	
 	rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
 

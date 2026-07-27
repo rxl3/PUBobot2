@@ -471,9 +471,9 @@ class Match:
 
 	async def vote_map(self, ctx, users: List[User | Member], lastmap: str | None = None):
 
-		await self.vote_map_msg(ctx, users, 0)
-
 		print(users)
+
+		await self.vote_map_msg(ctx, users=users, step=0)
 		
 		rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
 
