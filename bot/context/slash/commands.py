@@ -6,6 +6,7 @@ import traceback
 import time
 
 from bot.match.enums import Role
+from bot.match.match import MAPS
 from core.client import dc
 from core.utils import error_embed, ok_embed, parse_duration, get_nick
 from core.console import log
@@ -114,13 +115,14 @@ async def _set_ready_all(
 	
 @groups.admin_testing.subcommand(name='book', description='Book serveme.')
 async def _book(
-	interaction: Interaction
+	interaction: Interaction,
+	mapname: str = SlashOption(name="map", choices=MAPS, required=False)
 ): 
 	if not interaction.user.guild_permissions.administrator:
 		return await interaction.response.send_message(
 			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
 		)
-	await run_slash(bot.commands.book, interaction=interaction)
+	await run_slash(bot.commands.book, interaction=interaction, mapname=mapname)
 	
 @groups.admin_testing.subcommand(name='mapvote', description='Vote map')
 async def _map_vote(

@@ -170,8 +170,8 @@ async def seed_immunity(ctx, channel_id, num):
 	else:
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Failed"))
 
-async def book(ctx):
-	str_msg = await book_serveme(ctx)
+async def book(ctx, mapname = "cp_process"):
+	str_msg = await book_serveme(ctx, tfmap=mapname)
 	
 	await ctx.success(ctx.qc.gt(str_msg))
 # async def save_bot_state(ctx):

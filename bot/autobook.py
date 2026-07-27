@@ -7,7 +7,17 @@ import random
 import string
 import datetime
 
-async def book_serveme(ctx, match_id = None):
+tfmap_name_dict = {
+    "cp_process": "cp_process_f12", 
+    "cp_snakewater": "cp_snakewater_final1", 
+    "cp_sunshine": "cp_sunshine", 
+    "cp_gullywash": "cp_gullywash_f9", 
+    "cp_reckoner": "cp_reckoner", 
+    "koth_product": "koth_product_final", 
+    "koth_bagel": "koth_bagel_rc13"
+}
+
+async def book_serveme(ctx, match_id = None, tfmap = "cp_process"):
     try:
         strings_channel = dc.get_channel(config.cfg.DC_STRINGS_CHANNEL_ID)
         rcon_channel = dc.get_channel(config.cfg.DC_RCON_CHANNEL_ID)
@@ -54,8 +64,8 @@ async def book_serveme(ctx, match_id = None):
                             "server_id": serveme_server['id'],
                             "password": server_password,
                             "rcon": rcon_password,
-                            "first_map": "cp_process_f12",
-                            "server_config_id": 21 # ozfortress_6v6_pug
+                            "first_map": tfmap_name_dict[tfmap] if tfmap_name_dict[tfmap] else "cp_process_f12",
+                            "server_config_id": 1 # 1 = ozfortress_6v6_5cp, 2 = ozfortress_6v6_koth, 21 = ozfortress_6v6_pug
                         }
                     })
 

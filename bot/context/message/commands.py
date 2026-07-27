@@ -268,7 +268,7 @@ async def _seed_immunity(ctx: MessageContext, args: str = None):
 
 @message_command('book')
 async def _book(ctx: MessageContext, args: str = None):
-	await bot.commands.book(ctx)
+	await bot.commands.book(ctx, args)
 
 @message_command('promote')
 async def _promote(ctx: MessageContext, args: str = None):
