@@ -130,7 +130,7 @@ async def _map_vote(
 		return await interaction.response.send_message(
 			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
 		)
-	await run_slash(bot.commands.vote_map, interaction=interaction, users=[interaction.user,interaction.user])
+	await run_slash(bot.commands.vote_map, interaction=interaction, users=[interaction.user,interaction.user] lastmap=None)
 
 # queue -> ...
 

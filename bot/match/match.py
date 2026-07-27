@@ -469,7 +469,7 @@ class Match:
 	def set_tfmap(self, tfmap):
 		self.tfmap = tfmap
 
-	async def vote_map(self, ctx, users: List[User | Member], lastmap: str | None):
+	async def vote_map(self, ctx, users: List[User | Member], lastmap: str | None = None):
 
 		await self.vote_map_msg(ctx, users, 0)
 
