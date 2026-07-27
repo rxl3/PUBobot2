@@ -3,7 +3,7 @@ Description=Pubobot
 
 [Service]
 Type=simple
-WorkingDirectory=/root/PUBobot2/pyenv/bin
+WorkingDirectory=/root/PUBobot2
 ExecStart=/root/PUBobot2/pyenv/bin/python3 /root/PUBobot2/PUBobot2.py
 Restart=on-failure
 RestartSec=5
