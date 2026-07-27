@@ -207,7 +207,7 @@ class Embeds:
 			team_players = [
 				" \u200b " +
 				" \u200b ".join([
-					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"`{self.get_emoji_for_role(self.m.picked_roles[tindex][index])}` " + f"<@{p.id}>"
+					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"{self.get_emoji_for_role(self.m.picked_roles[tindex][index])} " + f"<@{p.id}>"
 					for index, p in enumerate(t)
 				])
 				for tindex, t in enumerate(self.m.teams[:2])

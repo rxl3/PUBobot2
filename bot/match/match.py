@@ -429,7 +429,7 @@ class Match:
 
 			lastmap = str(get_last_map(ctx))
 			print("lastmap:" + lastmap)
-			await self.vote_map(ctx, self.captains, lastmap)
+			await self.vote_map(ctx, users=self.captains, lastmap=lastmap)
 			# print(self.tfmap)
 		except DiscordException:
 			pass
