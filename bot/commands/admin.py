@@ -205,13 +205,13 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 
 	class Buttons(nextcord.ui.View):
 		def __init__(self):
-			# super().__init__()
+			super().__init__()
 			self.value = None
 			self.count = 0
 			self.turn = 0
 			self.users = users
 			self.vmm = vmm
-			self.children = []
+			# self.children = []
 			print(self.users)
 		
 		@nextcord.ui.button(label=rolls[0], style=nextcord.ButtonStyle.blurple)
