@@ -428,6 +428,7 @@ class Match:
 			await ctx.notice(embed=self.embeds.final_message())
 
 			lastmap = str(get_last_map(ctx))
+			print("lastmap:" + lastmap)
 			await self.vote_map(ctx, self.captains, lastmap)
 			# print(self.tfmap)
 		except DiscordException:
@@ -458,9 +459,8 @@ class Match:
 		bot.active_matches.remove(self)
 
 	async def vote_map_msg(self, ctx, users: List[User | Member], step = 0):
-		c: TextChannel = ctx.channel
 		if step == 0:
-			self.vmm: Message = await c.send(users[0].name + "'s turn to ban a map")
+			self.vmm: Message = await ctx.notice(users[0].name + "'s turn to ban a map")
 		elif step == 1:
 			await self.vmm.edit(content=users[1].name + "'s turn to ban a map")
 		elif step == 2:
