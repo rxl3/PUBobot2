@@ -72,11 +72,11 @@ async def book_serveme(ctx, match_id = None, tfmap = "cp_process"):
                     if book_response.status_code == 200:
 
                         string_message = "```markdown\n"
-                        string_message += "connect " + serveme_server['ip_and_port'] + "; password \"" + server_password + "\";"
+                        string_message += "connect " + serveme_server['resolved_ip'] + ":" + serveme_server['port'] + "; password \"" + server_password + "\";"
                         string_message += "```"
 
                         rcon_message = "```markdown\n"
-                        rcon_message += "rcon_address " + serveme_server['ip_and_port'] + "; rcon_password \"" + rcon_password + "\";"
+                        rcon_message += "rcon_address " + serveme_server['resolved_ip'] + ":" + serveme_server['port'] + "; rcon_password \"" + rcon_password + "\";"
                         rcon_message += "```"
 
                         str_msg = await strings_channel.send(content=string_message)
