@@ -17,7 +17,7 @@ tfmap_name_dict = {
     "koth_bagel": "koth_bagel_rc13"
 }
 
-async def book_serveme(ctx, match_id = None, tfmap="cp_process"):
+async def book_serveme(ctx, match_id=None, tfmap="cp_process"):
     print("map:"+tfmap)
     try:
         strings_channel = dc.get_channel(config.cfg.DC_STRINGS_CHANNEL_ID)
