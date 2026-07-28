@@ -427,7 +427,7 @@ class Match:
 		try:
 			await ctx.notice(embed=self.embeds.final_message())
 
-			lastmap = str(get_last_map(ctx))
+			lastmap = str(await get_last_map(ctx))
 			print("lastmap:" + lastmap)
 			await self.vote_map(ctx, users=self.captains, lastmap=lastmap)
 			# print(self.tfmap)
@@ -471,7 +471,7 @@ class Match:
 
 	async def vote_map(self, ctx, users: List[User | Member], lastmap: str | None = None):
 
-		print(users)
+		print(list(map(lambda u: u.name, users)))
 
 		await self.vote_map_msg(ctx, users=users, step=0)
 		
