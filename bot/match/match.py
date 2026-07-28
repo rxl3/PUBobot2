@@ -427,9 +427,9 @@ class Match:
 		try:
 			await ctx.notice(embed=self.embeds.final_message())
 
-			lastmap = str(await get_last_map(ctx))
-			print("lastmap:" + lastmap)
-			await self.vote_map(ctx, users=self.captains, lastmap=lastmap)
+			lastmap = str(await get_last_map(ctx)) or None
+			print("lastmap:" + (lastmap or "none"))
+			await self.vote_map(ctx, users=[self.teams[0][0], self.teams[1][0]], lastmap=lastmap)
 			# print(self.tfmap)
 		except DiscordException:
 			pass
