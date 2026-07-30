@@ -11,6 +11,7 @@ from core.console import log
 from core.database import db
 from core.utils import iter_to_dict, find, get_nick
 from core.client import dc
+import datetime
 
 db.ensure_table(dict(
 	tname="players",
@@ -108,6 +109,15 @@ db.ensure_table(dict(
 	primary_keys=["guild_id"]
 ))
 
+db.ensure_table(dict(
+	tname="audit",
+	columns=[
+		dict(cname="author", ctype=db.types.int),
+		dict(cname="match_id", ctype=db.types.int),
+		dict(cname="timestamp", ctype=db.types.float)
+	],
+	primary_keys=["author", "timestamp"]
+))
 
 async def check_match_id_counter():
 	"""
@@ -351,6 +361,7 @@ async def undo_match(ctx, match_id):
 
 	await db.delete('qc_player_matches', where=dict(match_id=match_id))
 	await db.delete('qc_matches', where=dict(match_id=match_id))
+	await db.insert('audit', dict(author=ctx.author.id, match_id=match_id, timestamp=datetime.datetime.now().timestamp()))
 	return True
 
 
