@@ -94,6 +94,7 @@ class Match:
 		match.cfg['captain_immunity_games'] = captain_immunity_games
 		match.teams[0].set(winners)
 		match.teams[1].set(losers)
+		match.picked_roles = [[Role.medic,Role.scout, Role.scout, Role.soldier, Role.soldier, Role.demo],[Role.medic,Role.scout, Role.scout, Role.soldier, Role.soldier, Role.demo]]
 		if draw:
 			match.winner = None
 		else:
