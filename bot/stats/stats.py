@@ -317,7 +317,7 @@ async def update_leaderboard(ctx):
 			await lb_channel.send(embed=embed)
 
 async def get_last_map(ctx):
-	match = await db.select_one(('tfmap',), 'qc_matches', where=dict(channel_id=ctx.qc.id))
+	match = await db.select(('tfmap',), 'qc_matches', where=dict(channel_id=ctx.qc.id), order_by='match_id', limit=1)
 	if not match:
 		return None
 	return match['tfmap']

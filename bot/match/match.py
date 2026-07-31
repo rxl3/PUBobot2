@@ -22,7 +22,9 @@ import nextcord
 from nextcord import Member, User
 from typing import List
 
-MAPS = ["cp_process", "cp_snakewater", "cp_sunshine", "cp_gullywash", "cp_reckoner", "koth_product", "koth_bagel"]
+MAPS_5CP = ["cp_process", "cp_snakewater", "cp_sunshine", "cp_gullywash", "cp_reckoner", "cp_metalworks"]
+MAPS_KOTH = ["koth_product", "koth_bagel"]
+MAPS = ["cp_process", "cp_snakewater", "cp_sunshine", "cp_gullywash", "cp_reckoner", "cp_metalworks", "koth_product", "koth_bagel"]
 
 class Match:
 
@@ -476,7 +478,9 @@ class Match:
 
 		await self.vote_map_msg(ctx, users=users, step=0)
 		
-		rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
+		rolls_5cp = random.sample(list(filter(lambda m: m != lastmap, MAPS_5CP)), 2)
+		rolls_koth = random.sample(list(filter(lambda m: m != lastmap, MAPS_KOTH)), 1)
+		rolls = rolls_5cp + rolls_koth
 
 		opts = set(rolls)
 

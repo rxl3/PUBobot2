@@ -13,6 +13,7 @@ tfmap_name_dict = {
     "cp_sunshine": "cp_sunshine", 
     "cp_gullywash": "cp_gullywash_f9", 
     "cp_reckoner": "cp_reckoner", 
+    "cp_metalworks": "cp_metalworks_f7",
     "koth_product": "koth_product_final", 
     "koth_bagel": "koth_bagel_rc13"
 }
