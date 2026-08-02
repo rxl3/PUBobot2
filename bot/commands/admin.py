@@ -1,7 +1,7 @@
 __all__ = [
 	'noadds', 'noadd', 'forgive', 'rating_seed', 'rating_penality', 'rating_hide',
 	'rating_reset', 'rating_snap', 'stats_reset', 'stats_reset_player', 'stats_replace_player',
-	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity', 'book', 'vote_map'
+	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity', 'book', 'vote_map', 'rcon_cmd'
 ]
 
 from time import time
@@ -20,6 +20,7 @@ import nextcord
 from nextcord import Member, User
 from typing import List
 
+from rcon.source import Client
 
 async def noadds(ctx):
 	data = await bot.noadds.get_noadds(ctx)
@@ -290,3 +291,8 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 	await ctx.notice(view=view)
 
 	print('votemap')
+
+async def rcon_cmd(ip: str, port: int, pwd: str, cmd: str):
+	with Client(ip, port, passwd=pwd) as client:
+		response = client.run(cmd)
+		print(response)

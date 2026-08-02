@@ -133,6 +133,20 @@ async def _map_vote(
 			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
 		)
 	await run_slash(bot.commands.vote_map, interaction=interaction, users=[interaction.user,interaction.user], lastmap=None)
+	
+@groups.admin_testing.subcommand(name='rcon_cmd', description='Vote map')
+async def _rcon_cmd(
+	interaction: Interaction,
+	ip: str,
+	port: int,
+	password: str,
+	cmd: str
+): 
+	if not interaction.user.guild_permissions.administrator:
+		return await interaction.response.send_message(
+			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
+		)
+	await run_slash(bot.commands.rcon_cmd, interaction=interaction, ip=ip, port=port, pwd=password, cmd=cmd)
 
 # queue -> ...
 
