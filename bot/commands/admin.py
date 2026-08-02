@@ -292,7 +292,7 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 
 	print('votemap')
 
-async def rcon_cmd(ip: str, port: int, pwd: str, cmd: str):
+async def rcon_cmd(ctx, ip: str, port: int, pwd: str, cmd: str):
 	with Client(ip, port, passwd=pwd) as client:
 		response = client.run(cmd)
 		print(response)
