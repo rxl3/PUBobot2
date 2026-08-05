@@ -22,9 +22,12 @@ import nextcord
 from nextcord import Member, User
 from typing import List
 
+MAPS_PUG = ["cp_process", "cp_snakewater", "cp_sunshine"]
 MAPS_5CP = ["cp_process", "cp_snakewater", "cp_sunshine", "cp_gullywash", "cp_reckoner", "cp_metalworks"]
 MAPS_KOTH = ["koth_product", "koth_bagel"]
 MAPS = ["cp_process", "cp_snakewater", "cp_sunshine", "cp_gullywash", "cp_reckoner", "cp_metalworks", "koth_product", "koth_bagel"]
+
+rand_map_data = {"list": [], "index":0}
 
 class Match:
 
@@ -199,6 +202,9 @@ class Match:
 		self.match_start_time = 0
 		self.tfmap = ""
 		self.connect_url = ""
+		self.resolved_ip = ""
+		self.port = 27015
+		self.rcon_password = ""
 		self.picked_roles = []
 		self.vmm: Message
 
@@ -208,6 +214,14 @@ class Match:
 		self.check_in = CheckIn(self, self.cfg['check_in_timeout'])
 		self.draft = Draft(self, self.cfg['pick_order'], self.cfg['captains_role_id'], list(map(lambda r: Role[r], self.cfg['pick_roles'])))
 		self.embeds = Embeds(self)
+		self.rand_map_data = {}
+
+		with open("rand_maps.json", "r") as file:
+			data = json.load(file)
+			if data:
+				self.rand_map_data = {"list": data["list"], "index": data["index"]}
+			else:
+				self.rand_map_data = {"list": random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1), "index": 0}
 
 	@staticmethod
 	def random_maps(maps, map_count, last_maps=None):
@@ -478,9 +492,13 @@ class Match:
 
 		await self.vote_map_msg(ctx, users=users, step=0)
 		
-		rolls_5cp = random.sample(list(filter(lambda m: m != lastmap, MAPS_5CP)), 2)
-		rolls_koth = random.sample(list(filter(lambda m: m != lastmap, MAPS_KOTH)), 1)
-		rolls = rolls_5cp + rolls_koth
+		# rolls_5cp = random.sample(list(filter(lambda m: m != lastmap, MAPS_5CP)), 2)
+		# rolls_koth = random.sample(list(filter(lambda m: m != lastmap, MAPS_KOTH)), 1)
+		# rolls = rolls_5cp + rolls_koth
+
+		# opts = set(rolls)
+		randmapIndex: int = self.rand_map_data["index"]
+		rolls = self.rand_map_data["list"][(randmapIndex-3):randmapIndex]
 
 		opts = set(rolls)
 
@@ -517,6 +535,7 @@ class Match:
 					self.stop()
 					self.parent.set_tfmap(opts.pop())
 					await self.parent.vote_map_msg(ctx, self.users, 2)
+					save_rand_map_data(rand_map_data)
 				await interact.response.edit_message(view=self)
 
 			@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
@@ -540,6 +559,7 @@ class Match:
 					self.stop()
 					self.parent.set_tfmap(opts.pop())
 					await self.parent.vote_map_msg(ctx, self.users, 2)
+					save_rand_map_data(rand_map_data)
 				await interact.response.edit_message(view=self)
 
 			@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
@@ -563,7 +583,16 @@ class Match:
 					self.stop()
 					self.parent.set_tfmap(opts.pop())
 					await self.parent.vote_map_msg(ctx, self.users, 2)
+					save_rand_map_data(rand_map_data)
 				await interact.response.edit_message(view=self)
 		view = Buttons(self)
 		await ctx.notice(view=view)
 		print('votemap')
+
+def save_rand_map_data(data: dict):
+	data["index"] += 3
+	if data["index"] > len(data["list"]) - 1:
+		data["index"] = 0
+		data["list"] = random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1)
+	with open("rand_maps.json", "w") as file:
+		json.dump(data, file, indent=4)

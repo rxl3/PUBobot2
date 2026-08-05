@@ -4,12 +4,13 @@ __all__ = [
 	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity', 'book', 'vote_map', 'rcon_cmd'
 ]
 
+import json
 from time import time
 from datetime import timedelta
 from nextcord import Member, Message, TextChannel
 
 from bot.autobook import book_serveme
-from bot.match.match import MAPS, Match
+from bot.match.match import MAPS, MAPS_PUG, Match
 from core.utils import seconds_to_str, get_nick
 
 import bot
@@ -172,7 +173,9 @@ async def seed_immunity(ctx, channel_id, num):
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Failed"))
 
 async def book(ctx, mapname="cp_process"):
-	str_msg = await book_serveme(ctx, tfmap=mapname)
+	booking = await book_serveme(ctx, tfmap=mapname)
+
+	str_msg = booking.connect
 	
 	await ctx.success(ctx.qc.gt(str_msg))
 # async def save_bot_state(ctx):
@@ -199,9 +202,23 @@ async def vote_map_msg(ctx, users: List[User | Member], vmm: Message | None = No
 async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 	print(users)
 
+	rand_map_data = {}
+
+	with open("rand_maps.json", "r") as file:
+		data = json.load(file)
+		if data:
+			rand_map_data = {"list": data["list"], "index": data["index"]}
+		else:
+			rand_map_data = {"list": random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1), "index": 0}
+
+
+
 	vmm = await vote_map_msg(ctx, users=users, step=0)
+
+	randmapIndex: int = rand_map_data["index"]
+	rolls = rand_map_data["list"][(randmapIndex-3):randmapIndex]
 	
-	rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
+	# rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
 
 	opts = set(rolls)
 
@@ -238,6 +255,7 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 				self.stop()
 				# set_tfmap(opts.pop())
 				await vote_map_msg(ctx, self.users, vmm=self.vmm, step=2)
+				save_rand_map_data(rand_map_data)
 			await interact.response.edit_message(view=self)
 
 		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
@@ -261,6 +279,7 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 				self.stop()
 				# self.parent.set_tfmap(opts.pop())
 				await vote_map_msg(ctx, self.users, vmm=self.vmm, step=2)
+				save_rand_map_data(rand_map_data)
 			await interact.response.edit_message(view=self)
 
 		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
@@ -284,6 +303,7 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 				self.stop()
 				# self.parent.set_tfmap(opts.pop())
 				await vote_map_msg(ctx, self.users, vmm=self.vmm, step=2)
+				save_rand_map_data(rand_map_data)
 			await interact.response.edit_message(view=self)
 
 	view = Buttons()
@@ -296,3 +316,11 @@ async def rcon_cmd(ctx, ip: str, port: int, pwd: str, cmd: str):
 	with Client(ip, port, passwd=pwd) as client:
 		response = client.run(cmd)
 		print(response)
+
+def save_rand_map_data(data: dict):
+	data["index"] += 3
+	if data["index"] > len(data["list"]) - 1:
+		data["index"] = 0
+		data["list"] = random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1)
+	with open("rand_maps.json", "w") as file:
+		json.dump(data, file, indent=4)
