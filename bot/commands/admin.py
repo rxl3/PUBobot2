@@ -329,7 +329,7 @@ async def rcon_cmd(ctx, ip: str, port: int, pwd: str, cmd: str):
 
 def save_rand_map_data(data: dict):
 	data["index"] += 3
-	if data["index"] > len(data["list"]) - 1:
+	if data["index"] > len(data["list"]) - 3:
 		data["index"] = 0
 		rmaps = random.sample(MAPS, len(MAPS))
 		rmaps = rmaps + random.sample(list(filter(lambda mp: mp not in rmaps[len(rmaps) - 2:], MAPS_PUG)), 1)
