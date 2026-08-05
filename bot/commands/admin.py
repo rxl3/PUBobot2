@@ -1,7 +1,7 @@
 __all__ = [
 	'noadds', 'noadd', 'forgive', 'rating_seed', 'rating_penality', 'rating_hide',
 	'rating_reset', 'rating_snap', 'stats_reset', 'stats_reset_player', 'stats_replace_player',
-	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity', 'book', 'vote_map', 'rcon_cmd'
+	'phrases_add', 'phrases_clear', 'undo_match', 'get_all_immunity', 'seed_immunity', 'book', 'vote_map', 'rcon_cmd', 'open_file_and_vote_map'
 ]
 
 import json
@@ -199,28 +199,28 @@ async def vote_map_msg(ctx, users: List[User | Member], vmm: Message | None = No
 		await vmm.edit(content="map picked")
 	return
 
-async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
-	print(users)
-
-	rand_map_data = {}
-
-	with open("rand_maps.json", "r") as file:
+async def open_file_and_vote_map(ctx, users):
+	with open("rand_maps.json", "r") as file:	
 		try:
 			data = json.load(file)
 			if data["list"] is None or len(data["list"]) < 3 or data["index"] is None:
 				raise Exception("data missing")
 			rand_map_data = {"list": data["list"], "index": data["index"]}
+			await vote_map(ctx, users, rand_map_data)
+
 		except: 
 			rand_map_data = {"list": random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1), "index": 0}
+			await vote_map(ctx, users, rand_map_data)
 
-
+async def vote_map(ctx, users, mapdata):
+	print(users)
 
 	vmm = await vote_map_msg(ctx, users=users, step=0)
 
-	randmapIndex: int = rand_map_data["index"]
-	rolls = rand_map_data["list"][(randmapIndex-3):randmapIndex]
+	randmapIndex: int = mapdata["index"]
+	rolls = mapdata["list"][(randmapIndex-3):randmapIndex]
 
-	print(str(rand_map_data))
+	print(str(mapdata))
 	
 	# rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
 
@@ -259,7 +259,7 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 				self.stop()
 				# set_tfmap(opts.pop())
 				await vote_map_msg(ctx, self.users, vmm=self.vmm, step=2)
-				save_rand_map_data(rand_map_data)
+				save_rand_map_data(mapdata)
 			await interact.response.edit_message(view=self)
 
 		@nextcord.ui.button(label=rolls[1], style=nextcord.ButtonStyle.blurple)
@@ -283,7 +283,7 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 				self.stop()
 				# self.parent.set_tfmap(opts.pop())
 				await vote_map_msg(ctx, self.users, vmm=self.vmm, step=2)
-				save_rand_map_data(rand_map_data)
+				save_rand_map_data(mapdata)
 			await interact.response.edit_message(view=self)
 
 		@nextcord.ui.button(label=rolls[2], style=nextcord.ButtonStyle.blurple)
@@ -307,7 +307,7 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 				self.stop()
 				# self.parent.set_tfmap(opts.pop())
 				await vote_map_msg(ctx, self.users, vmm=self.vmm, step=2)
-				save_rand_map_data(rand_map_data)
+				save_rand_map_data(mapdata)
 			await interact.response.edit_message(view=self)
 
 	view = Buttons()

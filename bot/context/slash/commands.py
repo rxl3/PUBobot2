@@ -132,7 +132,7 @@ async def _map_vote(
 		return await interaction.response.send_message(
 			embed=error_embed('You must possess server administrator permissions.'), ephemeral=True
 		)
-	await run_slash(bot.commands.vote_map, interaction=interaction, users=[interaction.user,interaction.user], lastmap=None)
+	await run_slash(bot.commands.open_file_and_vote_map, interaction=interaction, users=[interaction.user,interaction.user])
 	
 @groups.admin_testing.subcommand(name='rcon_cmd', description='Vote map')
 async def _rcon_cmd(
