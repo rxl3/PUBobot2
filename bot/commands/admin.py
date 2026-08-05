@@ -220,7 +220,10 @@ async def vote_map(ctx, users, mapdata):
 	vmm = await vote_map_msg(ctx, users=users, step=0)
 
 	randmapIndex: int = mapdata["index"]
-	rolls = mapdata["list"][(randmapIndex-3):randmapIndex]
+	if randmapIndex > 3:
+		rolls = mapdata["list"][(randmapIndex-3):randmapIndex]
+	else:
+		rolls = mapdata["list"][:3]
 
 	
 	# rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
