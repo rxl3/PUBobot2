@@ -331,6 +331,8 @@ def save_rand_map_data(data: dict):
 	data["index"] += 3
 	if data["index"] > len(data["list"]) - 1:
 		data["index"] = 0
-		data["list"] = random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1)
+		rmaps = random.sample(MAPS, len(MAPS))
+		rmaps = rmaps + random.sample(list(filter(lambda mp: mp not in rmaps[len(rmaps) - 2:], MAPS_PUG)), 1)
+		data["list"] = rmaps
 	with open("rand_maps.json", "w") as file:
 		json.dump(data, file, indent=4)
