@@ -209,7 +209,9 @@ async def open_file_and_vote_map(ctx, users):
 			rand_map_data = {"list": data["list"], "index": data["index"]}
 			await vote_map(ctx, users, rand_map_data)
 		except: 
-			rand_map_data = {"list": random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1), "index": 0}
+			rmaps = random.sample(MAPS, len(MAPS))
+			rmaps = rmaps + random.sample(list(filter(lambda mp: mp not in rmaps[len(rmaps) - 3:], MAPS_PUG)), 1)
+			rand_map_data = {"list": rmaps, "index": 0}
 			await vote_map(ctx, users, rand_map_data)
 
 async def vote_map(ctx, users, mapdata):
