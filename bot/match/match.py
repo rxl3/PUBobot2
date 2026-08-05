@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from time import time
 from itertools import combinations
 import random
@@ -445,9 +446,9 @@ class Match:
 		try:
 			await ctx.notice(embed=self.embeds.final_message())
 
-			lastmap = str(await get_last_map(ctx)) or None
-			print("lastmap:" + (lastmap or "none"))
-			await self.vote_map(ctx, users=[self.teams[0][0], self.teams[1][0]], lastmap=lastmap)
+			# lastmap = str(await get_last_map(ctx)) or None
+			# print("lastmap:" + (lastmap or "none"))
+			await self.vote_map(ctx, users=[self.teams[0][0], self.teams[1][0]])
 			# print(self.tfmap)
 		except DiscordException:
 			pass
@@ -487,9 +488,10 @@ class Match:
 	def set_tfmap(self, tfmap):
 		self.tfmap = tfmap
 
-	async def vote_map(self, ctx, users: List[User | Member], lastmap: str | None = None):
+	async def vote_map(self, ctx, users: List[User | Member]):
 
 		print(list(map(lambda u: u.name, users)))
+		sys.stdout.flush()
 
 		await self.vote_map_msg(ctx, users=users, step=0)
 		
@@ -498,8 +500,16 @@ class Match:
 		# rolls = rolls_5cp + rolls_koth
 
 		# opts = set(rolls)
+		
+
 		randmapIndex: int = self.rand_map_data["index"]
-		rolls = self.rand_map_data["list"][(randmapIndex-3):randmapIndex]
+		if randmapIndex >= 3:
+			rolls = self.rand_map_data["list"][randmapIndex:randmapIndex+3]
+		else:
+			rolls = self.rand_map_data["list"][:3]
+
+		# randmapIndex: int = self.rand_map_data["index"]
+		# rolls = self.rand_map_data["list"][(randmapIndex-3):randmapIndex]
 
 		opts = set(rolls)
 
@@ -592,8 +602,10 @@ class Match:
 
 def save_rand_map_data(data: dict):
 	data["index"] += 3
-	if data["index"] > len(data["list"]) - 1:
+	if data["index"] > len(data["list"]) - 3:
 		data["index"] = 0
-		data["list"] = random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1)
+		rmaps = random.sample(MAPS, len(MAPS))
+		rmaps = rmaps + random.sample(list(filter(lambda mp: mp not in rmaps[len(rmaps) - 2:], MAPS_PUG)), 1)
+		data["list"] = rmaps
 	with open("rand_maps.json", "w") as file:
 		json.dump(data, file, indent=4)
