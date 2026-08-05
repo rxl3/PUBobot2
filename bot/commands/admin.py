@@ -219,6 +219,8 @@ async def vote_map(ctx, users, lastmap, vmm: Message | None = None):
 
 	randmapIndex: int = rand_map_data["index"]
 	rolls = rand_map_data["list"][(randmapIndex-3):randmapIndex]
+
+	print(rand_map_data)
 	
 	# rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
 
