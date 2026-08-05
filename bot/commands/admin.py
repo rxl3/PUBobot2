@@ -207,20 +207,19 @@ async def open_file_and_vote_map(ctx, users):
 				raise Exception("data missing")
 			rand_map_data = {"list": data["list"], "index": data["index"]}
 			await vote_map(ctx, users, rand_map_data)
-
 		except: 
 			rand_map_data = {"list": random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1), "index": 0}
 			await vote_map(ctx, users, rand_map_data)
 
 async def vote_map(ctx, users, mapdata):
 	print(users)
+	print(str(mapdata))
 
 	vmm = await vote_map_msg(ctx, users=users, step=0)
 
 	randmapIndex: int = mapdata["index"]
 	rolls = mapdata["list"][(randmapIndex-3):randmapIndex]
 
-	print(str(mapdata))
 	
 	# rolls = random.sample(list(filter(lambda m: m != lastmap, MAPS)), 3) # replace string with lastmap
 
