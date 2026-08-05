@@ -5,6 +5,7 @@ __all__ = [
 ]
 
 import json
+import sys
 from time import time
 from datetime import timedelta
 from nextcord import Member, Message, TextChannel
@@ -214,6 +215,7 @@ async def open_file_and_vote_map(ctx, users):
 async def vote_map(ctx, users, mapdata):
 	print(users)
 	print(str(mapdata))
+	sys.stdout.flush()
 
 	vmm = await vote_map_msg(ctx, users=users, step=0)
 
