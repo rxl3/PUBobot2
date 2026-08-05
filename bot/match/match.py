@@ -215,12 +215,13 @@ class Match:
 		self.draft = Draft(self, self.cfg['pick_order'], self.cfg['captains_role_id'], list(map(lambda r: Role[r], self.cfg['pick_roles'])))
 		self.embeds = Embeds(self)
 		self.rand_map_data = {}
-
 		with open("rand_maps.json", "r") as file:
-			data = json.load(file)
-			if data:
+			try:
+				data = json.load(file)
+				if data["list"] is None or len(data["list"]) < 3 or data["index"] is None:
+					raise Exception("data missing")
 				self.rand_map_data = {"list": data["list"], "index": data["index"]}
-			else:
+			except: 
 				self.rand_map_data = {"list": random.sample(MAPS + random.sample(MAPS_PUG, 1), len(MAPS) + 1), "index": 0}
 
 	@staticmethod
