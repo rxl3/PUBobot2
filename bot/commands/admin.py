@@ -220,8 +220,8 @@ async def vote_map(ctx, users, mapdata):
 	vmm = await vote_map_msg(ctx, users=users, step=0)
 
 	randmapIndex: int = mapdata["index"]
-	if randmapIndex > 3:
-		rolls = mapdata["list"][(randmapIndex-3):randmapIndex]
+	if randmapIndex >= 3:
+		rolls = mapdata["list"][randmapIndex:randmapIndex+3]
 	else:
 		rolls = mapdata["list"][:3]
 
