@@ -50,14 +50,15 @@ async def book_serveme(ctx, match_id=None, tfmap="cp_process"):
                 break
 
         if existing_booking:
-            serveme_server = existing_booking['server']
+            booked_server = existingJson['reservations'][0]
+            serveme_server = booked_server['server']
             if len(matches) > 1: 
                 return {
                     "connect": "Auto-booked server is already in use, please manually book a server.",
                     "resolved_ip": serveme_server['resolved_ip'],
                     "port": serveme_server['port'],
-                    "password": existing_booking['password'],
-                    "rcon_password": existing_booking['rcon'],
+                    "password": booked_server['password'],
+                    "rcon_password": booked_server['rcon'],
                     "success": True
                 }
             else:
@@ -65,8 +66,8 @@ async def book_serveme(ctx, match_id=None, tfmap="cp_process"):
                     "connect": "Connect string: " + existing_message.jump_url,
                     "resolved_ip": serveme_server['resolved_ip'],
                     "port": serveme_server['port'],
-                    "password": existing_booking['password'],
-                    "rcon_password": existing_booking['rcon'],
+                    "password": booked_server['password'],
+                    "rcon_password": booked_server['rcon'],
                     "success": True
                 }
         else:
