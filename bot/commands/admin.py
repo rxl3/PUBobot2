@@ -334,7 +334,7 @@ async def rcon_cmd(ctx, rcon_str, cmd):
 	strings = rcon_str.split(' ')
 	ip_and_port = strings[1].split(':')
 	ip = ip_and_port[0]
-	port = ip_and_port[1]
+	port = ip_and_port[1].replace(';', '')
 	pwd = strings[3].replace('"', '')
 	print(' '.join([ip,port,pwd]))
 	sys.stdout.flush()
