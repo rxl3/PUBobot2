@@ -639,6 +639,12 @@ async def _top(
 ): await run_slash(bot.commands.top, interaction=interaction, period=period)
 
 
+@dc.slash_command(name='top_captains', description='Show top captains on the channel.', **guild_kwargs)
+async def _top(
+		interaction: Interaction,
+): await run_slash(bot.commands.top_captains, interaction=interaction)
+
+
 @dc.slash_command(name='rank', description='Show rating profile.', **guild_kwargs)
 async def _rank(
 		interaction: Interaction,

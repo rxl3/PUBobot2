@@ -545,6 +545,19 @@ async def top(channel_id, time_gap=None):
 	stats['players'] = data
 	return stats
 
+async def top_captains(channel_id, time_gap=None):
+	winners = await db.fetchone(
+		"select qpm.nick, count(*) as count from qc_player_matches qpm join qc_matches qm on qpm.match_id = qm.match_id where qpm.captain = 1 and qm.winner = qpm.team group by qpm.user_id and qm.channel_id=%s" + (f" AND qm.at>{time_gap} " if time_gap else "") + " order by count desc, qpm.nick limit 10",
+		(channel_id, )
+	)
+	# losers = await db.fetchone(
+	# 	"select qpm.nick, count(*) as count from qc_player_matches qpm join qc_matches qm on qpm.match_id = qm.match_id where qpm.captain = 1 and qm.winner != qpm.team group by qpm.user_id and qm.channel_id=%s" + (f" AND qm.at>{time_gap} " if time_gap else ""),
+	# 	(channel_id, )
+	# )
+	
+	# stats = dict(winners=winners['count'])
+	# stats['players'] = winners
+	return winners
 
 async def last_games(channel_id):
 	#  get last played ranked match for all players

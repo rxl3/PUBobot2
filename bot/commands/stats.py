@@ -1,4 +1,4 @@
-__all__ = ['last_game', 'stats', 'top', 'luck', 'rank', 'leaderboard', 'set_immunity']
+__all__ = ['last_game', 'stats', 'top', 'top_captains', 'luck', 'rank', 'leaderboard', 'set_immunity']
 
 from time import time
 from nextcord import Member, Embed, Colour
@@ -104,6 +104,20 @@ async def top(ctx, period=None):
 	for p in data['players']:
 		embed.add_field(name=p['nick'], value=str(p['count']), inline=True)
 	await ctx.reply(embed=embed)
+
+	
+
+async def top_captains(ctx):
+	data = await bot.stats.top_captains(ctx.qc.id, time_gap=None)
+	embed = Embed(
+		title=ctx.qc.gt("Top 10 captains for __{target}__").format(target=f"#{ctx.channel.name}"),
+		colour=Colour(0x50e3c2),
+		description=ctx.qc.gt("**Wins as captain**")
+	)
+	for p in data:
+		embed.add_field(name=p['nick'], value=str(p['count']), inline=True)
+	await ctx.reply(embed=embed)
+
 
 
 async def luck(ctx, rows=10, min_games=10):
@@ -261,3 +275,5 @@ async def leaderboard(ctx, page: int = 1):
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Leaderboard is empty."))
 	
 	await bot.stats.update_leaderboard(ctx)
+
+async def 
