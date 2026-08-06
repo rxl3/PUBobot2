@@ -146,6 +146,6 @@ async def rcon_cmd_exec(ctx, ip: str, port: str, pwd: str, cmd: str):
 		with Client(ip, int(port), passwd=pwd) as client:
 			response = client.run(cmd)
 			print(response)
-			await ctx.success(ctx.qc.gt("Done."))
+			await ctx.success(ctx.qc.gt("Exec: rcon " + cmd))
 	except:
 		await ctx.error(ctx.qc.gt("Could not parse command."))
