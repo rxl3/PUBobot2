@@ -275,5 +275,3 @@ async def leaderboard(ctx, page: int = 1):
 		raise bot.Exc.NotFoundError(ctx.qc.gt("Leaderboard is empty."))
 	
 	await bot.stats.update_leaderboard(ctx)
-
-async def 
