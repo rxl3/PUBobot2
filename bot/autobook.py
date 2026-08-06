@@ -32,7 +32,6 @@ tfmap_rcon_dict = {
 }
 
 async def book_serveme(ctx, match_id=None, tfmap="cp_process"):
-    print("map:"+tfmap)
     try:
         strings_channel = dc.get_channel(config.cfg.DC_STRINGS_CHANNEL_ID)
         rcon_channel = dc.get_channel(config.cfg.DC_RCON_CHANNEL_ID)
