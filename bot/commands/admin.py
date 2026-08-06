@@ -174,7 +174,7 @@ async def seed_immunity(ctx, channel_id, num):
 async def book(ctx, mapname="cp_process"):
 	booking = await book_serveme(ctx, tfmap=mapname)
 
-	str_msg = booking.connect
+	str_msg = booking['connect']
 	
 	await ctx.success(ctx.qc.gt(str_msg))
 # async def save_bot_state(ctx):
