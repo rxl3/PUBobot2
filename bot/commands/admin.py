@@ -336,4 +336,6 @@ async def rcon_cmd(ctx, rcon_str, cmd):
 	ip = ip_and_port[0]
 	port = ip_and_port[1]
 	pwd = strings[3].replace('"', '')
+	print(' '.join([ip,port,pwd]))
+	sys.stdout.flush()
 	await rcon_cmd_exec(ctx, ip=ip, port=port, pwd=pwd, cmd=cmd)
