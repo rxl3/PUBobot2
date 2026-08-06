@@ -640,7 +640,7 @@ async def _top(
 
 
 @dc.slash_command(name='top_captains', description='Show top captains on the channel.', **guild_kwargs)
-async def _top(
+async def _top_captains(
 		interaction: Interaction,
 ): await run_slash(bot.commands.top_captains, interaction=interaction)
 
