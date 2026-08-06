@@ -7,6 +7,8 @@ import random
 import string
 import datetime
 
+from rcon.source import Client
+
 tfmap_name_dict = {
     "cp_process": "cp_process_f12", 
     "cp_snakewater": "cp_snakewater_final1", 
@@ -16,6 +18,17 @@ tfmap_name_dict = {
     "cp_metalworks": "cp_metalworks_f7",
     "koth_product": "koth_product_final", 
     "koth_bagel": "koth_bagel_rc13"
+}
+
+tfmap_rcon_dict = {
+    "cp_process": "process", 
+    "cp_snakewater": "snakewater", 
+    "cp_sunshine": "sunshine", 
+    "cp_gullywash": "gullywash", 
+    "cp_reckoner": "reckoner", 
+    "cp_metalworks": "metalworks",
+    "koth_product": "product", 
+    "koth_bagel": "bagel"
 }
 
 async def book_serveme(ctx, match_id=None, tfmap="cp_process"):
@@ -38,10 +51,25 @@ async def book_serveme(ctx, match_id=None, tfmap="cp_process"):
                 break
 
         if existing_booking:
+            serveme_server = existing_booking['server']
             if len(matches) > 1: 
-                return "Auto-booked server is already in use, please manually book a server."
+                return {
+                    "connect": "Auto-booked server is already in use, please manually book a server.",
+                    "resolved_ip": serveme_server['resolved_ip'],
+                    "port": serveme_server['port'],
+                    "password": existing_booking['password'],
+                    "rcon_password": existing_booking['rcon'],
+                    "success": True
+                }
             else:
-                return "Connect string: " + existing_message.jump_url
+                return {
+                    "connect": "Connect string: " + existing_message.jump_url,
+                    "resolved_ip": serveme_server['resolved_ip'],
+                    "port": serveme_server['port'],
+                    "password": existing_booking['password'],
+                    "rcon_password": existing_booking['rcon'],
+                    "success": True
+                }
         else:
             response = requests.get("https://au.serveme.tf/api/reservations/new?api_key=" + config.cfg.SERVEME_API_KEY)
 
@@ -84,9 +112,19 @@ async def book_serveme(ctx, match_id=None, tfmap="cp_process"):
                         str_msg = await strings_channel.send(content=string_message)
                         rcon_msg = await rcon_channel.send(content=rcon_message)
                         
-                        return "Connect string: " + str_msg.jump_url
+                        return {
+                            "connect": "Connect string: " + str_msg.jump_url,
+                            "resolved_ip": serveme_server['resolved_ip'],
+                            "port": serveme_server['port'],
+                            "password": server_password,
+                            "rcon_password": rcon_password,
+                            "success": True
+                        }
                     else:
-                        return "Auto-booking didn't work :( please manually book a server."
+                        return {
+                            "connect": "Auto-booking didn't work :( please manually book a server.",
+                            "success": False
+                        }
                 else:
                     raise bot.Exc.NotFoundError(ctx.qc.gt("No available servers."))
             else:
@@ -96,3 +134,18 @@ async def book_serveme(ctx, match_id=None, tfmap="cp_process"):
     except requests.exceptions.RequestException as e:
         print('Error:', e)
         raise bot.Exc.NotFoundError(ctx.qc.gt("Error booking serveme."))
+
+
+async def rcon_cmd_exec(ctx, ip: str, port: str, pwd: str, cmd: str):
+	try:
+		# strings = rcon_str.split(' ')
+		# ip_and_port = strings[1].split(':')
+		# ip = ip_and_port[0]
+		# port = ip_and_port[1]
+		# pwd = strings[3].replace('"', '')
+		with Client(ip, port, passwd=pwd) as client:
+			response = client.run(cmd)
+			print(response)
+			ctx.qc.gt("Done.")
+	except:
+		ctx.qc.gt("Could not parse command.")

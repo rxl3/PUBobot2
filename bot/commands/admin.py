@@ -10,7 +10,7 @@ from time import time
 from datetime import timedelta
 from nextcord import Member, Message, TextChannel
 
-from bot.autobook import book_serveme
+from bot.autobook import book_serveme, rcon_cmd_exec
 from bot.match.match import MAPS, MAPS_PUG, Match
 from core.utils import seconds_to_str, get_nick
 
@@ -21,8 +21,6 @@ import random
 import nextcord
 from nextcord import Member, User
 from typing import List
-
-from rcon.source import Client
 
 async def noadds(ctx):
 	data = await bot.noadds.get_noadds(ctx)
@@ -322,11 +320,6 @@ async def vote_map(ctx, users, mapdata):
 
 	print('votemap')
 
-async def rcon_cmd(ctx, ip: str, port: int, pwd: str, cmd: str):
-	with Client(ip, port, passwd=pwd) as client:
-		response = client.run(cmd)
-		print(response)
-
 def save_rand_map_data(data: dict):
 	data["index"] += 3
 	if data["index"] > len(data["list"]) - 3:
@@ -336,3 +329,11 @@ def save_rand_map_data(data: dict):
 		data["list"] = rmaps
 	with open("rand_maps.json", "w") as file:
 		json.dump(data, file, indent=4)
+
+async def rcon_cmd(ctx, rcon_str, cmd):
+	strings = rcon_str.split(' ')
+	ip_and_port = strings[1].split(':')
+	ip = ip_and_port[0]
+	port = ip_and_port[1]
+	pwd = strings[3].replace('"', '')
+	await rcon_cmd_exec(ctx, ip=ip, port=port, pwd=pwd, cmd=cmd)

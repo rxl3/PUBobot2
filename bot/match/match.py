@@ -7,7 +7,7 @@ from nextcord import DiscordException, Message, TextChannel
 import json
 
 import bot
-from bot.autobook import book_serveme
+from bot.autobook import book_serveme, rcon_cmd_exec, tfmap_rcon_dict
 from bot.stats.stats import get_last_map
 from .enums import Role
 from core.utils import find, get, iter_to_dict, join_and, get_nick
@@ -208,6 +208,7 @@ class Match:
 		self.rcon_password = ""
 		self.picked_roles = []
 		self.vmm: Message
+		self.booking = {}
 
 		print(self.cfg['pick_roles'])
 
@@ -319,7 +320,8 @@ class Match:
 				await self.init_immune(self.cfg['captain_immunity_games'], self.cfg['pick_captains'])
 				await self.draft.start(ctx)
 				if self.cfg['autobook']:
-					self.connect_url = await book_serveme(ctx, self.id)
+					self.booking = await book_serveme(ctx, self.id)
+					self.connect_url = self.booking['connect']
 			elif self.state == self.WAITING_REPORT:
 				await self.start_waiting_report(ctx)
 		else:
@@ -485,8 +487,15 @@ class Match:
 		elif step == 2:
 			await self.vmm.edit(content="map picked")
 
-	def set_tfmap(self, tfmap):
+	async def set_tfmap(self, tfmap):
 		self.tfmap = tfmap
+
+		ip=self.booking['resolved_ip']
+		port=self.booking['port']
+		pwd=self.booking['rcon_password']
+		tfmap_rcon=tfmap_rcon_dict[tfmap]
+		await rcon_cmd_exec(self, ip=ip, port=port, pwd=pwd, cmd=tfmap_rcon)
+	
 
 	async def vote_map(self, ctx, users: List[User | Member]):
 
