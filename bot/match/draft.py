@@ -88,7 +88,7 @@ class Draft:
 			elif (team := find(lambda t: author in t[:1], self.m.teams[:2])) is None:
 				raise bot.Exc.PermissionError(self.m.gt("You are not a captain."))
 			elif picker_team is not None and picker_team is not team:
-				if pick_step > 0 and role is not self.m.picked_roles[self.pick_order[pick_step - 1]][-1] and player is team[-1]:
+				if pick_step > 0 and role is not self.m.picked_roles[self.pick_order[pick_step - 1]][-1] and player is team[-1] and find(lambda r: r == role, self.pick_roles[self.pick_order[pick_step - 1]]) is not None:
 					# change last picked role
 					self.pick_roles[self.pick_order[pick_step - 1]].append(self.m.picked_roles[self.pick_order[pick_step - 1]].pop())
 					self.pick_roles[self.pick_order[pick_step]].remove(role)
@@ -99,7 +99,7 @@ class Draft:
 					raise bot.Exc.PermissionError(self.m.gt("Not your turn to pick."))
 			elif player not in self.m.teams[2]:
 				raise bot.Exc.NotFoundError(self.m.gt("Specified player not in the unpicked list."))
-			elif find(lambda r: r == role, self.pick_roles[self.pick_order[pick_step - 1]]) is None:
+			elif find(lambda r: r == role, self.pick_roles[self.pick_order[pick_step]]) is None:
 				raise bot.Exc.ValueError(self.m.gt("Specified role cannot be picked."))
 
 			self.m.teams[2].remove(player)
