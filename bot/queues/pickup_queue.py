@@ -303,6 +303,12 @@ class PickupQueue:
 				default=False,
 				notnull=True,
 			),
+			Variables.BoolVar(
+				"map_voting", display="Auto map voting", section="General",
+				description="Auto map voting",
+				default=False,
+				notnull=True,
+			),
 		]
 	)
 
