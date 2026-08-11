@@ -74,49 +74,77 @@ class Draft:
 		team.insert(0, author)
 		await self.print(ctx)
 
-	async def pick(self, ctx, author, player: Member, role: Role):
-		print(role)
-		# for player in players:
-		pick_step = max(0, (len(self.m.teams[0]) + len(self.m.teams[1]) - 2))
-		picker_team = self.m.teams[self.pick_order[pick_step]] if pick_step < len(self.pick_order) - 1 else None
-		
-		print(self.pick_roles)
+	async def pick(self, ctx, author, player: Member, role: Role = Role.scout):
+		if self.m.cfg['role_picking']:
+			print(role)
+			# for player in players:
+			pick_step = max(0, (len(self.m.teams[0]) + len(self.m.teams[1]) - 2))
+			picker_team = self.m.teams[self.pick_order[pick_step]] if pick_step < len(self.pick_order) - 1 else None
+			
+			print(self.pick_roles)
 
-		if self.m.state != self.m.DRAFT:
-			raise bot.Exc.MatchStateError(self.m.gt("The match is not on the draft stage."))
-		elif (team := find(lambda t: author in t[:1], self.m.teams[:2])) is None:
-			raise bot.Exc.PermissionError(self.m.gt("You are not a captain."))
-		elif picker_team is not None and picker_team is not team:
-			if pick_step > 0 and role is not self.m.picked_roles[self.pick_order[pick_step - 1]][-1] and player is team[-1]:
-				# change last picked role
-				self.pick_roles[self.pick_order[pick_step - 1]].append(self.m.picked_roles[self.pick_order[pick_step - 1]].pop())
-				self.pick_roles[self.pick_order[pick_step]].remove(role)
-				self.m.picked_roles[self.pick_order[pick_step]].append(role)
-				await self.refresh(ctx)
-				return
-			else:
+			if self.m.state != self.m.DRAFT:
+				raise bot.Exc.MatchStateError(self.m.gt("The match is not on the draft stage."))
+			elif (team := find(lambda t: author in t[:1], self.m.teams[:2])) is None:
+				raise bot.Exc.PermissionError(self.m.gt("You are not a captain."))
+			elif picker_team is not None and picker_team is not team:
+				if pick_step > 0 and role is not self.m.picked_roles[self.pick_order[pick_step - 1]][-1] and player is team[-1]:
+					# change last picked role
+					self.pick_roles[self.pick_order[pick_step - 1]].append(self.m.picked_roles[self.pick_order[pick_step - 1]].pop())
+					self.pick_roles[self.pick_order[pick_step]].remove(role)
+					self.m.picked_roles[self.pick_order[pick_step]].append(role)
+					await self.refresh(ctx)
+					return
+				else:
+					raise bot.Exc.PermissionError(self.m.gt("Not your turn to pick."))
+			elif player not in self.m.teams[2]:
+				raise bot.Exc.NotFoundError(self.m.gt("Specified player not in the unpicked list."))
+			elif find(lambda r: r == role, self.pick_roles[self.pick_order[pick_step]]) is None:
+				raise bot.Exc.ValueError(self.m.gt("Specified role cannot be picked."))
+
+			self.m.teams[2].remove(player)
+			team.append(player)
+			self.pick_roles[self.pick_order[pick_step]].remove(role)
+			self.m.picked_roles[self.pick_order[pick_step]].append(role)
+
+			# auto last-pick rest of the players if possible
+			# if rest of pick_order covers the unpicked list
+			if len(self.m.teams[2]) and len(self.pick_order[pick_step+1:]) >= len(self.m.teams[2]):
+				# if rest of pick_order is a single team
+				if len(set(self.pick_order[pick_step+1:])) == 1:
+					picker_team = self.m.teams[self.pick_order[pick_step+1]]
+					picker_team.extend(self.m.teams[2])
+					self.m.teams[2].clear()
+					self.m.picked_roles[self.pick_order[pick_step+1]].append(self.pick_roles[self.pick_order[pick_step+1]].pop())
+
+			await self.refresh(ctx)
+		else:
+			# for player in players:
+			pick_step = max(0, (len(self.m.teams[0]) + len(self.m.teams[1]) - 2))
+			picker_team = self.m.teams[self.pick_order[pick_step]] if pick_step < len(self.pick_order) - 1 else None
+
+			if self.m.state != self.m.DRAFT:
+				raise bot.Exc.MatchStateError(self.m.gt("The match is not on the draft stage."))
+			elif (team := find(lambda t: author in t[:1], self.m.teams[:2])) is None:
+				raise bot.Exc.PermissionError(self.m.gt("You are not a captain."))
+			elif picker_team is not None and picker_team is not team:
 				raise bot.Exc.PermissionError(self.m.gt("Not your turn to pick."))
-		elif player not in self.m.teams[2]:
-			raise bot.Exc.NotFoundError(self.m.gt("Specified player not in the unpicked list."))
-		elif find(lambda r: r == role, self.pick_roles[self.pick_order[pick_step]]) is None:
-			raise bot.Exc.ValueError(self.m.gt("Specified role cannot be picked."))
+			elif player not in self.m.teams[2]:
+				raise bot.Exc.NotFoundError(self.m.gt("Specified player not in the unpicked list."))
 
-		self.m.teams[2].remove(player)
-		team.append(player)
-		self.pick_roles[self.pick_order[pick_step]].remove(role)
-		self.m.picked_roles[self.pick_order[pick_step]].append(role)
+			self.m.teams[2].remove(player)
+			team.append(player)
 
-		# auto last-pick rest of the players if possible
-		# if rest of pick_order covers the unpicked list
-		if len(self.m.teams[2]) and len(self.pick_order[pick_step+1:]) >= len(self.m.teams[2]):
-			# if rest of pick_order is a single team
-			if len(set(self.pick_order[pick_step+1:])) == 1:
-				picker_team = self.m.teams[self.pick_order[pick_step+1]]
-				picker_team.extend(self.m.teams[2])
-				self.m.teams[2].clear()
-				self.m.picked_roles[self.pick_order[pick_step+1]].append(self.pick_roles[self.pick_order[pick_step+1]].pop())
+			# auto last-pick rest of the players if possible
+			# if rest of pick_order covers the unpicked list
+			if len(self.m.teams[2]) and len(self.pick_order[pick_step+1:]) >= len(self.m.teams[2]):
+				# if rest of pick_order is a single team
+				if len(set(self.pick_order[pick_step+1:])) == 1:
+					picker_team = self.m.teams[self.pick_order[pick_step+1]]
+					picker_team.extend(self.m.teams[2])
+					self.m.teams[2].clear()
 
-		await self.refresh(ctx)
+			await self.refresh(ctx)
 
 	async def put(self, ctx, player: Member, team_name, pos: int):
 		if (team := find(lambda t: t.name.lower() == team_name.lower(), self.m.teams)) is None:

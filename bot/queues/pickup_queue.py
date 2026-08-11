@@ -292,6 +292,12 @@ class PickupQueue:
 				notnull=True,
 			),
 			Variables.StrVar(
+				"role_picking", display="Enable role picking", section="General",
+				description="Enable role picking during draft",
+				default=False,
+				notnull=True,
+			),
+			Variables.StrVar(
 				"pick_roles", display="List of roles each team must pick", section="General",
 				description="Can be list of [scout, soldier, demo, flex]",
 				default=["scout","scout","soldier","soldier","demo"],

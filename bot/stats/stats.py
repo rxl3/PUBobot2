@@ -173,7 +173,7 @@ async def register_match_unranked(ctx, m):
 		else:
 			team = None
 
-		role = m.picked_roles[team][m.teams[team].index(p)]
+		role = m.picked_roles[team][m.teams[team].index(p)] if m.cfg['role_picking'] else None
 
 		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
 
@@ -240,7 +240,7 @@ async def register_match_ranked(ctx, m):
 		nick = get_nick(p)
 		team = 0 if p in m.teams[0] else 1
 		captain = 1 if p == m.teams[0][0] or p == m.teams[1][0] else 0
-		role = m.picked_roles[team][m.teams[team].index(p)]
+		role = m.picked_roles[team][m.teams[team].index(p)] if m.cfg['role_picking'] else None
 
 		# If captain & immunity < max, set the immunity value to max. If immunity >= max then leave it as is
 		new_immunity = before[p.id]['immunity']

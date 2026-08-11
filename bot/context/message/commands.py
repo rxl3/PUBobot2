@@ -155,13 +155,18 @@ async def _pick(ctx: MessageContext, args: str = None):
 		raise bot.Exc.SyntaxError(f"Usage: {ctx.qc.cfg.prefix}pick __player__")
 
 	members = [await ctx.get_member(i.strip()) for i in args.strip().split(" ")[:-1]]
-	role = args.strip().split(" ").pop()
+	
 	if None in members:
 		raise bot.Exc.SyntaxError(ctx.qc.gt("Specified user not found."))
-	elif len(args.strip().split(" ")) < 3 or Role[role] is None:
-		raise bot.Exc.SyntaxError(ctx.qc.gt("Missing role."))
+	if ctx.qc.cfg['role_picking']:
+		role = Role[args.strip().split(" ").pop()]
+		if len(args.strip().split(" ")) < 3 or role is None:
+			raise bot.Exc.SyntaxError(ctx.qc.gt("Missing role."))
 
-	await bot.commands.pick(ctx, players=members, role=role)
+		await bot.commands.pick(ctx, player=members[0], role=role)
+	else:
+		await bot.commands.pick(ctx, player=members[0])
+
 
 
 @message_command('report_loss', 'rl')

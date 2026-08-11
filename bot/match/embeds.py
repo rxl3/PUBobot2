@@ -105,6 +105,15 @@ class Embeds:
 				for index, p in enumerate(t)
 			]) if len(t) else self.m.gt("empty")
 			for tindex, t in enumerate(self.m.teams[:2])
+		] if self.m.cfg['role_picking'] else [
+			" \u200b ".join([
+					" \u200b {mention}".format(
+						mention=get_mention(p),
+						role_icons=get_class_role_icons(p, self.m.cfg['class_roles'])
+					)
+				for p in enumerate(t)
+			]) if len(t) else self.m.gt("empty")
+			for t in enumerate(self.m.teams[:2])
 		]
 		embed.add_field(name=teams_names[0], value=" \u200b ❲ \u200b " + team_players[0] + " \u200b ❳", inline=False)
 		embed.add_field(name=teams_names[1], value=" \u200b ❲ \u200b " + team_players[1] + " \u200b ❳\n\u200b", inline=False)
@@ -180,7 +189,6 @@ class Embeds:
 		return embed
 
 	def final_message(self):
-		print(self.m.picked_roles)
 		show_ranks = bool(self.m.ranked and not self.m.qc.cfg.rating_nicks)
 		embed = Embed(
 			colour=Colour(0x27b75e),
@@ -211,6 +219,13 @@ class Embeds:
 					for index, p in enumerate(t)
 				])
 				for tindex, t in enumerate(self.m.teams[:2])
+			] if self.m.cfg['role_picking'] else [
+				" \u200b " +
+				" \u200b ".join([
+					(f"`{self.m.rank_str(p)}`" if show_ranks else "") + f"<@{p.id}>"
+					for p in enumerate(t)
+				])
+				for t in enumerate(self.m.teams[:2])
 			]
 			team_players[1] += "\n\u200b"  # Extra empty line
 			embed.add_field(name=teams_names[0], value=team_players[0], inline=False)
