@@ -456,7 +456,7 @@ class Match:
 
 			# lastmap = str(await get_last_map(ctx)) or None
 			# print("lastmap:" + (lastmap or "none"))
-			if self.cfg['map_voting']:
+			if self.queue.cfg['map_voting']:
 				await self.vote_map(ctx, users=[self.teams[0][0], self.teams[1][0]])
 			# print(self.tfmap)
 		except DiscordException:

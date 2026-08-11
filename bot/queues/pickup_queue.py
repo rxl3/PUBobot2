@@ -394,7 +394,8 @@ class PickupQueue:
 			class_roles=self.cfg.class_roles.split(",") if self.cfg.class_roles else None,
 			role_picking=self.cfg.role_picking,
 			show_checkin_timer=self.cfg.show_checkin_timer, player_list_format=self.cfg.player_list_format, 
-			autobook=self.cfg.autobook, pick_roles=self.cfg.pick_roles.split(",")
+			autobook=self.cfg.autobook, pick_roles=self.cfg.pick_roles.split(","),
+			map_voting=self.cfg.map_voting
 		)
 
 	async def promote(self, ctx):
