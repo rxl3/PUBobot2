@@ -48,7 +48,7 @@ class Match:
 		pick_order=None, maps=[], vote_maps=0, map_count=0, check_in_timeout=0,
 		check_in_discard=True, match_lifetime=3*60*60, start_msg=None, server=None, show_streamers=True,
 		captain_immunity_games=0, division_roles=[], class_roles=[], show_checkin_timer=False, player_list_format="{name}",
-		pick_roles=["flex"], autobook=False
+		pick_roles=["flex"], autobook=False, role_picking=False, map_voting=False
 	)
 
 	class Team(list):
@@ -456,7 +456,7 @@ class Match:
 
 			# lastmap = str(await get_last_map(ctx)) or None
 			# print("lastmap:" + (lastmap or "none"))
-			if self.cfg['votemap']:
+			if self.cfg['map_voting']:
 				await self.vote_map(ctx, users=[self.teams[0][0], self.teams[1][0]])
 			# print(self.tfmap)
 		except DiscordException:
@@ -614,7 +614,6 @@ class Match:
 				await interact.response.edit_message(view=self)
 		view = Buttons(self)
 		await ctx.notice(view=view)
-		print('votemap')
 
 def save_rand_map_data(data: dict):
 	data["index"] += 3
