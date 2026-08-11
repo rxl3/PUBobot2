@@ -99,7 +99,7 @@ class Draft:
 					raise bot.Exc.PermissionError(self.m.gt("Not your turn to pick."))
 			elif player not in self.m.teams[2]:
 				raise bot.Exc.NotFoundError(self.m.gt("Specified player not in the unpicked list."))
-			elif find(lambda r: r == role, self.pick_roles[self.pick_order[pick_step]]) is None:
+			elif find(lambda r: r == role, self.pick_roles[self.pick_order[pick_step - 1]]) is None:
 				raise bot.Exc.ValueError(self.m.gt("Specified role cannot be picked."))
 
 			self.m.teams[2].remove(player)
