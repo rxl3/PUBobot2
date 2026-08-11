@@ -296,6 +296,12 @@ class Match:
 			if (pick_captains == "no captains"):
 				self.temporary_captains = [p.id for p in self.players[:2]]
 
+				# auto add captains to teams
+				self.teams[0].append(self.players[:2][0])
+				self.teams[1].append(self.players[:2][1])
+				self.teams[2].remove(self.players[:2][0])
+				self.teams[2].remove(self.players[:2][1])
+
 	async def think(self, frame_time):
 		if self.state == self.INIT:
 			await self.next_state(bot.SystemContext(self.qc))
