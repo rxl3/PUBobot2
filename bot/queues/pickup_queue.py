@@ -291,7 +291,7 @@ class PickupQueue:
 				default="{name}",
 				notnull=True,
 			),
-			Variables.StrVar(
+			Variables.BoolVar(
 				"role_picking", display="Enable role picking", section="General",
 				description="Enable role picking during draft",
 				default=False,
