@@ -158,7 +158,7 @@ async def _pick(ctx: MessageContext, args: str = None):
 	
 	if None in members:
 		raise bot.Exc.SyntaxError(ctx.qc.gt("Specified user not found."))
-	if ctx.qc.cfg['role_picking']:
+	if ctx.qc.cfg.role_picking:
 		role = Role[args.strip().split(" ").pop()]
 		if len(args.strip().split(" ")) < 3 or role is None:
 			raise bot.Exc.SyntaxError(ctx.qc.gt("Missing role."))

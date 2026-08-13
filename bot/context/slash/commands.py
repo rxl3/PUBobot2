@@ -611,7 +611,7 @@ _cap_for.on_autocomplete('team')(autocomplete.teams_by_author)
 async def _pick(
 		interaction: Interaction,
 		player: Member = SlashOption(name="player", verify=False),
-		role: str = SlashOption(name="role", choices=["scout", "soldier", "demo"])
+		role: str = SlashOption(name="role", choices=["scout", "soldier", "demo"], required=False)
 ): await run_slash(bot.commands.pick, interaction=interaction, player=player, role=role)
 
 
