@@ -153,8 +153,8 @@ class Embeds:
 						rating=self.m.ratings[p.id],
 						name=get_nick(p),
 						mention=get_mention(p),
-						# div=get_div_role(p, divs),
-						# classes=get_class_roles(p, self.m.cfg['class_roles']),
+						div=get_div_role(p, divs),
+						classes=get_class_roles(p, self.m.cfg['class_roles']),
 						immune=f" - **IMMUNE: x{self.m.immune[int(p.id)]}**" if p.id in self.m.immune else "",
 						forced_meds=f" - {self.m.forced_captains[int(p.id)]} med games left" if p.id in self.m.forced_captains else ""
 					)

@@ -168,12 +168,9 @@ def get_class_roles(user, class_roles):
 		return ""
 
 class_role_icons_dict = {
-	"SCOUT": "<:scout1:1360561390707937280>",
-	"scout": "<:scout2:1360561392721334332>",
-	"SOLDIER": "<:soldier1:1360561394726080573>",
-	"soldier": "<:soldier2:1360561396953255986>",
-	"DEMO": "<:demoman1:1360561385465057431>",
-	"demo": "<:demoman2:1360561387746758706>",
+	"scout": "<:SCOUT:1535987183725584384>",
+	"soldier": "<:SOLDIER:1535987711419219968>",
+	"demo": "<:DEMO:1535987751613104169>",
 }
 
 def get_icon_for_role(role):
